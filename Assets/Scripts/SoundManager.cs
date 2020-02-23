@@ -17,9 +17,9 @@ public class SoundManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        player = gameObject.GetComponent<AudioSource>();
         musicVolume = PlayerPrefs.GetFloat("musicVolume",1f);
         effectVolume = PlayerPrefs.GetFloat("effectVolume",1f);
-        player = gameObject.GetComponent<AudioSource>();
         player.volume = musicVolume;
         LoadAndPlay("bgm");
     }
@@ -35,8 +35,25 @@ public class SoundManager : MonoBehaviour
         }
         player.volume = music;
     }
+    public void PlayEffect(string name){
+        AudioClip src = Resources.Load<AudioClip>("sound/effect/"+name);
+        PlayEffect(src);
+    }
+    public void PlayEffect(AudioClip src){
+        if (src == null){
+            return;
+        }
+        GameObject gO = new GameObject("SFX");
+        AudioSource sfx = gO.AddComponent(typeof(AudioSource)) as AudioSource;
+        gO.AddComponent(typeof(DelayedSelfDestroy));
+        sfx.volume = effectVolume;
+        sfx.clip = src;
+        sfx.Play();
+    }
 
     public void LoadAudio(string name){
+        if (player == null)
+            player = gameObject.GetComponent<AudioSource>();
         player.Stop();
         AudioClip aud = Resources.Load<AudioClip>("sound/"+name);
         if (aud == null)

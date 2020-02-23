@@ -7,6 +7,9 @@ public class VirtualRigidbodyHandler : MonoBehaviour
     public bool isGrounded;
     public Rigidbody2D rigid;
     public Vector2 tVector;
+    public VirtualRigidbodySensor upSensor;
+    public VirtualRigidbodySensor rightSensor;
+    public VirtualRigidbodySensor leftSensor;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +26,23 @@ public class VirtualRigidbodyHandler : MonoBehaviour
         isGrounded = false;  
         rigid.drag = 50f;        
         rigid.gravityScale = 10f;  
+    }
+
+    public Vector3 GetFinePosition(){
+        Vector3 adjust = new Vector3(0f,0f,0f);
+        if (upSensor.isActivated){
+            // adjust.x = 0.1f;
+            adjust.y = -0.1f;
+        }
+        if (rightSensor.isActivated){
+            // adjust.x = 0.1f;
+            adjust.y = -0.1f;
+        }
+        if (leftSensor.isActivated){
+            // adjust.x = 0.1f;
+            adjust.y = -0.1f;
+        }
+        return this.transform.position + adjust;
     }
 
     public void SetMovingRigidbody(){

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class CommonUIController : UIController
 {
     [Header("SETTINGS")]
-    public GameController gameController;
     // public GameObject yourTurnPanel;
     public GameObject loginPanel;
     public GameObject mainPanel;
@@ -25,14 +24,6 @@ public class CommonUIController : UIController
     // public int angle;
     // public Dictionary<string, int> propDict;
     
-
-	public void ChangeMusicVolume(Slider doer){
-        gameController.soundManager.ChangeVolume(doer.value,-1f);
-    }
-
-	public void ChangeEffectVolume(Slider doer){
-        gameController.soundManager.ChangeVolume(-1f,doer.value);
-    }
 
     public void LogOut(){
         PlayerPrefs.DeleteAll();
@@ -228,17 +219,31 @@ public class CommonUIController : UIController
 		gameController.ConnectHost(GameObject.Find("HsIPA_InputField_Text").GetComponent<Text>().text);
         GameObject.Find("HostIpPanel").SetActive(false);
     }
+    [Header("Set Match UI")]
+    public GameObject matchButton;
+    public GameObject readyButton;
+    public GameObject cancelButton;
 
-
+    public void OpenMatch(){
+        matchButton.SetActive(false);
+        countUpUI.SetActive(true);
+        gameController.StartMatch();
+    }
     public void SoloPVPMatch(){
         countUpUI.SetActive(true);
         gameController.StartMatch();
     }
     
     public void CancelMatch(){
+        matchButton.SetActive(true);
         countUpUI.SetActive(false);
         gameController.StopMatch();
     }
+
+    public void OpenRegister(){
+        gameController.connector.OpenRegister();
+    }
+
     public void LoginToHost(){
 		string id = loginIdText.text;
         if (string.IsNullOrEmpty(id)){

@@ -5,6 +5,16 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {       
+    
+    public GameController gameController;
+	public void ChangeMusicVolume(Slider doer){
+        gameController.soundManager.ChangeVolume(doer.value,-1f);
+    }
+
+	public void ChangeEffectVolume(Slider doer){
+        gameController.soundManager.ChangeVolume(-1f,doer.value);
+    }
+
     public virtual void SetUpMainPlayerController(){}
     public virtual void UpdatePlayerInfo(){}
     public virtual void SetArrowButtonDown(string buttonName){}

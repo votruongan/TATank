@@ -62,6 +62,8 @@ public class LivingController : BaseObjectController
     
     //Update heathbar
     public void UpdateHealthBar(int colorCode, float percent){
+        if (healthBar == null)
+            healthBar = this.FindChildObject("ForeHealth").GetComponent<HealthBarSprite>();
         if (colorCode == 1)
             healthBar.ChangeToBlue();
         else
@@ -168,12 +170,12 @@ public class LivingController : BaseObjectController
 
     //Move to position in Unity unit
     public void MoveTo(int milisec, Vector3 pos){
-        if (anim != null){
-           anim.SetBool("isMoving",true);
-        }
-        if (equipAnimators.Length > 0){
-            PlayEquipAnimation("PlayerMove");
-        }
+        // if (anim != null){
+        //    anim.SetBool("isMoving",true);
+        // }
+        // if (equipAnimators.Length > 0){
+        //     PlayEquipAnimation("PlayerMove");
+        // }
         if ((pos - this.transform.position).x > 0){
             if (!isHeadingRight)
                 RotateLiving();

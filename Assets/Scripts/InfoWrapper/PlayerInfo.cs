@@ -1,12 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class PlayerInfo
+public class PlayerInfo : BaseInfoWrapper
 {
 	public bool isNoHole;
 	public bool isLiving;
@@ -31,27 +28,19 @@ public class PlayerInfo
 	public int team;	// 1: blue, 2: red
 	public PlayerInfo(){}
 
-	public string ToString(){
-        string output = JsonUtility.ToJson(this, true);
-		string prop3 = JsonUtility.ToJson(style, true);
-		string prop4 = JsonUtility.ToJson(color, true);
-		output = output + "\n" + prop3 + "\n" + prop4;
-        return output;
-	}
-
     public PlayerInfo Clone()
     {
-        using (var ms = new MemoryStream())
-        {
-            var formatter = new BinaryFormatter();
-            formatter.Serialize(ms, this);
-            ms.Position = 0;
+        // using (MemoryStream ms = new MemoryStream())
+        // {
+        //     BinaryFormatter formatter = new BinaryFormatter();
+        //     formatter.Serialize(ms, this);
+        //     ms.Position = 0;
 
-            return (PlayerInfo) formatter.Deserialize(ms);
-        }
+        //     return (PlayerInfo) formatter.Deserialize(ms);
+        // }
+        return (PlayerInfo) this.MemberwiseClone();
     }
 
-	
     public static int ConvertStyleId(string equipType, bool isMale, int equipId){
         // Debug.Log(equipType + " - " +equipId);
         if (equipId == 0)

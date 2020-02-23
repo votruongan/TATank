@@ -159,6 +159,10 @@ namespace Game.Base.Packets
 		}
 		public void UnCompress()
 		{
+			// byte[] array = Marshal.Uncompress(this.m_buffer);
+			// this.m_offset = 0;
+			// this.Write(array);
+			// this.m_length = array.Length - 20;
 		}
 		public void ClearContext()
 		{

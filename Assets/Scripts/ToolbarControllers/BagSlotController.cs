@@ -14,6 +14,11 @@ public class BagSlotController : MonoBehaviour
     }
     public void LoadDisplay(string path){
         Texture2D te = Resources.Load<Texture2D>(path);
+        if (te == null){
+            slotImage.color = new Color(28/255,10/255,200/255,1f);
+            slotImage.texture = null;
+            return;
+        }
         slotImage.color = Color.white;
         slotImage.texture = te;
     }

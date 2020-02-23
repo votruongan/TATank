@@ -49,7 +49,8 @@ public class InitTestGameScene : MonoBehaviour
         PlayerInfo pInf = new PlayerInfo();
         pInf.blood = 12345;
         gC.mainPlayerController.SetPlayerInfo(pInf);
-        gC.mainPlayerController.Damaged(2000,1647,false,12345-1647);
-        SwitchScene("Scene_Game","Scene_Front");
+		// gC.explosionController.DelayedExecute(2000,gC.mainPlayerController.transform.position);
+        // gC.mainPlayerController.Damaged(2000,1647,false,12345-1647);
+        gC.PlayerFire(0,100,100,100);
     }
 }

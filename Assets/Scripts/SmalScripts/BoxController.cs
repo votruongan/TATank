@@ -16,6 +16,7 @@ public class BoxController : MonoBehaviour
         gameObject.GetComponent<Animator>().SetBool("isCollided",true);
         dsd.SetStarted(true);
     }
+    
     void OnTriggerEnter2D(Collider2D col){
         Debug.Log("Trigger collider2d enter");
         gameObject.GetComponent<Animator>().SetBool("isCollided",true);

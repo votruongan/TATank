@@ -79,8 +79,8 @@ public class ForegroundController : MonoBehaviour
 		Vector3 res = new Vector3 (bottomLeftPosition.x + pos.x, 
 							bottomLeftPosition.y + pos.y,
 							 0f);
-		Debug.Log(" Pixel " + pos.ToString() + " -> world: " + res.ToString()+ 
-			"BLP: "+ bottomLeftPosition.ToString());
+		// Debug.Log(" Pixel " + pos.ToString() + " -> world: " + res.ToString()+ 
+			// "BLP: "+ bottomLeftPosition.ToString());
 		return res;
 	}
 

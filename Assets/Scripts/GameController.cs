@@ -7,8 +7,10 @@ using ConnectorSpace;
 
 public class GameController : MonoBehaviour
 {
+	[Header("For References")]
+	public bool isStarted = false;
     [Header("FOR DEBUGGING")]
-    public bool isOnLocalTest;
+    public bool isOnLocalTest = false;
 	public bool isFrontScene;
     public ConnectorManager connector;
 	public ExplosionController explosionController;
@@ -26,6 +28,7 @@ public class GameController : MonoBehaviour
     [Header("PREFABS")]
     public GameObject playerPrefab;
     public GameObject mainPlayerPrefab;
+	private int[] playerIdCache;
 
     public static void LogToScreen(string log){
         debugString += "\n" + log;
@@ -38,7 +41,7 @@ public class GameController : MonoBehaviour
 #region CONNECTOR_HANDLER
 	public GameObject BoxSprite;
     public void PlayerTurn(int pId, List<BoxInfo> newBoxes, List<PlayerInfo> playerList){
-    	PlayerController pCtrl = SearchPlayerId(pId);
+    	PlayerController pCtrl = FindPlayerById(pId);
     	if (pCtrl == null){
     		return;
     	}
@@ -52,7 +55,7 @@ public class GameController : MonoBehaviour
         	countDownController.ToggleObject(false);
     	}
 		foreach(PlayerInfo p in playerList){
-			PlayerController setPCtrl = SearchPlayerId(p.id);
+			PlayerController setPCtrl = FindPlayerById(p.id);
 			if (setPCtrl == null)
 				continue;
 			setPCtrl.UpdatePlayerInfo(p);
@@ -70,22 +73,28 @@ public class GameController : MonoBehaviour
 	}
 
 
-	PlayerController SearchPlayerId(int pId){
+	PlayerController FindPlayerById(int pId){
 		PlayerController pCtrl = null;
 		if (pId == mainPlayerController.info.id){
 		 	pCtrl = mainPlayerController;
 		}else{
-			foreach(PlayerController pC in playerControllers){
-				if (pC.info.id == pId){
-					pCtrl = pC;
-					break;
+			if (playerIdCache == null){
+				playerIdCache = new int[]{-1,-1,-1,-1,-1,-1,-1,-1};
+				for(int i = 0; i < playerControllers.Count; i++){
+					playerIdCache[i] = playerControllers[i].info.id;
 				}
 			}
+			for(int i = 0; i < playerControllers.Count; i++){
+				if (playerIdCache[i] == pId){
+					pCtrl = playerControllers[i];
+				}
+			}
+
 		}
 		return pCtrl;
 	}
 	public void PlayerDamage( int delayedTime, int pId, int damage,bool critical, int remainingBlood){
-		PlayerController pCtrl = SearchPlayerId(pId);
+		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
 			return;
 		pCtrl.Damaged(delayedTime,damage,critical,remainingBlood);
@@ -93,7 +102,7 @@ public class GameController : MonoBehaviour
 
     // add the destination to explode
     public void PlayerFire(int pId, int time, int pVx, int pVy){
-		PlayerController pCtrl = SearchPlayerId(pId);
+		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
 			return;
 		float vx = pVx / 100;
@@ -105,7 +114,7 @@ public class GameController : MonoBehaviour
 
 
     public void PlayerDirection(int pId, int dir){
-		PlayerController pCtrl = SearchPlayerId(pId);
+		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
 			return;
 		if ((pCtrl.isHeadingRight && dir == 255)
@@ -121,7 +130,7 @@ public class GameController : MonoBehaviour
 		// 	return;
 		// }
 
-		PlayerController pC = SearchPlayerId(pId);
+		PlayerController pC = FindPlayerById(pId);
 		if (pC == null)
 			return;
 		Vector2 pPos = new Vector2(x,y);
@@ -129,7 +138,7 @@ public class GameController : MonoBehaviour
     	pC.MoveTo(pos,dir);
     }
     public void PlayerUsingProp(int pId, byte propType,int place,int templateId){
-		PlayerController pC = SearchPlayerId(pId);
+		PlayerController pC = FindPlayerById(pId);
 		if (pC == null)
 			return;
 			
@@ -141,7 +150,7 @@ public class GameController : MonoBehaviour
 
     }
     public void PlayerFly(int time, int pId, int m_x,int m_y){
-		PlayerController pC = SearchPlayerId(pId);
+		PlayerController pC = FindPlayerById(pId);
 		if (pC == null)
 			return;
 		explosionController.CancelDelayedExecution();
@@ -158,8 +167,6 @@ public class GameController : MonoBehaviour
     		}
     	}
     }
-
-
 	public void LoadMap(int mapId)
 	{
 		uiController.SetLoadingScreen(true);
@@ -174,6 +181,7 @@ public class GameController : MonoBehaviour
 		digController.isDiggable  = false;
 		mainCamController.UpdateClamp(foreController.transform.position,foreController.bottomLeftPosition);
 		minimapCamController.TranslateTo(foreController.transform.position);
+		connector.SendLoadComplete();
 	}
 	public void GameOver()
 	{
@@ -193,16 +201,20 @@ public class GameController : MonoBehaviour
 		// 	Debug.Log(p.ToString());
 		// }
 		uiController.SetLoadingScreen(true);
+		connector.playerInfos = Players;
+		isStarted = false;
+		if (isOnLocalTest)
+			return;
 		SwitchScene("Scene_Front","Scene_Game");
 	}	
 
 	
     void SwitchScene(string from, string to){
         Scene temp = SceneManager.CreateScene("temp");
+		connector.isSceneTransforming = true;
         StartCoroutine(ExecSwitchScene(from,to));
     }
     IEnumerator ExecSwitchScene(string from, string to){
-        yield return null;
         AsyncOperation lao = SceneManager.LoadSceneAsync(to,LoadSceneMode.Additive);
         lao.allowSceneActivation = false;
         while (!lao.isDone){
@@ -211,6 +223,7 @@ public class GameController : MonoBehaviour
                 Debug.Log("load done");
                 break;
             }
+        	yield return null;
         }
         AsyncOperation uao = SceneManager.UnloadSceneAsync(from);
         lao.allowSceneActivation = true;
@@ -219,9 +232,9 @@ public class GameController : MonoBehaviour
 
 	public void StartGame(List<PlayerInfo> Players)
 	{
-		foreach(PlayerInfo p in Players){
-			Debug.Log(p.ToString());
-		}
+		// foreach(PlayerInfo p in Players){
+		// 	Debug.Log(p.ToString());
+		// }
 		//Remove all Spawned players on scene
 		foreach (GameObject pOb in GameObject.FindGameObjectsWithTag("Player")){
 			Destroy(pOb);
@@ -256,7 +269,7 @@ public class GameController : MonoBehaviour
 		}
 		mainCamController.TranslateTo(mainPlayerController.transform.position);
 		uiController.SetUpMainPlayerController();
-		Debug.Log("UpdateMainPlayerController called");
+		// Debug.Log("UpdateMainPlayerController called");
 		uiController.SetLoadingScreen(false);
 	}	
 #endregion
@@ -280,12 +293,12 @@ public class GameController : MonoBehaviour
 			}
 		}
     	Vector2 pPos = foreController.WorldPositionToPixel(mainPlayerController.transform.position, true);
-		if (isOnLocalTest){
-			Debug.Log("Main Player Fired: " + ((int)(mainPlayerController.isHeadingRight?(byte)1:(byte)255)).ToString());
-			Debug.Log("Main Player Fired: " + ((int)pPos.x).ToString() + ", "+
-						 ((int)pPos.y).ToString() + ", " + force.ToString()+ ", " + angle.ToString());
-			return;
-		}
+		// if (isOnLocalTest){
+		// 	Debug.Log("Main Player Fired: " + ((int)(mainPlayerController.isHeadingRight?(byte)1:(byte)255)).ToString());
+		// 	Debug.Log("Main Player Fired: " + ((int)pPos.x).ToString() + ", "+
+		// 				 ((int)pPos.y).ToString() + ", " + force.ToString()+ ", " + angle.ToString());
+		// 	return;
+		// }
 		connector.SendDirection(mainPlayerController.isHeadingRight?(byte)1:(byte)255);
 		//Send ShootTag and Shoot packet
     	connector.SendShoot((int)pPos.x,(int)pPos.y,force,angle);
@@ -295,11 +308,11 @@ public class GameController : MonoBehaviour
     	//get player pixel position on map
     	Vector2 pPos = foreController.WorldPositionToPixel(tx,ty,true);
     	//send position to connector
-		if (isOnLocalTest){
-			Debug.Log("Main Player Moved: " + ((int)pPos.x).ToString() + ", "+
-						 ((int)pPos.y).ToString() + ", " + ((int)(isHeadingRight?(byte)1:(byte)255)).ToString());
-			return;
-		}
+		// if (isOnLocalTest){
+		// 	Debug.Log("Main Player Moved: " + ((int)pPos.x).ToString() + ", "+
+		// 				 ((int)pPos.y).ToString() + ", " + ((int)(isHeadingRight?(byte)1:(byte)255)).ToString());
+		// 	return;
+		// }
     	connector.SendMove((int)pPos.x,(int)pPos.y,isHeadingRight?(byte)1:(byte)255);
     }
     public void MainPlayerSkip(){
@@ -337,11 +350,9 @@ public class GameController : MonoBehaviour
     	connector.SendMove((int)pPos.x,(int)pPos.y,mainPlayerController.isHeadingRight?(byte)1:(byte)255);
 	}
 
+
 #region MONOBEH_IMPLEMENTS
 	void Start(){
-		Scene tmpScene = SceneManager.GetSceneByName("temp");
-		if (tmpScene.IsValid())		
-			SceneManager.UnloadSceneAsync("temp");
 		// if (connector == null){
 		// 	connector = GameObject.Find("ConnectorManager").GetComponent<ConnectorManager>();
 		// }
@@ -351,6 +362,7 @@ public class GameController : MonoBehaviour
 			soundManager.gameObject.SetActive(true);
 			GameObject.DontDestroyOnLoad(connector.gameObject);
 			GameObject.DontDestroyOnLoad(soundManager.gameObject);
+			isOnLocalTest =	true;
 		} else {
 			connector = g.GetComponent<ConnectorManager>();
 			soundManager = GameObject.Find("SoundManager").GetComponent<SoundManager>();
@@ -362,10 +374,13 @@ public class GameController : MonoBehaviour
 			uiController.SetLoadingScreen(true);
 		}
 		try {
+			playerIdCache = null;
 			if (foreController == null){
+				Debug.Log("Finding bg: " + GameObject.Find("Foreground"));
 				foreController = GameObject.Find("Foreground").GetComponent<ForegroundController>();	
 			}
 			if (backgroundSprite == null){
+				Debug.Log("Finding bg: " + GameObject.Find("Background"));
 				backgroundSprite = GameObject.Find("Background").GetComponent<SpriteRenderer>();	
 			}
 			// no ExplosionController assigned
@@ -387,6 +402,13 @@ public class GameController : MonoBehaviour
 				countDownController = GameObject.Find("CountDownController").GetComponent<CountDownController>();
 			}
 			countDownController.ToggleObject(false);
+			foreach(PlayerInfo inf in connector.playerInfos){
+				if (inf.team == 1){
+					((FightUIController)uiController).LoadBluePlayerPreview(inf);
+				} else{
+					((FightUIController)uiController).LoadRedPlayerPreview(inf);
+				}
+			}
 			// no DigController assigned	
 			if (digController == null){
 				try{
@@ -396,12 +418,27 @@ public class GameController : MonoBehaviour
 					Debug.Log("No digController : " + e.ToString());
 				}
 			}
-			connector.SendLoadComplete();
+			// if (isOnLocalTest){
+			// 	bool res = ConnectHost("127.0.0.1");
+			// 	if (res){
+			// 		StartMatch();
+			// 		// isOnLocalTest = false;
+			// 	}else{
+			// 		Debug.Log(" Cannot simulate login ");
+			// 	}
+			// }
+			Debug.Log("Fight Scene ");
 		} catch(Exception e){
+			isOnLocalTest = false;
 			Debug.Log("Not Fight Scene : " + e.ToString());
 		}
-		//string path = "map/1028/";
-		//Debug.Log(Resources.Load<Sprite>(path+"back"));
+		isStarted = true;
+		connector.isSceneTransforming = false;
+		Scene tmpScene = SceneManager.GetSceneByName("temp");
+		if (tmpScene.IsValid()){
+			SceneManager.UnloadSceneAsync("temp");
+		}
+		Debug.Log("[GameController] START DONE");
 	}
 #endregion
 	public ClientConnector GetClientConnector(){

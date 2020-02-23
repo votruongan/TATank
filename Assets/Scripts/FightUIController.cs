@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class FightUIController : UIController
 {
     [Header("SETTINGS")]
-    public GameController gameController;
     public GameObject yourTurnPanel;
     public GameObject loadingScreen;
     public GameObject fightUI;
@@ -17,6 +16,20 @@ public class FightUIController : UIController
     public int power;
     public int angle;
     public Dictionary<string, int> propDict;
+    public PlayerPreviewLoader RedPlayerPreview;
+    public PlayerPreviewLoader BluePlayerPreview;
+
+    public void LoadRedPlayerPreview(PlayerInfo inf){
+        if (inf == null)
+            return;
+        RedPlayerPreview.LoadFromInfo(inf);
+    }
+    public void LoadBluePlayerPreview(PlayerInfo inf){
+        if (inf == null)
+            return;
+        BluePlayerPreview.LoadFromInfo(inf);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -103,7 +116,7 @@ public class FightUIController : UIController
         // mainPanel.SetActive(!isActive);
         fightUI.SetActive(isActive);
         if (isActive){
-            gameController.countDownController = GameObject.Find("CountDownController").GetComponent<CountDownController>();
+            // gameController.countDownController = GameObject.Find("CountDownController").GetComponent<CountDownController>();
         }
     }
     public override void SetLoadingScreen(bool isActive){
@@ -147,9 +160,9 @@ public class FightUIController : UIController
         mainPlayerController.UsingFightingProp(propString,propId);
     }
 
-    public override void UpdateMainPlayerPreview(PlayerInfo pInfo){
-        GameObject.Find("MainPlayerPreview").GetComponent<PlayerPreviewLoader>().LoadFromInfo(pInfo);
-    }
+    // public override void UpdateMainPlayerPreview(PlayerInfo pInfo){
+    //     GameObject.Find("MainPlayerPreview").GetComponent<PlayerPreviewLoader>().LoadFromInfo(pInfo);
+    // }
 
     void FixedUpdate(){
         if (isTakePower){

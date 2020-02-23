@@ -402,6 +402,7 @@ namespace ConnectorSpace
         /// PVE中点券不足
         /// </summary>
         INSUFFICIENT_MONEY = 0x58,
+        GAME_CMD = 0x5b,
 
         GAME_VISITOR_DATA = 0x5d,
 

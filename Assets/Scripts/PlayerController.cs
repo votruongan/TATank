@@ -119,16 +119,27 @@ public class PlayerController : LivingController
         this.info.blood = remainingBlood;
     }
 
+    public virtual void GetTurn(bool isTurn){
+        if (isTurn)
+            healthBar.getTurnSprite.gameObject.SetActive(true);
+        else
+            healthBar.getTurnSprite.gameObject.SetActive(false);
+    }
 
     public virtual void SetPlayerInfo(PlayerInfo inf, GameController gc = null){
         if (gc != null)
             this.gameController = gc;
         originalInfo = inf;
+        if (healthBar == null)
+            healthBar = this.FindChildObject("ForeHealth").GetComponent<HealthBarSprite>();
+        if (healthBar.playerName == null)
+            healthBar.BaseChangeColor();
+        healthBar.playerName.text = inf.nickname;
         UpdatePlayerInfo(inf);
     }
 
     public virtual void UpdatePlayerInfo(PlayerInfo inf){
-        this.info = inf;
+        this.info = inf.Clone();
         this.UpdateHealthBar(this.originalInfo.team, this.info.blood/this.originalInfo.blood);
     }
 

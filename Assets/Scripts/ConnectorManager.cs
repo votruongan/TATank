@@ -6,8 +6,13 @@ using Game.Logic.Phy.Actions;
 
 public class ConnectorManager : MonoBehaviour
 {
+    public bool isSceneTransforming = false;
     public bool isLogedIn = false;
 	public GameController gameController;
+    public List<PlayerInfo> playerInfos;
+    public List<ItemInfo>[] localBags = new List<ItemInfo>[16];
+
+    public PlayerInfo localPlayerInfo;
 	ClientConnector connector;
     UnityThread uThread;
 
@@ -113,9 +118,22 @@ public class ConnectorManager : MonoBehaviour
         gameController.PlayerTurn(pId,newBoxes,players);
     }
     //eTankCmdType.GAME_LOAD: load map
-    public void GameLoadHandler(int mapId){
+    IEnumerator ExecGameLoadHandler(int mapId){
         Debug.Log("LoadMapHandler : " + mapId.ToString());
-        gameController.LoadMap(mapId);        
+        while(gameController.backgroundSprite == null){
+            yield return null;
+            Debug.Log("backgroundSprite null");
+        }
+        gameController.LoadMap(mapId);
+    }
+
+    public void GirdGoodsHandler(int bagType, List<ItemInfo> bag){
+        localBags[bagType] = bag;
+    }
+    public void GameLoadHandler(int mapId){
+        // Debug.Log("LoadMapHandler : " + mapId.ToString());
+        // gameController.LoadMap(mapId);
+        StartCoroutine(ExecGameLoadHandler(mapId));
     }
     //eTankCmdType.START_GAME: load players
     public void StartGameHandler(List<PlayerInfo> Players){
@@ -138,11 +156,12 @@ public class ConnectorManager : MonoBehaviour
     public void StartMatch(){
         this.connector.StartMatch();
     }
-    
     public void StopMatch(){
         this.connector.ExitRoom();
     }
-
+    public void SendItemEquip (){
+        this.connector.SendItemEquip();
+    }
     public void SendShoot(int x, int y, int force, int angle){
         this.connector.ShootTag(true,0);
         this.connector.Shoot(x, y, force, angle);
@@ -218,6 +237,9 @@ public class ConnectorManager : MonoBehaviour
         return true;
     }
 
+    public void OpenRegister(){
+        Application.OpenURL(ConfigMgr.RegisterUrl);
+    }
     public ClientConnector GetClientConnector(){
         return connector;
     }
@@ -236,7 +258,8 @@ public class ConnectorManager : MonoBehaviour
     }
     public void UpdateLocalPlayerPreview(){
         // Debug.Log("Check at ConnectorManager");
-        gameController.uiController.UpdateMainPlayerPreview(connector.GetLocalPlayerInfo());
+        localPlayerInfo = connector.GetLocalPlayerInfo();
+        gameController.uiController.UpdateMainPlayerPreview(localPlayerInfo);
     }
 
 

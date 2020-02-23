@@ -88,7 +88,7 @@ public class MainPlayerController : PlayerController
 
         isHeadingRight = (this.transform.rotation.eulerAngles.x < 179f);
         moveSlowMultiply  = new Vector2(0.8f,0f);
-        fireAngle = 20;
+        fireAngle = (int) handRotator.transform.rotation.eulerAngles.z + angleMin;
         handRotator.SetAngle(fireAngle);
         firePower = 0;  
         timer = 0f;
@@ -96,7 +96,8 @@ public class MainPlayerController : PlayerController
         //anim = transform.GetChild(1).gameObject.GetComponent<Animator>();
     }
     
-    public void GetTurn(bool isMainTurn){
+    public virtual void GetTurn(bool isMainTurn){
+        base.GetTurn(isMainTurn);
         isOnTurn = isMainTurn;
     }
 
@@ -163,7 +164,7 @@ public class MainPlayerController : PlayerController
             //     this.MoveTo(virtualRigidBody.transform.position+new Vector3(0f,-0.1f,0f));
             //     continue;
             // }
-    this.MoveTo(virtualRigidBody.transform.position);
+            this.MoveTo(virtualRigidBody.GetFinePosition());
         }
     }
 
@@ -212,10 +213,11 @@ public class MainPlayerController : PlayerController
     }
     public void BeginMove(){
         Debug.Log("BeginMove");
-        anim.SetBool("isFiring",false);
-        anim.SetBool("isFired",false);
-        anim.SetBool("isMoving",true);
+        // anim.SetBool("isFiring",false);
+        // anim.SetBool("isFired",false);
+        // anim.SetBool("isMoving",true);
         this.SetMovableRigidbody();
+        this.PlayEquipAnimation("PlayerMove");
         isBeginMove = true;
         startTimer = true;
         StartCoroutine(MoveExecution());
@@ -328,8 +330,12 @@ public class MainPlayerController : PlayerController
 
     public override void SetPlayerInfo(PlayerInfo inf, GameController gc = null){
         this.originalInfo = inf.Clone();
-        fightInfoDisplay.original = this.originalInfo.Clone();
+        if (fightInfoDisplay == null){
+            fightInfoDisplay = GameObject.Find("PlayerFightInfo").GetComponent<PlayerFightInfoDisplay>();
+        }
+        fightInfoDisplay.original = inf.Clone();
         base.SetPlayerInfo(inf, gc);
+        ((MainPlayerController)this).UpdatePlayerInfo(inf);
     }
     public override void UpdatePlayerInfo(PlayerInfo inf){
         base.UpdatePlayerInfo(inf);
