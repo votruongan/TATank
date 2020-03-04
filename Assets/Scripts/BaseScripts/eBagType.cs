@@ -1,4 +1,4 @@
-public enum eBageType
+public enum eBagType
 {
     MainBag = 0,
     PropBag = 1,

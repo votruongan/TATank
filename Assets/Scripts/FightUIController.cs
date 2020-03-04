@@ -124,10 +124,13 @@ public class FightUIController : UIController
         // countUpUI.SetActive(!isActive);
     }
 
+    private GameObject powerAudio;
 	public override void FireClicked()
 	{
         if (mainPlayerController == null)
             return;
+        gameController.soundManager.PlayEffect("releasePower");
+        powerAudio = gameController.soundManager.PlayEffect("takePower");
         mainPlayerController.BeginTakePower();
         isTakePower = true;
 	}
@@ -136,6 +139,8 @@ public class FightUIController : UIController
         if (mainPlayerController == null)
             return;
         isTakePower = false;
+        Destroy(powerAudio);
+        gameController.soundManager.PlayEffect("startFire");
         mainPlayerController.ReleasePower();
 	}
 
@@ -155,8 +160,18 @@ public class FightUIController : UIController
     }
 
     public override void SelectFightingProp(string propString){
-        int propId = propDict[propString];
+
+        int propId = 0;
+        try{
+            propId = propDict[propString];
+        } catch (KeyNotFoundException e){}
         Debug.Log("propID: "+ propId + " name: " + FightingPropIdToName(propId));
+        gameController.soundManager.PlayEffect("choose");
+        gameController.soundManager.PlayEffect("noti");
+        gameController.soundManager.PlayEffect("move");
+        if (propString == "FLY"){
+            gameController.connector.SendUsingFly();
+        }
         mainPlayerController.UsingFightingProp(propString,propId);
     }
 

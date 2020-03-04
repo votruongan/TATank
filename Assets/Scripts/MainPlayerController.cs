@@ -16,6 +16,7 @@ public class MainPlayerController : PlayerController
     public VirtualRigidbodyHandler virtualRigidBody;
     public GameObject indicatorRotator;
     public GameObject angleBackground;
+    public AngleIndicatorController angleIndicator;
     public PlayerFightInfoDisplay fightInfoDisplay;
     public UIController uiController;
 
@@ -34,8 +35,8 @@ public class MainPlayerController : PlayerController
     
 	[Header("FIRE CONTROL")]
     public bool isFiring;
-    public int angleMax;
-    public int angleMin;
+    // public int angleMax;
+    // public int angleMin;
     public int firePower;
     public int fireAngle;
     public Slider powerIndicator;
@@ -67,6 +68,7 @@ public class MainPlayerController : PlayerController
         if (handRotator == null)
             try{
                 handRotator = GameObject.Find("AngleHand").GetComponent<HandRotator>();
+                handRotator.SetIsHeadRight(this.isHeadingRight);
             } catch (Exception e){
                 
             }
@@ -75,21 +77,22 @@ public class MainPlayerController : PlayerController
         // } catch(Exception e){
         //     Debug.Log("Err: "+ e);
         // }
-        indicatorRotator = GameObject.Find("AngleIndicator");
-        angleBackground = GameObject.Find("AngleBackground");
+        indicatorRotator = this.FindChildObject("AngleIndicator");
+        angleIndicator = indicatorRotator.GetComponent<AngleIndicatorController>();
+        angleBackground = this.FindChildObject("AngleBackground");
         fightInfoDisplay = GameObject.Find("PlayerFightInfo").GetComponent<PlayerFightInfoDisplay>();
-        if (virtualRigidBody != null){
-            Debug.Log("VRB != NULL");
-            Destroy(virtualRigidBody.gameObject);
-        } else {
-        }
-        GameObject vrb = Instantiate(virtualRigidbodyPrefab,this.transform.position,Quaternion.identity);
-        virtualRigidBody = vrb.GetComponent<VirtualRigidbodyHandler>();
-
+        // if (virtualRigidBody != null){
+        //     Debug.Log("VRB != NULL");
+        //     Destroy(virtualRigidBody.gameObject);
+        // } else {
+        // }
+        // GameObject vrb = Instantiate(virtualRigidbodyPrefab,this.transform.position,Quaternion.identity);
+        // virtualRigidBody = vrb.GetComponent<VirtualRigidbodyHandler>();
+        // virtualRigidBody.mpc = this;
         isHeadingRight = (this.transform.rotation.eulerAngles.x < 179f);
-        moveSlowMultiply  = new Vector2(0.8f,0f);
-        fireAngle = (int) handRotator.transform.rotation.eulerAngles.z + angleMin;
-        handRotator.SetAngle(fireAngle);
+        // moveSlowMultiply  = new Vector2(0.8f,0f);
+        // fireAngle = 20;
+        // handRotator.SetAngle(fireAngle);
         firePower = 0;  
         timer = 0f;
         // rigidBody.simulated = true;
@@ -101,20 +104,27 @@ public class MainPlayerController : PlayerController
         isOnTurn = isMainTurn;
     }
 
-
+    private bool skipChangeAngle = false;
     private void ChangeAngle(int change){
         fireAngle += change;
-        if (fireAngle >= angleMax || fireAngle <= angleMin){
-            fireAngle -= change;
-            return;
-        }
+        // if (fireAngle >= angleMax || fireAngle <= angleMin){
+        //     fireAngle -= change;
+        //     return;
+        // }
         if (fireAngle < -179){
             fireAngle = 180;
         } else if (fireAngle > 180){
             fireAngle = -179;
         }
-        handRotator.SetAngle(fireAngle);
+        if (skipChangeAngle){
+            skipChangeAngle = false;
+            return;
+        }
+        gameController.soundManager.PlayEffectOnce("changeAngle");
+        // handRotator.SetAngle(fireAngle);
+        angleIndicator.ChangeAngle(change);
         UpdateAngleIndicator();
+        skipChangeAngle = true;
     }
 
     private void UpdateAngleIndicator(){
@@ -136,14 +146,17 @@ public class MainPlayerController : PlayerController
         // this.SetMovableRigidbody();
         // Vector3 force = new Vector3(1.0f,0f,0f);
         // rigidBody.AddForce(Vector3.Scale(transform.right,force));
-        Vector3 virtualRbdPos = virtualRigidBody.transform.position;
+        // Vector3 virtualRbdPos = virtualRigidBody.transform.position;
         
         if (isGrounded){
-            if (isHeadingRight){
-                virtualRigidBody.MoveRight();
-            } else {
-                virtualRigidBody.MoveLeft();
-            } 
+            // if (isHeadingRight){
+            //     // virtualRigidBody.MoveRight();
+            // } else {
+            //     transform.Translate(-0.01f,0f,0f);
+            //     // virtualRigidBody.MoveLeft();
+            // } 
+            transform.Translate(0.01f,0f,0f);
+            gameController.soundManager.PlayEffectOnce("move");
             // if (Vector2.Distance(virtualRbdPos, this.transform.position) >= 0.5f){
             //     Debug.Log("Go Go Go vrb's position: "+ virtualRbdPos);
             //     this.MoveTo(virtualRbdPos);
@@ -164,7 +177,9 @@ public class MainPlayerController : PlayerController
             //     this.MoveTo(virtualRigidBody.transform.position+new Vector3(0f,-0.1f,0f));
             //     continue;
             // }
-            this.MoveTo(virtualRigidBody.GetFinePosition());
+            // if (virtualRigidBody.isGrounded){
+            //     this.MoveTo(virtualRigidBody.GetFinePosition());
+            // }
         }
     }
 
@@ -182,6 +197,7 @@ public class MainPlayerController : PlayerController
                 BeginMove();
             if (!isHeadingRight){
                 RotateLiving();
+                handRotator.SetIsHeadRight(this.isHeadingRight);
             }
             //MoveTo(new Vector3(this.transform.position.x + moveSpeed.x,this.transform.position.y,0f));
             execTranslate();
@@ -192,6 +208,7 @@ public class MainPlayerController : PlayerController
                 BeginMove();
             if (isHeadingRight){
                 RotateLiving();
+                handRotator.SetIsHeadRight(this.isHeadingRight);
             }
             //MoveTo(new Vector3(this.transform.position.x + moveSpeed.x,this.transform.position.y,0f));
             execTranslate();
@@ -217,11 +234,12 @@ public class MainPlayerController : PlayerController
         // anim.SetBool("isFired",false);
         // anim.SetBool("isMoving",true);
         this.SetMovableRigidbody();
-        this.PlayEquipAnimation("PlayerMove");
+        this.PlayAnimation("PlayerMove");
+        this.PlayEquipAnimation("ClothMove");
         isBeginMove = true;
         startTimer = true;
-        StartCoroutine(MoveExecution());
-        virtualRigidBody.SetMovingRigidbody();
+        // StartCoroutine(MoveExecution());
+        // virtualRigidBody.SetMovingRigidbody();
     }
     public void BeginTakePower(){
         isFiring = true;
@@ -258,7 +276,8 @@ public class MainPlayerController : PlayerController
         this.StopEquipAnimation();
         startTimer = false;
         timer = 0f;
-        virtualRigidBody.SetRestRigidbody();
+        // virtualRigidBody.StopMove();
+        // virtualRigidBody.SetRestRigidbody();
         this.SetRestRigidbody();
         gameController.MainPlayerMove(this.transform.position.x,this.transform.position.y,isHeadingRight);
     }
@@ -298,7 +317,7 @@ public class MainPlayerController : PlayerController
     IEnumerator FireExecution(){    
         for (int i = 0; i < fireBuff + 1; i++){
             firePower = (int)((float) power * 100);
-            gameController.MainPlayerFire(firePower,fireAngle + (int)this.transform.rotation.eulerAngles.z);
+            gameController.MainPlayerFire(firePower,handRotator.currentAngle);
             yield return new WaitForSeconds(1.0f);
         }
         fireBuff = 0;
@@ -354,8 +373,8 @@ public class MainPlayerController : PlayerController
         }
 
         int target = fireAngle + (int)this.transform.position.z;
-        UpdateAngleIndicator();
-        handRotator.SetAngle(isHeadingRight, target);
+        // UpdateAngleIndicator();
+        // handRotator.SetAngle(isHeadingRight, target);
         if (base.isMoving){
         }
 

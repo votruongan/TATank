@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -26,6 +27,7 @@ public class ClientConnector : BaseConnector
     private long m_actionInterval;
     private int m_blood;
     private int m_gameCount;
+    private int m_grade;
     private bool m_isHost;
     private short m_lastRecv;
     private short m_lastSent;
@@ -125,7 +127,9 @@ public class ClientConnector : BaseConnector
                 for (int i = 0; i < elementsByTagName.Count; i++)
                 {
                     this.NickName = elementsByTagName[i].Attributes["NickName"].Value;
+                    this.m_grade = Int32.Parse(elementsByTagName[i].Attributes["Grade"].Value);
                 }
+                
             }
 			this.LoginWeb();
             if (lastErr == eErrorCode.LOADING)
@@ -235,6 +239,23 @@ public class ClientConnector : BaseConnector
         // this.lastErr = eErrorCode.DONE;
     }
 
+    public string LoadTemplate(){
+        string requestUriString = ConfigMgr.LoadTemplateUrl;
+        string str3 = "";
+        Debug.Log("LOADING TEMPLATE");
+        using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
+        {
+            string decStr;
+            using (var ms = new MemoryStream()){
+                response.GetResponseStream().CopyTo(ms);
+                byte[] dat = Marshal.Uncompress(ms.ToArray());
+                Debug.Log("Template loaded and decompressed: rawLength - compLength: " + dat.Length + " - " + ms.Length);
+                decStr = Encoding.UTF8.GetString(dat);
+            }
+            return decStr;
+            // saveTo = tempList.ToArray();
+        }
+    }
 
     public void LoginWeb()
     {
@@ -383,17 +404,17 @@ public class ClientConnector : BaseConnector
                 pkg.ReadInt(); //4
                 this.m_playerId = pkg.Parameter1;
                 localPlayerInfo  = new PlayerInfo();
-                pkg.ReadInt(); //attack
-                pkg.ReadInt();//def
-                pkg.ReadInt();//agil
-                pkg.ReadInt();//luck
+                localPlayerInfo.attack = pkg.ReadInt(); //attack
+                localPlayerInfo.defence = pkg.ReadInt();//def
+                localPlayerInfo.agility = pkg.ReadInt();//agil
+                localPlayerInfo.luck = pkg.ReadInt();//luck
                 pkg.ReadInt();//gp
                 pkg.ReadInt();//repute
                 pkg.ReadInt();//gold
                 pkg.ReadInt();//money
                 pkg.ReadInt();//PropBag.GetItemCount
                 pkg.ReadInt();//PlayerCharacter.Hide
-                pkg.ReadInt();//PlayerCharacter.FightPower
+                localPlayerInfo.fightPower = pkg.ReadInt();//PlayerCharacter.FightPower
                 pkg.ReadInt();
                 pkg.ReadInt();
                 pkg.ReadString(); //Master
@@ -420,7 +441,7 @@ public class ClientConnector : BaseConnector
                 pkg.ReadString(); //skin
 
                 Debug.Log("login socket success! pid " +  this.m_playerId+" uid: "+this.UserId);
-                Debug.Log("localPlayerInfo style: " + localPlayerInfo.style);
+                // Debug.Log("localPlayerInfo style: " + localPlayerInfo.style);
                 UnityThread.executeInUpdate(() =>
                 {
                     //Call StartGameHandler in ConnectorManager
@@ -451,7 +472,7 @@ public class ClientConnector : BaseConnector
                 int bagType = pkg.ReadInt();
                 int slotLength = pkg.ReadInt();
                 List<ItemInfo> bagBag = new List<ItemInfo>();
-                Debug.Log("bagtype: " + bagType + " slotLEngth: " +slotLength);
+                Debug.Log("bagtype: " + bagType + " - " + (eBagType)bagType + " slotLEngth: " +slotLength);
                 for (int ind = 0; ind < slotLength; ind++){
                     pkg.ReadInt();
                     bagBag.Add(new ItemInfo(ref pkg, true));
@@ -460,7 +481,7 @@ public class ClientConnector : BaseConnector
                 UnityThread.executeInUpdate(() =>
                 {
                     //Call StartGameHandler in ConnectorManager
-                    connectorManager.GirdGoodsHandler(bagType, bagBag);
+                    connectorManager.GridGoodsHandler(bagType, bagBag);
                 });
                 break;
             }
@@ -501,13 +522,81 @@ public class ClientConnector : BaseConnector
                 }
                 break;
             }
+            case (byte)ePlayerPackageType.UPDATE_PRIVATE_INFO:{
+                localPlayerInfo.money = pkg.ReadInt();
+                localPlayerInfo.medal = pkg.ReadInt();
+                localPlayerInfo.gold = pkg.ReadInt();
+                localPlayerInfo.giftToken = pkg.ReadInt();
+                break;
+            }
+            case (byte)ePlayerPackageType.UPDATE_PlAYER_INFO:{
+                localPlayerInfo.grade = this.m_grade;
+                localPlayerInfo.gp = pkg.ReadInt();//info.GP);
+                pkg.ReadInt();//info.Offer);
+                pkg.ReadInt();//info.RichesOffer);
+                pkg.ReadInt();//info.RichesRob);
+                localPlayerInfo.win = pkg.ReadInt();//info.Win);
+                localPlayerInfo.totalMatch = pkg.ReadInt();//info.Total);
+                pkg.ReadInt();//info.Escape);
+
+                localPlayerInfo.attack = pkg.ReadInt();//info.Attack);
+                localPlayerInfo.defence = pkg.ReadInt();//info.Defence);
+                localPlayerInfo.agility =  pkg.ReadInt();//info.Agility);
+                localPlayerInfo.luck = pkg.ReadInt();//info.Luck);
+                pkg.ReadInt();//info.Hide);
+                localPlayerInfo.style = pkg.ReadString();//info.Style);
+                localPlayerInfo.color = pkg.ReadString();//info.Colors);
+                localPlayerInfo.skin = pkg.ReadString();//info.Skin);
+
+                pkg.ReadInt();//info.ConsortiaID);
+                pkg.ReadString();//info.ConsortiaName);
+                pkg.ReadInt();//info.ConsortiaLevel);
+                pkg.ReadInt();//info.ConsortiaRepute);
+
+                pkg.ReadInt();//info.Nimbus);
+                pkg.ReadString();//info.PvePermission);
+                pkg.ReadString();//"1");
+                localPlayerInfo.fightPower = pkg.ReadInt();//info.FightPower);
+                // pkg.ReadInt();//1);
+                // pkg.ReadInt();//-1);
+                // pkg.ReadString();//"ss");
+                // pkg.ReadInt();//1);
+                // pkg.ReadString();//"ss");
+                // ////AchievementPoint
+                // pkg.ReadInt();//0);
+                // ////honor
+                // pkg.ReadString();//"honor");
+                // // //LastSpaDate
+                // // if ();//info.ExpendDate != null)
+                // //     pkg.ReadDateTime();//();//DateTime)info.ExpendDate);
+                // // else { pkg.ReadDateTime();//DateTime.MinValue); }
+                // //charmgp
+                // pkg.ReadInt();//100);
+                // //consortiaCharmGP
+                // pkg.ReadInt();//100);
+
+                // pkg.ReadDateTime();//DateTime.MinValue);
+                // ////DeputyWeaponID
+                // pkg.ReadInt();//10001);
+                // pkg.ReadInt();//0);
+                // // box gi ko biet
+                // pkg.ReadInt();//info.AnswerSite);
+                // // pkg.ReadInt();//0);
+                Debug.Log(localPlayerInfo.ToString());
+                UnityThread.executeInUpdate(() =>
+                {
+                    //Call LoadMapHandler in ConnectorManager
+                    connectorManager.UpdateStatsDisplay();
+                });
+                break;
+            }
             case (byte)ePlayerPackageType.GAME_CMD:{
             //GAME_CMD
 				//Debug.Log("GAME_CMD");
                 eTankCmdType type = (eTankCmdType) pkg.ReadByte();  
                 int pId = pkg.Parameter1;        
                 int LifeTime = pkg.Parameter2;
-                Debug.Log("[CMD] " + ((eTankCmdType)type).ToString() +" - lifeTime: "+LifeTime.ToString()); 
+                Debug.Log("[CMD] " + ((eTankCmdType)type).ToString() +" - lifeTime: "+LifeTime.ToString());
                 switch (type)
                 {
                     case eTankCmdType.TAKE_CARD:
@@ -532,9 +621,7 @@ public class ClientConnector : BaseConnector
                         int size = pkg.ReadInt(); //number of players
                         // List<PlayerInfo> Players = new List<PlayerInfo>();
                         for (int i = 0; i < size; i++){
-                            // Players.Add(new PlayerInfo());
                             int tmpId = pkg.ReadInt();
-                            // Players[i].id = pkg.ReadInt();
                             for (int j = 0; j < size; j++){
                                 if (tmpId != playersList[j].id){
                                     continue;
@@ -578,64 +665,7 @@ public class ClientConnector : BaseConnector
                         pkg.ReadInt(); //Roomtype
                         pkg.ReadInt(); //gametype
                         pkg.ReadInt(); //Timetype
-                        int num2 = pkg.ReadInt(); // number of players
-                        this.playersList = new List<PlayerInfo>();
-                        for (int i = 0; i < num2; i++)
-                        {
-                            this.playersList.Add(new PlayerInfo());
-                            pkg.ReadInt();
-                            pkg.ReadString();
-                            this.playersList[i].id = pkg.ReadInt();
-                            this.playersList[i].nickname = pkg.ReadString();
-                            pkg.ReadBoolean(); // is vip
-                            pkg.ReadInt();  // vip level
-                            this.playersList[i].sex = pkg.ReadBoolean(); // sex
-                            pkg.ReadInt();
-                            this.playersList[i].style = pkg.ReadString();
-                            this.playersList[i].color = pkg.ReadString();
-                            this.playersList[i].skin = pkg.ReadString();
-                            pkg.ReadInt(); // grade
-                            pkg.ReadInt(); // repute
-                            this.playersList[i].mainWeapon = pkg.ReadInt(); 
-                            pkg.ReadInt();
-                            pkg.ReadString();
-                            pkg.ReadDateTime();
-                            pkg.ReadInt();
-                            pkg.ReadInt(); // Nimbus
-                            pkg.ReadInt(); // Corsotia Id
-                            pkg.ReadString(); //Corsotia name
-                            pkg.ReadInt(); // Corsotia level
-                            pkg.ReadInt(); // Corsotia repute
-                            pkg.ReadInt(); // win
-                            pkg.ReadInt(); // total
-                            pkg.ReadInt(); // fightPower
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            pkg.ReadString();
-                            pkg.ReadInt();
-                            pkg.ReadString();
-                            bool isMarried = pkg.ReadBoolean();
-                            if (isMarried)
-                            {
-                                pkg.ReadInt();
-                                pkg.ReadString();
-                            }
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            
-                            this.playersList[i].team = pkg.ReadInt();
-                            this.playersList[i].id = pkg.ReadInt();
-                            this.playersList[i].blood = pkg.ReadInt();
-                            if (this.playersList[i].id == this.m_playerId)
-                            {
-                                this.m_team = this.playersList[i].team;
-                                this.m_blood = this.playersList[i].blood;
-                            }
-                        }
+                        this.playersList = ClientRecvPreparer.GameCreate_PlayerList(ref pkg);
                         this.m_state = ePlayerState.CreateGame;
                         UnityThread.executeInUpdate(() =>
                         {
@@ -717,46 +747,8 @@ public class ClientConnector : BaseConnector
                         });
                         //pkg.WriteByte((byte)player.BallCount);
                         return;
-                    case eTankCmdType.FIRE:   
-                        int bombCount = pkg.ReadInt();
-                        float lifeTime = 0;
-                        List<FireInfo> fireInfos = new List<FireInfo>();
-                        for (int i = 0; i < bombCount; i++)
-                        {
-                            fireInfos.Add(new FireInfo());
-                            // int vx = (int)(force * reforce * Math.Cos((double)(angle + reangle) / 180 * Math.PI));
-                            // int vy = (int)(force * reforce * Math.Sin((double)(angle + reangle) / 180 * Math.PI));
-                            //Console.ReadLine(string.Format("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< vx:{0}   vy:{1}", vx, vy));
-                            // m_map.AddPhysical(bomb);
-                            // bomb.StartMoving();
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            fireInfos[i].isDigMap = pkg.ReadBoolean();
-                            fireInfos[i].bomId = pkg.ReadInt();
-                            fireInfos[i].x = pkg.ReadInt();
-                            fireInfos[i].y = pkg.ReadInt();
-                            fireInfos[i].vx = pkg.ReadInt();
-                            fireInfos[i].vy = pkg.ReadInt();
-                            fireInfos[i].bomInfoId = pkg.ReadInt();
-                            //FlyingPartical
-                            //pkg.ReadString(bomb.BallInfo.FlyingPartical);
-                            pkg.ReadString();
-                            pkg.ReadInt();
-                            pkg.ReadInt();
-                            //pkg.ReadInt(0);
-                            fireInfos[i].bomActionCount = pkg.ReadInt();
-                            //Debug.Log("Bom Action count: "+ fireInfos[i].bomActionCount.ToString());
-                            for (int j = 0; j < fireInfos[i].bomActionCount; j++)
-                            {
-                                fireInfos[i].timeInt.Add(pkg.ReadInt()); //0 ->null
-                                fireInfos[i].actionType.Add(pkg.ReadInt()); //0 ->null
-                                fireInfos[i].actionParam1.Add(pkg.ReadInt()); //0 ->null
-                                fireInfos[i].actionParam2.Add(pkg.ReadInt()); //0 ->null
-                                fireInfos[i].actionParam3.Add(pkg.ReadInt()); //0 ->null
-                                fireInfos[i].actionParam4.Add(pkg.ReadInt()); //0 ->null
-                            }
-                            //Debug.Log(fireInfos[i].ToString());
-                        }         
+                    case eTankCmdType.FIRE:
+                        List<FireInfo> fireInfos = ClientRecvPreparer.MakeFireInfo(ref pkg);
                         UnityThread.executeInUpdate(() =>
                         {
                             //Call FireHandler in ConnectorManager
@@ -888,6 +880,16 @@ public class ClientConnector : BaseConnector
         pkg.WriteInt(dir);
         this.SendTCP(pkg);
     }
+    public void SendChangePlaceItem(eBagType bagType, int place, eBagType toBag, int toPlace, int count)
+    {
+        GSPacketIn pkg = new GSPacketIn((byte)ePackageType.CHANGE_PLACE_ITEM);
+        pkg.WriteByte((byte)bagType);
+        pkg.WriteInt(place);
+        pkg.WriteByte((byte)toBag);
+        pkg.WriteInt(toPlace);
+        pkg.WriteInt(count);
+        this.SendTCP(pkg);
+    }
 
     private void SendShootTag(bool b, int time)
     {
@@ -960,6 +962,15 @@ public class ClientConnector : BaseConnector
         Debug.Log("Send SKIP successfully");
     }
 
+    public void Fly()
+    {
+        GSPacketIn pkg = new GSPacketIn(GAME_CMD);
+        pkg.Parameter1 = this.m_playerId;
+        pkg.WriteByte((byte)eTankCmdType.FLY);
+        this.SendTCP(pkg);
+        Debug.Log("Send FLY successfully");
+    }
+
     public void Move(int x, int y,byte dir)
     {
         // Debug.Log("Main Player Moving "+x+" - "+y+" d: "+dir);
@@ -970,7 +981,7 @@ public class ClientConnector : BaseConnector
         pkg.WriteInt(x);
         pkg.WriteInt(y);
         pkg.WriteByte(dir);
-        pkg.WriteBoolean(m_blood > 0);
+        pkg.WriteBoolean(localPlayerInfo.blood > 0);
         this.SendTCP(pkg);
         Debug.Log("Send MOVE successfully");
     }

@@ -376,9 +376,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef9a120dafbdaa84eb94b3bf39fc1dd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mpc: {fileID: 0}
   isGrounded: 0
   rigid: {fileID: 0}
-  tVector: {x: 0.02, y: 0}
+  tVector: {x: 0.05, y: 0.03}
   upSensor: {fileID: 4764639517861062909}
   rightSensor: {fileID: 5495277118779050261}
   leftSensor: {fileID: 1988566024713154077}
+  isMoving: 0
+  isHeadingRight: 0

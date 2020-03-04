@@ -25,30 +25,43 @@ public class SoundManager : MonoBehaviour
     }
 
     public void ChangeVolume(float music = -1f, float effect = -1f){
-        if (music != -1f){
+        if (music > -0.5f){
             PlayerPrefs.SetFloat("musicVolume",music);
             musicVolume = music;
+            player.volume = music;
         }
-        if (effect != -1f){
+        if (effect > 0.5f){
             PlayerPrefs.SetFloat("effectVolume",effect);
             effectVolume = effect;
         }
-        player.volume = music;
     }
-    public void PlayEffect(string name){
-        AudioClip src = Resources.Load<AudioClip>("sound/effect/"+name);
-        PlayEffect(src);
-    }
-    public void PlayEffect(AudioClip src){
-        if (src == null){
+    public void PlayEffectOnce(string name){
+        if (GameObject.Find(name)){
             return;
         }
-        GameObject gO = new GameObject("SFX");
+        PlayEffect(name);
+    }
+    public GameObject PlayEffect(string name){
+        if (effectVolume <0.05f){
+            return null;
+        }
+        AudioClip src = Resources.Load<AudioClip>("sound/"+name);
+        return PlayEffect(src,name);
+    }
+    public GameObject PlayEffect(AudioClip src,string name){
+        // Debug.Log("Sfx check0");
+        if (src == null){
+            return null;
+        }
+        // Debug.Log("Sfx check1");
+        GameObject gO = new GameObject(name);
         AudioSource sfx = gO.AddComponent(typeof(AudioSource)) as AudioSource;
-        gO.AddComponent(typeof(DelayedSelfDestroy));
+        DelayedSelfDestroy dsd = gO.AddComponent(typeof(DelayedSelfDestroy)) as DelayedSelfDestroy;
+        dsd.delayedSeconds = src.length;
         sfx.volume = effectVolume;
         sfx.clip = src;
         sfx.Play();
+        return gO;
     }
 
     public void LoadAudio(string name){

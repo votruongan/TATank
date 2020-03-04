@@ -4,6 +4,8 @@ using Game.Base.Packets;
 using UnityEngine;
 public class ItemInfo  
 {
+    //["", "head", "glass", "hair", "eff", "cloth", "face", "arm", "armlet", "ring", "", "", "", "suits", "necklace", "wing", "chatBall"];
+    public eItemType itemType;
     public bool isNull;
     public byte BagType;
     public int UserID;

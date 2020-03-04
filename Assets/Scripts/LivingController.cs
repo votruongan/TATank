@@ -49,7 +49,7 @@ public class LivingController : BaseObjectController
             effectDisplay = this.FindChildObject("EffectDisplay").GetComponent<Animator>();
 
         if (healthBar == null)
-            healthBar = this.FindChildObject("ForeHealth").GetComponent<HealthBarSprite>();
+            healthBar = this.FindChildObject("HealthInfo").GetComponent<HealthBarSprite>();
 
         isHeadingRight = true;
         if (rigidBody != null)
@@ -110,11 +110,11 @@ public class LivingController : BaseObjectController
         //rigidBody.simulated = false;
         //this.transform.Translate(new Vector3(tx,ty,0f));
         //rigidBody.simulated = true;
-        if (rigidBody != null){
-            rigidBody.MovePosition(new Vector2(transform.position.x + tx, transform.position.y + ty));
-            return;
-        }
-        this.transform.Translate(new Vector3(tx,ty,0f));
+        // if (rigidBody != null){
+        //     rigidBody.MovePosition(new Vector2(transform.position.x + tx, transform.position.y + ty));
+        //     return;
+        // }
+        this.transform.Translate(tx,ty,0f);
     }
 
 

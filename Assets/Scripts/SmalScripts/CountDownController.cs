@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class CountDownController : MonoBehaviour
 {
+    public int elapsed = 0;
     public int currentPos;
     [Header("SETTINGS")]
     public int initSeconds = 15;
@@ -30,9 +31,13 @@ public class CountDownController : MonoBehaviour
     }
 
     public void ToggleObject(bool value){
+        elapsed = 0;
         currentPos = initSeconds;        
         thisImage.texture = nullTexture;
         this.gameObject.SetActive(value);
+        if(gameController == null){
+            gameController = GameObject.Find("GameController").GetComponent<GameController>();
+        }
     }
 
 
@@ -45,6 +50,7 @@ public class CountDownController : MonoBehaviour
         timer += Time.deltaTime;
         if (timer >= 1f){
             timer = 0f;
+            elapsed++;
             if (currentPos == 0){
                 currentPos = initSeconds;
                 gameController.MainPlayerSkip();

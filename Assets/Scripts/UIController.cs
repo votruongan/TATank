@@ -15,6 +15,11 @@ public class UIController : MonoBehaviour
         gameController.soundManager.ChangeVolume(-1f,doer.value);
     }
 
+    public void OpenToolbar(GameObject toolbar){
+        gameController.soundManager.PlayEffect("choose");
+        toolbar.SetActive(true);
+    }
+
     public virtual void SetUpMainPlayerController(){}
     public virtual void UpdatePlayerInfo(){}
     public virtual void SetArrowButtonDown(string buttonName){}

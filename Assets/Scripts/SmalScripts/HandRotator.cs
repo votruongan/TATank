@@ -5,36 +5,45 @@ using UnityEngine.UI;
 
 public class HandRotator : MonoBehaviour
 {
+    public bool isHeadRight;
     public Transform anchor;
     public Vector3 currentAngles;
     public Text angleDisplay;
     public int currentAngle;
     public GameObject angleIndicator;
     public GameObject angleBackground;
+
+
     public void Start(){
         currentAngle = 0;
     }
-    public void InverseAngle(){
-        // Debug.Log("Inverse Angle Called");
-        if (currentAngle >= 0){
-            SetAngle(180 - currentAngle);
-        } else {
-            SetAngle(currentAngle + 90);
-        }
+    // public void InverseAngle(){
+    //     // Debug.Log("Inverse Angle Called");
+    //     if (currentAngle >= 0){
+    //         SetAngle(180 - currentAngle);
+    //     } else {
+    //         SetAngle(currentAngle + 90);
+    //     }
+    // }
+    
+    public void SetIsHeadRight(bool val){
+        isHeadRight = val;
     }
-    public void SetAngle(bool isHeadingRight,int targetAngle){
-        //Target run from -90 to 90
-        int target = (targetAngle > 90)?90:targetAngle;
-        target = (targetAngle < -90)?-90:targetAngle;
-        if (!isHeadingRight){
-            if (target < 0){
-                target = -180 - target;
-            } else {
-                target = 180-target;
-            }
-        }     
-        this.SetAngle(target);
-    }
+
+    // public void SetAngle(bool isHeadingRight,int targetAngle){
+    //     //Target run from -90 to 90
+    //     int target = (targetAngle > 90)?90:targetAngle;
+    //     target = (targetAngle < -90)?-90:targetAngle;
+    //     if (!isHeadingRight){
+    //         if (target < 0){
+    //             target = -180 - target;
+    //         } else {
+    //             target = 180-target;
+    //         }
+    //     }     
+    //     this.SetAngle(target);
+    // }
+
     public void SetAngle(int target){
         // targetAngle = target;
         if (target < 179){
@@ -57,8 +66,11 @@ public class HandRotator : MonoBehaviour
         // if (angleDisplay != null)
         //     angleDisplay.text = displayAngle.ToString();
         transform.RotateAround(anchor.position,transform.forward,-currentAngle);
-        currentAngle = target;
-        transform.RotateAround(anchor.position,transform.forward,target);
+        if (isHeadRight)
+            currentAngle = target;
+        else
+            currentAngle = 180 - target;
+        transform.RotateAround(anchor.position,transform.forward,currentAngle);
         int displayAngle = currentAngle;
         if (Mathf.Abs(currentAngle) > 90){
             displayAngle = 180 - Mathf.Abs(currentAngle);
@@ -67,10 +79,10 @@ public class HandRotator : MonoBehaviour
         angleDisplay.text = displayAngle.ToString();
     }
 
-    public void ReloadAngleIndicator(){
-        angleIndicator = GameObject.Find("AngleIndicator");
-        angleBackground = GameObject.Find("AngleBackground");
-    }
+    // public void ReloadAngleIndicator(){
+    //     angleIndicator = GameObject.Find("AngleIndicator");
+    //     angleBackground = GameObject.Find("AngleBackground");
+    // }
 
 
     int whichSide(int angle, int main, int counter){
@@ -95,6 +107,7 @@ public class HandRotator : MonoBehaviour
 
     void FixedUpdate()
     {
+
         // currentAngle = transform.rotation.eulerAngles;
     }
 }

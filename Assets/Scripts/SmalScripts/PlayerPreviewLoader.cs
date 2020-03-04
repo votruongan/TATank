@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 
-public class PlayerPreviewLoader : MonoBehaviour
+public class PlayerPreviewLoader : BaseObjectController
 {
     public RawImage cloth;
     public RawImage face;    
@@ -14,22 +14,33 @@ public class PlayerPreviewLoader : MonoBehaviour
     private static bool isWeaponLoaded = false;
     private static UnityEngine.Object[] weaponPaths;
     public void LoadFromInfo(PlayerInfo pInfo){
-        Debug.Log("Processing load request ...");
-        Debug.Log(pInfo.ToString());
+        // Debug.Log("Processing load request ...");
+        // Debug.Log(pInfo.ToString());
         if (pInfo == null){
             Debug.Log("PInfo is NULL");
             return;
+        }
+        try{
+            StartCoroutine(ExecLoad(pInfo));
+        } catch (Exception e){
+
+        }
+    }
+
+    IEnumerator ExecLoad(PlayerInfo pInfo){
+        while (hair == null || face == null || cloth == null){
+            yield return null;
         }
         if (pName != null)
             pName.text = pInfo.nickname;
         List<int> styleID = pInfo.GetStyleList();
         bool isMale = pInfo.sex;
         this.transform.GetChild(3).gameObject.SetActive(false);
-        hair.texture = loadImage("hair",isMale,styleID[2]);
+        hair.texture = loadImage("hair",isMale,styleID[(int)eItemType.hair]);
         hair.gameObject.SetActive(true);
-        cloth.texture = loadImage("cloth",isMale,styleID[4]);
+        cloth.texture = loadImage("cloth",isMale,styleID[(int)eItemType.cloth]);
         cloth.gameObject.SetActive(true);
-        face.texture = loadImage("face",isMale,styleID[5]);
+        face.texture = loadImage("face",isMale,styleID[(int)eItemType.face]);
         face.gameObject.SetActive(true);
     }
     
@@ -73,12 +84,14 @@ public class PlayerPreviewLoader : MonoBehaviour
         //         Debug.Log(w.name);
         //     }
         // }
-        face = this.transform.GetChild(0).gameObject.GetComponent<RawImage>();
-        hair = this.transform.GetChild(1).gameObject.GetComponent<RawImage>();
-        cloth = this.transform.GetChild(2).gameObject.GetComponent<RawImage>();
-        face.gameObject.SetActive(false);
-        cloth.gameObject.SetActive(false);
-        hair.gameObject.SetActive(false);
+        face = this.FindChildObject("Face").GetComponent<RawImage>();
+        hair = this.FindChildObject("Hair").GetComponent<RawImage>();
+        cloth = this.FindChildObject("Cloth").GetComponent<RawImage>();
+        if (hair.texture == null){
+            face.gameObject.SetActive(false);
+            cloth.gameObject.SetActive(false);
+            hair.gameObject.SetActive(false);
+        }
         try{
             pName = this.transform.GetChild(4).gameObject.GetComponent<Text>();
             pName.gameObject.SetActive(false);

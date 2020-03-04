@@ -14,6 +14,19 @@ public class PlayerInfo : BaseInfoWrapper
 	public int x; // pos is in pixel
 	public int y; // pos is in pixel
 	public int direction;
+	public int gp; //exp
+	public int win;
+	public int totalMatch;
+    public int attack;
+    public int defence;
+    public int agility;
+    public int luck;
+    public int grade;
+    public int fightPower;
+    public int money;
+    public int medal;
+    public int gold;
+    public int giftToken;
 	public int blood;
     public int energy;
     public int dander;
@@ -21,6 +34,7 @@ public class PlayerInfo : BaseInfoWrapper
     public int effectCount;
 	public List<int> property3;
 	public List<int> property4;
+    //["", "head", "glass", "hair", "eff", "cloth", "face", "arm", "armlet", "ring", "", "", "", "suits", "necklace", "wing", "chatBall"];
 	public string style; //2: hair; 4: cloth; 5: face; 6: weapon
 	public string color;
 	public string skin;

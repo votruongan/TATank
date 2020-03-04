@@ -131,7 +131,7 @@ public class PlayerController : LivingController
             this.gameController = gc;
         originalInfo = inf;
         if (healthBar == null)
-            healthBar = this.FindChildObject("ForeHealth").GetComponent<HealthBarSprite>();
+            healthBar = this.FindChildObject("HealthInfo").GetComponent<HealthBarSprite>();
         if (healthBar.playerName == null)
             healthBar.BaseChangeColor();
         healthBar.playerName.text = inf.nickname;

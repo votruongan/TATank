@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using ConnectorSpace;
 using Game.Logic.Phy.Actions;
@@ -9,12 +12,32 @@ public class ConnectorManager : MonoBehaviour
     public bool isSceneTransforming = false;
     public bool isLogedIn = false;
 	public GameController gameController;
+    public List<ItemTemplateInfo> templateInfos;
     public List<PlayerInfo> playerInfos;
     public List<ItemInfo>[] localBags = new List<ItemInfo>[16];
 
     public PlayerInfo localPlayerInfo;
 	ClientConnector connector;
     UnityThread uThread;
+
+    public ItemTemplateInfo FindItemTemplateInfo(string pic, bool isMale){
+        // Debug.Log("FindItemTemplateInfo: " + pic);
+        int needSex = (isMale)?(1):(2);
+        foreach(ItemTemplateInfo iti in templateInfos){
+            if (iti.Pic == pic)
+            {
+            // Debug.Log(iti.Pic);
+                if (iti.NeedSex == needSex || iti.NeedSex == 0){
+                    return iti;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+        }
+        return null;
+    }   
 
 #region ConnectorHandler
     //eTankCmdType.FIRE
@@ -127,8 +150,28 @@ public class ConnectorManager : MonoBehaviour
         gameController.LoadMap(mapId);
     }
 
-    public void GirdGoodsHandler(int bagType, List<ItemInfo> bag){
-        localBags[bagType] = bag;
+    public void GridGoodsHandler(int bagType, List<ItemInfo> bag){
+        if (localBags[bagType]== null || localBags[bagType].Count == 0){
+            localBags[bagType] = bag;
+            return;
+        }
+        for (int j = 0; j < bag.Count; j++){
+            bool existed = false;
+            for(int i = 0; i < localBags[bagType].Count; i++){
+                if (bag[j].Place == localBags[bagType][i].Place){
+                    localBags[bagType][i] = bag[j];
+                    existed = true;
+                    break;
+                }
+            }
+            if (!existed){
+                localBags[bagType].Add(bag[j]);
+            }
+        }
+        GameObject go = GameObject.Find("BagAndInfoPanel");
+        if (go != null){
+            go.GetComponent<BagAndInfoController>().OnEnable();
+        }
     }
     public void GameLoadHandler(int mapId){
         // Debug.Log("LoadMapHandler : " + mapId.ToString());
@@ -140,6 +183,9 @@ public class ConnectorManager : MonoBehaviour
         gameController.StartGame(Players);
     }
     public void GameCreateHandler(List<PlayerInfo> pList){
+        foreach(PlayerInfo pI in pList){
+            Debug.Log(pI.ToString());
+        }
         gameController.GameCreate(pList);
     }
     public void GameOverHandler(){
@@ -162,8 +208,8 @@ public class ConnectorManager : MonoBehaviour
     public void SendItemEquip (){
         this.connector.SendItemEquip();
     }
-    public void SendShoot(int x, int y, int force, int angle){
-        this.connector.ShootTag(true,0);
+    public void SendShoot(int x, int y, int force, int angle, byte shootTime){
+        this.connector.ShootTag(true,shootTime);
         this.connector.Shoot(x, y, force, angle);
     }
 
@@ -174,6 +220,9 @@ public class ConnectorManager : MonoBehaviour
 
     public void SendSkip(){
         this.connector.Skip();
+    }
+    public void SendUsingFly(){
+        this.connector.Fly();
     }
 
     public void SendMove(int x, int y,byte dir){
@@ -201,6 +250,10 @@ public class ConnectorManager : MonoBehaviour
         
         if (gameController == null)
             return;
+        
+    }
+    public void SendChangePlaceItem(eBagType bagType, int place, eBagType toBag, int toPlace, int count){
+        connector.SendChangePlaceItem(bagType, place, toBag, toPlace, count);
     }
     public bool ConnectToHost(string HostIp){
         connector = new ClientConnector("bot0", "123456", 100, HostIp, 9200, this);
@@ -233,10 +286,48 @@ public class ConnectorManager : MonoBehaviour
         PlayerPrefs.SetString("28102000",password);
         GameController.LogToScreen("Connector Started");
         Debug.Log("Login Done - Connector Started");
+        ((CommonUIController)gameController.uiController).notiPanel.ShowText("Đang xử lý ... ");
+        string decStr = connector.LoadTemplate();
+        XmlDocument document = new XmlDocument();
+        document.LoadXml(decStr);
+        XmlNodeList itemNodes = document.GetElementsByTagName("Item");
+        StartCoroutine(ExecLoadTemplate(itemNodes));
+        StartCoroutine(UpdateLoadTemplateProcess());
         isLogedIn = true;
         return true;
     }
-
+    IEnumerator UpdateLoadTemplateProcess(){
+        while(templateInfos.Count < 3300){
+            yield return new WaitForSeconds(0.2f);
+             ((CommonUIController)gameController.uiController).notiPanel.ShowText(templateInfos.Count.ToString()+"/3300");
+        }
+        ((CommonUIController)gameController.uiController).notiPanel.Close();
+    }
+    IEnumerator ExecLoadTemplate(XmlNodeList itemNodes){
+        templateInfos = new List<ItemTemplateInfo>();
+        string path = Application.persistentDataPath + "itemTemplate.dat";
+        // File.Delete(path);
+        if (System.IO.File.Exists(path)){
+            using(Stream fileStream = File.OpenRead(path))
+            {
+                BinaryFormatter deserializer = new BinaryFormatter();
+                templateInfos = (List<ItemTemplateInfo>)deserializer.Deserialize(fileStream);
+            }
+        }
+        else{
+            foreach (XmlNode childrenNode in itemNodes)
+            {
+                templateInfos.Add(new ItemTemplateInfo(childrenNode.Attributes));
+                yield return null;
+            } 
+            using(Stream fileStream = File.Open(path, FileMode.Create))
+            {
+                BinaryFormatter serializer = new BinaryFormatter();
+                serializer.Serialize(fileStream, templateInfos);
+            }
+        }
+        Debug.Log("item template length: " + templateInfos.Count);
+    }
     public void OpenRegister(){
         Application.OpenURL(ConfigMgr.RegisterUrl);
     }
@@ -260,6 +351,13 @@ public class ConnectorManager : MonoBehaviour
         // Debug.Log("Check at ConnectorManager");
         localPlayerInfo = connector.GetLocalPlayerInfo();
         gameController.uiController.UpdateMainPlayerPreview(localPlayerInfo);
+    }
+
+    public void UpdateStatsDisplay(){
+        GameObject go = GameObject.Find("BagAndInfoPanel");
+        if (go != null){
+            go.GetComponent<BagAndInfoController>().LoadStats();
+        }
     }
 
 

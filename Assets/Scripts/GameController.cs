@@ -284,14 +284,18 @@ public class GameController : MonoBehaviour
 		connector.StopMatch();
 	}	
 
+	public void SendUsingFly(){
+		connector.SendUsingFly();
+	}
+
     public void MainPlayerFire(int force, int angle){
-		PlayerController enemyControl = mainPlayerController;
-		foreach(PlayerController pc in playerControllers){
-			if (pc.info.id != mainPlayerController.info.id){
-				enemyControl = pc;
-				break;
-			}
-		}
+		// PlayerController enemyControl = mainPlayerController;
+		// foreach(PlayerController pc in playerControllers){
+		// 	if (pc.info.id != mainPlayerController.info.id){
+		// 		enemyControl = pc;
+		// 		break;
+		// 	}
+		// }                 
     	Vector2 pPos = foreController.WorldPositionToPixel(mainPlayerController.transform.position, true);
 		// if (isOnLocalTest){
 		// 	Debug.Log("Main Player Fired: " + ((int)(mainPlayerController.isHeadingRight?(byte)1:(byte)255)).ToString());
@@ -301,7 +305,9 @@ public class GameController : MonoBehaviour
 		// }
 		connector.SendDirection(mainPlayerController.isHeadingRight?(byte)1:(byte)255);
 		//Send ShootTag and Shoot packet
-    	connector.SendShoot((int)pPos.x,(int)pPos.y,force,angle);
+		// byte tim = ((byte)(countDownController.initSeconds - ((int)countDownController.timer)));
+		byte tim = ((byte)(int)countDownController.timer);
+    	connector.SendShoot((int)pPos.x,(int)pPos.y,force,angle,(byte)tim);
     }
 
     public void MainPlayerMove(float tx, float ty, bool isHeadingRight){
@@ -402,13 +408,6 @@ public class GameController : MonoBehaviour
 				countDownController = GameObject.Find("CountDownController").GetComponent<CountDownController>();
 			}
 			countDownController.ToggleObject(false);
-			foreach(PlayerInfo inf in connector.playerInfos){
-				if (inf.team == 1){
-					((FightUIController)uiController).LoadBluePlayerPreview(inf);
-				} else{
-					((FightUIController)uiController).LoadRedPlayerPreview(inf);
-				}
-			}
 			// no DigController assigned	
 			if (digController == null){
 				try{
@@ -416,6 +415,13 @@ public class GameController : MonoBehaviour
 				}
 				catch(Exception e){
 					Debug.Log("No digController : " + e.ToString());
+				}
+			}
+			foreach(PlayerInfo inf in connector.playerInfos){
+				if (inf.team == 1){
+					((FightUIController)uiController).LoadBluePlayerPreview(inf);
+				} else{
+					((FightUIController)uiController).LoadRedPlayerPreview(inf);
 				}
 			}
 			// if (isOnLocalTest){

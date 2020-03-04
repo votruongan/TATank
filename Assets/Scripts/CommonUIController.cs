@@ -31,10 +31,6 @@ public class CommonUIController : UIController
         loginPanel.SetActive(true);
     }
 
-    public void OpenToolbar(GameObject toolbar){
-        toolbar.SetActive(true);
-    }
-
     void Start()
     {
         if(gameController == null)
@@ -92,6 +88,7 @@ public class CommonUIController : UIController
             loginPanel.SetActive(false);
             mainPanel.SetActive(true);
             countUpUI.SetActive(false);
+            UpdateMainPlayerPreview(gameController.connector.localPlayerInfo);
         }
         loadingScreen.SetActive(false);
     }
@@ -286,7 +283,7 @@ public class CommonUIController : UIController
 
 
     public override void UpdateMainPlayerPreview(PlayerInfo pInfo){
-        Debug.Log("Check at UIController");
+        // Debug.Log("Check at UIController");
         mainPlayerPreview.GetComponent<PlayerPreviewLoader>().LoadFromInfo(pInfo);
         // loginPanel.SetActive(false);
     }
