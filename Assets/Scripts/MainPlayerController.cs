@@ -184,7 +184,9 @@ public class MainPlayerController : PlayerController
         }
     }
 
-
+    private void OnDestroy() {
+        gameController.KillSelf();    
+    }
 
     //Update every 0.02s
     void FixedUpdate(){
@@ -194,6 +196,7 @@ public class MainPlayerController : PlayerController
         }
     	// Left/Right Arrow
     	if (Input.GetKey(KeyCode.RightArrow)|| isRightArrowDown){
+            // Debug.Log("R");
             if (!isBeginMove)
                 BeginMove();
             if (!isHeadingRight){
@@ -205,6 +208,7 @@ public class MainPlayerController : PlayerController
     	}
 
     	if (Input.GetKey(KeyCode.LeftArrow) || isLeftArrowDown){
+            // Debug.Log("Left");
             if (!isBeginMove)
                 BeginMove();
             if (isHeadingRight){
@@ -357,11 +361,15 @@ public class MainPlayerController : PlayerController
         fightInfoDisplay.FightInfoDisplay(inf.energy,inf.blood,inf.dander);
     }
 
+    // public void RotateLiving(){
+    //     base.RotateLiving();
+    // }
+
 
     // Update every frame
     void Update()
     {        
-        base.Update();
+        // base.Update();
 
         if (!isOnTurn){
             return;

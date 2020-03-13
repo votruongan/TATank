@@ -90,10 +90,10 @@ public class LivingController : BaseObjectController
         //groundSensitivity = 0.2f;
     }
 
-    public void RotateLiving(){
-        Debug.Log("Rotate Living");        
+    public void RotateLiving(){   
         try{
             this.transform.Rotate(0f, 180f, 0f, Space.Self);
+            Debug.Log("Rotate Living");
             //rigidBody.MoveRotation(180f);
             isHeadingRight = !isHeadingRight;
         }catch (Exception e){
@@ -273,7 +273,7 @@ public class LivingController : BaseObjectController
         rigidBody.gravityScale = 5f;
     }
 
-
+    private bool sentGroundedFunc;
     protected void FixedUpdate(){
         // CheckGrounded();
         if (!isGrounded){
@@ -281,11 +281,12 @@ public class LivingController : BaseObjectController
             // if (rot.z != 0f){
             //     transform.Rotate(new Vector3(0f,0f,-rot.z),Space.Self);
             // }
-            this.transform.eulerAngles = new Vector3(0f,0f,0f);
+            this.transform.eulerAngles = new Vector3(0f,this.transform.eulerAngles.y,0f);
             rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-            SetRestRigidbody();
+            // SetRestRigidbody();
             this.SetFallRigidbody();
             sentGravityNormalize = false;
+            sentGroundedFunc = true;
         }
         else{
             if(!sentGravityNormalize){
@@ -293,6 +294,7 @@ public class LivingController : BaseObjectController
                 rigidBody.constraints = RigidbodyConstraints2D.None;
                 SetRestRigidbody();
                 sentGravityNormalize = true;
+                sentGroundedFunc = false;
             }
         }
     }
