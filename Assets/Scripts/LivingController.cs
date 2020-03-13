@@ -185,8 +185,8 @@ public class LivingController : BaseObjectController
                 RotateLiving();
         }
         // Debug.Log("living is moving to: " + pos.ToString());
-        isMoving = true;
         targetPosition = pos;
+        isMoving = true;
         sentFinishMove = false;
     }
     
@@ -233,7 +233,7 @@ public class LivingController : BaseObjectController
 
     protected void Update(){
         if (isMoving){
-            SetMovableRigidbody();            
+            SetMovableRigidbody();    
             if (isGrounded){
                 Vector3 pos = Vector3.MoveTowards(this.transform.position,targetPosition,2f*Time.deltaTime);
                 //Debug.Log("MoveTo Pos: " +pos.ToString());
@@ -265,7 +265,7 @@ public class LivingController : BaseObjectController
         rigidBody.gravityScale = 1f;
     }
     protected void SetRestRigidbody(){
-        rigidBody.drag = 300f;
+        rigidBody.drag = 1000f;
         rigidBody.gravityScale = 0.5f;
     }
     protected void SetFallRigidbody(){
@@ -281,6 +281,7 @@ public class LivingController : BaseObjectController
             // if (rot.z != 0f){
             //     transform.Rotate(new Vector3(0f,0f,-rot.z),Space.Self);
             // }
+            this.transform.eulerAngles = new Vector3(0f,0f,0f);
             rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
             SetRestRigidbody();
             this.SetFallRigidbody();

@@ -83,17 +83,18 @@ public class PlayerController : LivingController
         rigidBody.simulated = true;
     }
 
-    public void Fire(int time, float vx, float vy){
+    public void Fire(int time, float vx, float vy, Vector3 target){
         //System.Threading.Thread.Sleep(speedTime);
         //staticBullet.SetActive(false);
-        Fire(vx,vy);
+        Fire(vx,vy, target);
     }
 
-    public void Fire(float vx, float vy){
+    public void Fire(float vx, float vy, Vector3 target){
         //staticBullet.SetActive(false);
         movingBullet = Instantiate(bulletPrefab,this.transform.position,Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
         bCtrl.Fire(vx, vy);
+        bCtrl.SetTarget(target);
     }
 
 
@@ -111,7 +112,7 @@ public class PlayerController : LivingController
             damPanelController = damPanel.GetComponent<DamagePanelController>();
             damPanelController.SetDamage(damage);
         }
-        UpdateHealthBar(info.team,remainingBlood/originalInfo.blood);
+        UpdateHealthBar(info.team,(float)remainingBlood/originalInfo.blood);
     }
     public virtual void Damaged(int time, int damage, bool critical, int remainingBlood){
         StartCoroutine(WaitAndDamage(time/1000, damage, critical, remainingBlood));
@@ -140,7 +141,7 @@ public class PlayerController : LivingController
 
     public virtual void UpdatePlayerInfo(PlayerInfo inf){
         this.info = inf.Clone();
-        this.UpdateHealthBar(this.originalInfo.team, this.info.blood/this.originalInfo.blood);
+        this.UpdateHealthBar(this.originalInfo.team, (float)this.info.blood/this.originalInfo.blood);
     }
 
     public void resetBullet(){

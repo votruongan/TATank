@@ -36,10 +36,10 @@ public class BagAndInfoController : BaseToolbarController
         if (infoHightligting > -1){
             infoSlots[infoHightligting].NormalbackGround();
             infoSlots[infoHightligting+1].NormalbackGround();
-            // infoHightligting = -1;
+            infoHightligting = -1;
         }
-        // infoSelectingPlace = -1;
-        // selectingPlace = -1;
+        infoSelectingPlace = -1;
+        selectingPlace = -1;
         itemInfoController.Hide();
         // Debug.Log("Deselected");
     }
@@ -54,6 +54,7 @@ public class BagAndInfoController : BaseToolbarController
             RectTransform slotTransform = null;
             //Touch a slot in bag
             if (bagPrefix[0] == 'B'){
+                Debug.Log("BagSelected");
                 DeselectSlotInList(ref bagSlots, ref selectingPlace);
                 slotTransform = (RectTransform) bagSlots[bagPlace].transform;
                 selectingPlace = bagPlace;
@@ -206,7 +207,7 @@ public class BagAndInfoController : BaseToolbarController
             case "hair": res = 2; break;
             case "face": res = 3; break;
             case "cloth": res = 4; break;
-            case "weapon": res = 6; break;                
+            case "weapon": res = 6; break;
         }
         return res;
     }

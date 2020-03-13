@@ -10,6 +10,7 @@ public class HealthBarSprite : BaseObjectController {
 	public TextMesh playerName;
 	public SpriteRenderer getTurnSprite;
 	Transform parentTf;
+
 	private void Update() {
 		Vector3 vRot = parentTf.rotation.eulerAngles;
 		if (vRot.y>1f || vRot.y < -1f){
@@ -61,6 +62,7 @@ public class HealthBarSprite : BaseObjectController {
 
 	// Update is called once per frame
 	public void UpdateHealthBar (float percent) {
+		// Debug.Log(" -- -- Change Healthbar " + percent.ToString());
 		if (!isInited){
 			spriteRenderer.transform.localScale = new Vector3(1f,2f,0f);
 		}

@@ -31,7 +31,7 @@ public class BulletController : MonoBehaviour
     public float timer = 0f;
 
     //Vx = (force * cos(a)) / 5	
-    //Vy = (force * sin(a) - gt) / 5 
+    //Vy = (force * sin(a)) / 5 
 
     //move the bullet to the current position
     private void execFire(int time){
@@ -58,8 +58,24 @@ public class BulletController : MonoBehaviour
         this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
         // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
     }
-
-
+    private bool isHeadingRight;
+    private Vector3 targetPos;
+    private Vector3 middlePos;
+    public void SetTarget(Vector3 targ){
+        targetPos = targ;
+        middlePos = Vector3.zero;
+        middlePos.x = targetPos.x + this.transform.position.x;
+        middlePos.y = this.transform.position.y + velorY;
+        if (this.transform.position.x - targetPos.x < 0){
+            isHeadingRight = true;
+        } else {
+            isHeadingRight = false;
+        }
+        isFired = true;
+        initTransform = this.transform.position;
+    }
+    private float moveUnit = 0.01f;
+    private float tanBallAngle;
     public void Fire(int time, float vx, float vy){
         //isDestined = false;
         initTransform = this.transform.position;
@@ -74,17 +90,37 @@ public class BulletController : MonoBehaviour
         // {
             
         // }
-        this.rigidBody.AddForce(new Vector2(velorX*75,velorY*75));
+        tanBallAngle = vy/vx;
+        StartCoroutine(TimedDestroy(time/1000));
+        // this.rigidBody.AddForce(new Vector2(velorX*75,velorY*75));
     }
-
+    IEnumerator TimedDestroy(float secs){
+        Debug.Log("Timed Destroy: "+ secs);
+        yield return new WaitForSeconds(secs);
+        Destroy(this.gameObject);
+    }
+    private bool passMidCheckpoint = false;
+    private float totalTime = 0f;
     void FixedUpdate(){
         if (this.transform.position.y <= -20f || this.transform.position.x <= -20f){
             Destroy(this.gameObject);
         }
         if (isFired){
+            totalTime += 0.02f;
+            float xPos = initTransform.x + velorX * totalTime;
+            float yPos = initTransform.y + velorY * totalTime - 0.5f * 9.81f * totalTime * totalTime;
+            this.transform.position = new Vector3(xPos, yPos , 0f);
             //move the bullet with diagonal 
             // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
             //isFired = false;
+            // if (!passMidCheckpoint){
+            //     this.transform.Translate(new Vector3(moveUnit,moveUnit*tanBallAngle));
+            //     if (this.transform.position.x - targetPos.x < moveUnit){
+            //         passMidCheckpoint = true;
+            //     }
+            // } else {
+            //     this.transform.Translate(new Vector3(moveUnit,moveUnit*tanBallAngle - 2 * moveUnit * tanBallAngle));
+            // }
             //this.transform.Translate(new Vector3(velorX*dT,velorY*dT,0f));
             // Debug.Log("[BULLET] this pos - x "+transform.position.x.ToString()+" - y "+transform.position.y.ToString());
         }
@@ -121,21 +157,21 @@ public class BulletController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (justFired){
-            timer += Time.deltaTime;
-            if (timer > 0.04f){
-                justFired = false;
-            }
-            return;
-        }
-    	//if bullet contact to ground
-        if (isGrounded && isFired){
-            // if (!isDestined){
-            //     gameController.BulletExplodeAt(this.transform.position);
-            // }
-            Destroy(this.gameObject);
-            //rigidBody.simulated = false;
-        }
+        // if (justFired){
+        //     timer += Time.deltaTime;
+        //     if (timer > 0.04f){
+        //         justFired = false;
+        //     }
+        //     return;
+        // }
+    	// //if bullet contact to ground
+        // if (isGrounded && isFired){
+        //     // if (!isDestined){
+        //     //     gameController.BulletExplodeAt(this.transform.position);
+        //     // }
+        //     Destroy(this.gameObject);
+        //     //rigidBody.simulated = false;
+        // }
         if (this.transform.position.y >= maxX){
             //Debug.Log("Over X. ");
         }

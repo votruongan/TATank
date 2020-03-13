@@ -159,6 +159,11 @@ public class FightUIController : UIController
         return "";
     }
 
+    public void SelectQuitGame(){
+        gameController.KillSelf();
+    }
+
+
     public override void SelectFightingProp(string propString){
 
         int propId = 0;

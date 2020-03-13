@@ -30,7 +30,7 @@ public class SoundManager : MonoBehaviour
             musicVolume = music;
             player.volume = music;
         }
-        if (effect > 0.5f){
+        if (effect > -0.5f){
             PlayerPrefs.SetFloat("effectVolume",effect);
             effectVolume = effect;
         }

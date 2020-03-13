@@ -41,14 +41,12 @@ public class GameController : MonoBehaviour
 #region CONNECTOR_HANDLER
 	public GameObject BoxSprite;
     public void PlayerTurn(int pId, List<BoxInfo> newBoxes, List<PlayerInfo> playerList){
-    	PlayerController pCtrl = FindPlayerById(pId);
-    	if (pCtrl == null){
-    		return;
-    	}
+		PlayerController pCtrl = null;
     	if (pId == mainPlayerController.info.id){
 			uiController.DisplayYourTurn();
 	    	mainPlayerController.GetTurn(true);
         	countDownController.ToggleObject(true);
+			pCtrl = mainPlayerController;
     	}
 		else{
 			mainPlayerController.GetTurn(false);
@@ -59,11 +57,17 @@ public class GameController : MonoBehaviour
 			if (setPCtrl == null)
 				continue;
 			setPCtrl.UpdatePlayerInfo(p);
+			if (p.id != pId){
+				setPCtrl.GetTurn(false);
+			}else{
+				pCtrl = setPCtrl;
+				setPCtrl.GetTurn(true);
+			}
 		}
 		foreach(BoxInfo box in newBoxes){
 
 		}
-    	mainCamController.TranslateTo(pCtrl.transform.position);
+    	mainCamController.LockTo(pCtrl.transform);
     }
 
 	public void BombExplodeAt(int time, int pId,int ePPosX,int ePPosY){
@@ -101,14 +105,15 @@ public class GameController : MonoBehaviour
 	}
 
     // add the destination to explode
-    public void PlayerFire(int pId, int time, int pVx, int pVy){
+    public void PlayerFire(int pId, int time, int pVx, int pVy, int targX, int targY){
 		PlayerController pCtrl = FindPlayerById(pId);
+		Vector3 targPos = foreController.PixelToWorldPosition(targX,targY,true);
 		if (pCtrl == null)
 			return;
 		float vx = pVx / 100;
 		float vy = -pVy / 100;
 		pCtrl.PlayAnimation("PlayerFired");
-		pCtrl.Fire(time,vx,vy);
+		pCtrl.Fire(time,vx,vy,targPos);
     	mainCamController.LockTo(pCtrl.movingBullet.transform);
     }
 
@@ -125,11 +130,9 @@ public class GameController : MonoBehaviour
 
 
     public void PlayerMove(int pId, int x, int y, byte dir){
-
-		// if (pId == mainPlayerController.info.id){
-		// 	return;
-		// }
-
+		if (pId == mainPlayerController.info.id){
+			return;
+		}
 		PlayerController pC = FindPlayerById(pId);
 		if (pC == null)
 			return;
@@ -277,6 +280,9 @@ public class GameController : MonoBehaviour
 
 
 #region SIGNAL_FROM_MAIN_PLAYER 
+	public void KillSelf(){
+		connector.connector.SendKillSelf();
+	}
 	public void StartMatch(){
 		connector.StartMatch();
 	}
@@ -295,7 +301,7 @@ public class GameController : MonoBehaviour
 		// 		enemyControl = pc;
 		// 		break;
 		// 	}
-		// }                 
+		// } 
     	Vector2 pPos = foreController.WorldPositionToPixel(mainPlayerController.transform.position, true);
 		// if (isOnLocalTest){
 		// 	Debug.Log("Main Player Fired: " + ((int)(mainPlayerController.isHeadingRight?(byte)1:(byte)255)).ToString());
@@ -327,6 +333,7 @@ public class GameController : MonoBehaviour
     }
 
 	public void SendUsingFightingProp(int propId){
+		// Debug.Log("SendUsingFightingProp: " + propId.ToString());
 		if (mainPlayerController.isOnTurn)
 		{
 			connector.SendUsingProp(254,-2,propId);

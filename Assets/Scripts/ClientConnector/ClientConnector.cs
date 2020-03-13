@@ -476,7 +476,7 @@ public class ClientConnector : BaseConnector
                 for (int ind = 0; ind < slotLength; ind++){
                     pkg.ReadInt();
                     bagBag.Add(new ItemInfo(ref pkg, true));
-                    Debug.Log(bagBag[ind].ToString());
+                    // Debug.Log(bagBag[ind].ToString());
                 }
                 UnityThread.executeInUpdate(() =>
                 {
@@ -791,7 +791,7 @@ public class ClientConnector : BaseConnector
                         
                         return;
                     case eTankCmdType.DIRECTION:
-                        int direction = pkg.ReadInt();        
+                        int direction = pkg.ReadInt();
                         UnityThread.executeInUpdate(() =>
                         {
                             //Call CurrentBallHandler in ConnectorManager
@@ -800,7 +800,8 @@ public class ClientConnector : BaseConnector
                         return;
                     case eTankCmdType.DANDER:
                         int playerId = pkg.Parameter1;
-                        int dander = pkg.ReadInt();        
+                        int dander = pkg.ReadInt();
+                        localPlayerInfo.dander = dander;        
                         UnityThread.executeInUpdate(() =>
                         {
                             //Call CurrentBallHandler in ConnectorManager
@@ -897,6 +898,13 @@ public class ClientConnector : BaseConnector
         pkg.WriteByte((byte) eTankCmdType.FIRE_TAG);
         pkg.WriteBoolean(b);
         pkg.WriteByte((byte) time);
+        this.SendTCP(pkg);
+    }
+
+    public void SendKillSelf()
+    {
+        GSPacketIn pkg = new GSPacketIn(GAME_CMD);
+        pkg.WriteByte((byte) eTankCmdType.KILLSELF);
         this.SendTCP(pkg);
     }
 

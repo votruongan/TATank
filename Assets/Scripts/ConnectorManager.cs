@@ -17,7 +17,7 @@ public class ConnectorManager : MonoBehaviour
     public List<ItemInfo>[] localBags = new List<ItemInfo>[16];
 
     public PlayerInfo localPlayerInfo;
-	ClientConnector connector;
+	public ClientConnector connector;
     UnityThread uThread;
 
     public ItemTemplateInfo FindItemTemplateInfo(string pic, bool isMale){
@@ -47,13 +47,13 @@ public class ConnectorManager : MonoBehaviour
             Debug.Log(fire.ToString());
             Debug.Log(fire.DetailString());
             for (int i = 0; i < fire.actionType.Count; i++){
-                gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy); 
                 switch ((ActionType)fire.actionType[i]){
                     case ActionType.PICK:
                     //ActionType.PICK, phy.Id, 0, 0, 0));
                         break;
                     case ActionType.BOMB:
                     gameController.BombExplodeAt(fire.timeInt[i], pId,fire.actionParam1[i],fire.actionParam2[i]);
+                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);     
                     //ActionType.BOMB, m_x, m_y, digMap ? 1 : 0, 0));
                         break;
                     case ActionType.KILL_PLAYER:
@@ -73,6 +73,7 @@ public class ConnectorManager : MonoBehaviour
                     //ActionType.START_MOVE, m_owner.Id, m_owner.X, m_owner.Y, m_owner.IsLiving ? 1 : 0));
                         break;
                     case ActionType.TRANSLATE:
+                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);  
                     gameController.PlayerFly(fire.timeInt[i],pId,fire.actionParam1[i],fire.actionParam2[i]); 
                     //ActionType.TRANSLATE, m_x, m_y, 0, 0));
                         break;
@@ -336,13 +337,13 @@ public class ConnectorManager : MonoBehaviour
     }
 
     IEnumerator InteruptStallConnector(){
-        int times = 0;
+        int count = 0;
         while (connector.lastErr == eErrorCode.LOADING)
         {
             yield return new WaitForSeconds(0.5f);
-            Debug.Log("0.5 s have passed");
-            times++;
-            if (connector.lastErr == eErrorCode.LOADING && times == 10){
+            // Debug.Log("0.5 s have passed");
+            count++;
+            if (connector.lastErr == eErrorCode.LOADING && count == 10){
                 connector.lastErr = eErrorCode.FAILED;
             }
         }

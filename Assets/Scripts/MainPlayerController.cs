@@ -65,13 +65,14 @@ public class MainPlayerController : PlayerController
             }
         // angleIndicatorAnchor = transform.GetChild(2).GetComponent<Transform>().position;
         // angleIndicator = transform.GetChild(1).GetComponent<Transform>();
-        if (handRotator == null)
+        if (handRotator == null){
             try{
                 handRotator = GameObject.Find("AngleHand").GetComponent<HandRotator>();
-                handRotator.SetIsHeadRight(this.isHeadingRight);
             } catch (Exception e){
                 
             }
+        }
+        handRotator.SetIsHeadRight(this.isHeadingRight);
         // try {
         //     virtualRigidBody = GameObject.Find("VirtualRigidbody").GetComponent<VirtualRigidbodyHandler>();
         // } catch(Exception e){
@@ -99,7 +100,7 @@ public class MainPlayerController : PlayerController
         //anim = transform.GetChild(1).gameObject.GetComponent<Animator>();
     }
     
-    public virtual void GetTurn(bool isMainTurn){
+    public override void GetTurn(bool isMainTurn){
         base.GetTurn(isMainTurn);
         isOnTurn = isMainTurn;
     }
@@ -155,7 +156,7 @@ public class MainPlayerController : PlayerController
             //     transform.Translate(-0.01f,0f,0f);
             //     // virtualRigidBody.MoveLeft();
             // } 
-            transform.Translate(0.01f,0f,0f);
+            transform.Translate(0.015f,0.002f,0f);
             gameController.soundManager.PlayEffectOnce("move");
             // if (Vector2.Distance(virtualRbdPos, this.transform.position) >= 0.5f){
             //     Debug.Log("Go Go Go vrb's position: "+ virtualRbdPos);
@@ -281,11 +282,6 @@ public class MainPlayerController : PlayerController
         this.SetRestRigidbody();
         gameController.MainPlayerMove(this.transform.position.x,this.transform.position.y,isHeadingRight);
     }
-
-    public void RotateLiving(){
-        base.RotateLiving();
-    }
-
     public void ReleasePower(){
         if (power > 1f){
             power = 1f;
@@ -295,7 +291,7 @@ public class MainPlayerController : PlayerController
         }
         powerIndicator.value = power;
         prevPowerIndicator.value = power;
-        firePower = (int)((float) power * 100);
+        firePower = (int)((float) power * 100f);
         //Vx = (force * cos(a)) / 5 
         float vx = (float)firePower * Mathf.Cos((float)fireAngle)/5;
         float vy = (float)firePower * Mathf.Sin((float)fireAngle)/5;
@@ -316,8 +312,7 @@ public class MainPlayerController : PlayerController
 
     IEnumerator FireExecution(){    
         for (int i = 0; i < fireBuff + 1; i++){
-            firePower = (int)((float) power * 100);
-            gameController.MainPlayerFire(firePower,handRotator.currentAngle);
+            gameController.MainPlayerFire(firePower*100,handRotator.currentAngle);
             yield return new WaitForSeconds(1.0f);
         }
         fireBuff = 0;
@@ -329,10 +324,10 @@ public class MainPlayerController : PlayerController
         gameController.SendUsingFightingProp(id);
         switch (name){
             case "X2":
-                fireBuff = 2;
+                fireBuff += 2;
                 break;
             case "X1":
-                fireBuff = 1;
+                fireBuff += 1;
                 break;
         }
     }
