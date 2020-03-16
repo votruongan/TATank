@@ -254,11 +254,19 @@ public class GameController : MonoBehaviour
 			pos += new Vector3(0f,0.2f,0f);
 			GameObject pOb;
 			PlayerController pCtrl = null;
+			if (uiController == null){
+				uiController = GameObject.Find("UIController").GetComponent<FightUIController>();
+			}
+			if (p.team == 1){
+				((FightUIController)uiController).LoadBluePlayerPreview(p);
+			} else{
+				((FightUIController)uiController).LoadRedPlayerPreview(p);
+			}
 			//Set player info and GameController	
 			if (p.isMainPlayer){
 				pOb = Instantiate(mainPlayerPrefab, pos, Quaternion.identity);
 				mainPlayerController = pOb.GetComponent<MainPlayerController>();
-				Debug.Log(mainPlayerController);
+				// Debug.Log(mainPlayerController);
 				pCtrl = mainPlayerController;
 			}else{ 
 				pOb = Instantiate(playerPrefab, pos, Quaternion.identity);

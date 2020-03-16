@@ -1263,7 +1263,7 @@ MonoBehaviour:
   equipAnimators: []
   propIcon: {fileID: 0}
   healthBar: {fileID: 0}
-  groundSensitivity: {x: 0.16, y: 0}
+  groundSensitivity: {x: 0.15, y: 0}
   isHeadingRight: 0
   isMoving: 0
   positionList: []

@@ -91,6 +91,13 @@ public class PlayerController : LivingController
 
     public void Fire(float vx, float vy, Vector3 target){
         //staticBullet.SetActive(false);
+        StartCoroutine(ExecFire(vx,vy,target));
+    }
+    IEnumerator ExecFire(float vx, float vy, Vector3 target){
+        while (this.isMoving)
+        {
+            yield return new WaitForSeconds(0.02f);
+        }
         movingBullet = Instantiate(bulletPrefab,this.transform.position,Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
         bCtrl.Fire(vx, vy);

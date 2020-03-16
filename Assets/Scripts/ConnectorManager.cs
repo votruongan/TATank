@@ -253,6 +253,9 @@ public class ConnectorManager : MonoBehaviour
             return;
         
     }
+    private void OnDestroy() {
+        connector.SendLogOut();
+    }
     public void SendChangePlaceItem(eBagType bagType, int place, eBagType toBag, int toPlace, int count){
         connector.SendChangePlaceItem(bagType, place, toBag, toPlace, count);
     }

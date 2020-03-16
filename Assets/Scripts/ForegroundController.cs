@@ -92,7 +92,7 @@ public class ForegroundController : MonoBehaviour
 		if (foreSprite.sprite != null){
 			mapRect = foreSprite.sprite.rect;
 			Debug.Log("Updated BottomLeftPosition ");
-			return;				
+			return;
 		}
 		mapRect = deadSprite.sprite.rect;
 	}

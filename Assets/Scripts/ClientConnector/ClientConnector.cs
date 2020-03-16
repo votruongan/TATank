@@ -851,6 +851,14 @@ public class ClientConnector : BaseConnector
     }
 
 
+
+    public void SendLogOut()
+    {
+        GSPacketIn pkg = new GSPacketIn((byte)ePackageType.GAME_PLAYER_EXIT);
+        //pkg.WriteInt(7);
+        this.SendTCP(pkg);
+			
+    }
     public void SendLoadingComplete()
     {
         GSPacketIn pkg = new GSPacketIn(GAME_CMD);
@@ -1012,9 +1020,9 @@ public class ClientConnector : BaseConnector
         pkg.WriteInt(y);
         pkg.WriteInt(force);
         pkg.WriteInt(angle);
+        Debug.LogFormat("Send SHOOT successfully - force:{0} - angle:{1} - x:{2} - y:{3}",force,angle,x,y);
         this.SendTCP(pkg);
         //this.FindTarget();
-        Debug.Log("Send SHOOT successfully");
     }
 
     public void UsingProp(byte type, int place, int templateId)

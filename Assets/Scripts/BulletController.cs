@@ -6,7 +6,7 @@ public class BulletController : MonoBehaviour
 {
     [Header("FOR DEBUGGING")]
     public List<Vector3> positionList;
-    public bool justFired;
+    public bool justFired = true;
     public Rigidbody2D rigidBody;
     public int time;
     public float currentT = 0f;
@@ -48,7 +48,7 @@ public class BulletController : MonoBehaviour
         velorY = vy;
         maxX = this.transform.position.x + vx;
         maxY = this.transform.position.y + vy;
-        initTransform = this.transform.position;
+        initTransform = this.transform.position +  new Vector3(0f,0.1f,0f);
         // transform.Translate(new Vector3(vx/10,vy/10,0f));
         //rigidBody.simulated = true;
         if (rigidBody == null)
@@ -58,23 +58,23 @@ public class BulletController : MonoBehaviour
         this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
         // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
     }
-    private bool isHeadingRight;
+    // private bool isHeadingRight;
     private Vector3 targetPos;
-    private Vector3 middlePos;
+    // private Vector3 middlePos;
     public void SetTarget(Vector3 targ){
         targetPos = targ;
-        middlePos = Vector3.zero;
-        middlePos.x = targetPos.x + this.transform.position.x;
-        middlePos.y = this.transform.position.y + velorY;
-        if (this.transform.position.x - targetPos.x < 0){
-            isHeadingRight = true;
-        } else {
-            isHeadingRight = false;
-        }
+        // middlePos = Vector3.zero;
+        // middlePos.x = targetPos.x + this.transform.position.x;
+        // middlePos.y = this.transform.position.y + velorY;
+        // if (this.transform.position.x - targetPos.x < 0){
+        //     isHeadingRight = true;
+        // } else {
+        //     isHeadingRight = false;
+        // }
         isFired = true;
         initTransform = this.transform.position;
     }
-    private float moveUnit = 0.01f;
+    // private float moveUnit = 0.01f;
     private float tanBallAngle;
     public void Fire(int time, float vx, float vy){
         //isDestined = false;
@@ -99,7 +99,7 @@ public class BulletController : MonoBehaviour
         yield return new WaitForSeconds(secs);
         Destroy(this.gameObject);
     }
-    private bool passMidCheckpoint = false;
+    // private bool passMidCheckpoint = false;
     private float totalTime = 0f;
     void FixedUpdate(){
         if (this.transform.position.y <= -20f || this.transform.position.x <= -20f){
@@ -157,26 +157,26 @@ public class BulletController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // if (justFired){
-        //     timer += Time.deltaTime;
-        //     if (timer > 0.04f){
-        //         justFired = false;
-        //     }
-        //     return;
-        // }
-    	// //if bullet contact to ground
-        // if (isGrounded && isFired){
-        //     // if (!isDestined){
-        //     //     gameController.BulletExplodeAt(this.transform.position);
-        //     // }
-        //     Destroy(this.gameObject);
-        //     //rigidBody.simulated = false;
-        // }
-        if (this.transform.position.y >= maxX){
-            //Debug.Log("Over X. ");
+        if (justFired){
+            timer += Time.deltaTime;
+            if (timer > 0.04f){
+                justFired = false;
+            }
+            return;
         }
-        if (this.transform.position.y >= maxY){
-           // Debug.Log("Over Y. ");
+    	//if bullet contact to ground
+        if (isGrounded && isFired){
+            // if (!isDestined){
+            //     gameController.BulletExplodeAt(this.transform.position);
+            // }
+            Destroy(this.gameObject);
+            //rigidBody.simulated = false;
         }
+        // if (this.transform.position.y >= maxX){
+        //     //Debug.Log("Over X. ");
+        // }
+        // if (this.transform.position.y >= maxY){
+        //    // Debug.Log("Over Y. ");
+        // }
     }
 }

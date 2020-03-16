@@ -50,13 +50,14 @@ public class LivingController : BaseObjectController
 
         if (healthBar == null)
             healthBar = this.FindChildObject("HealthInfo").GetComponent<HealthBarSprite>();
-
+        targetPosition = this.transform.position;
         isHeadingRight = true;
         if (rigidBody != null)
             rigidBody.simulated = true;
         sentGravityNormalize = false;
         sentFinishMove = false;
         rigidBody.drag = 100f;
+        // Debug.Log("Init transform: " + this.transform.position);
         //StartCoroutine(WaitAndInit(0.1f));
 	}
     
@@ -188,6 +189,7 @@ public class LivingController : BaseObjectController
         targetPosition = pos;
         isMoving = true;
         sentFinishMove = false;
+        Debug.Log("Moving to "+pos);
     }
     
 
@@ -232,14 +234,18 @@ public class LivingController : BaseObjectController
     }
 
     protected void Update(){
+        // Debug.Log("Update transform: " + this.transform.position);
         if (isMoving){
-            SetMovableRigidbody();    
+            SetMovableRigidbody();
             if (isGrounded){
-                Vector3 pos = Vector3.MoveTowards(this.transform.position,targetPosition,2f*Time.deltaTime);
+                // Debug.Log("Moving living to Target: " + targetPosition);
+                Vector3 pos = Vector3.MoveTowards(this.transform.position,targetPosition,2f*Time.deltaTime) - transform.position;
                 //Debug.Log("MoveTo Pos: " +pos.ToString());
-                rigidBody.MovePosition(pos);
+                // rigidBody.MovePosition(pos);
+                pos.x = (isHeadingRight)?(pos.x):(-pos.x);
+                this.transform.Translate(pos.x,0.002f,0f);
                 // Debug.Log(Mathf.Abs(transform.position.x -targetPosition.x));
-                if (this.transform.position == targetPosition || Mathf.Abs(transform.position.x -targetPosition.x) <= 0.1f){
+                if (this.transform.position == targetPosition || Mathf.Abs(transform.position.x -targetPosition.x) <= 0.01f){
                     Debug.Log("MoveTo Finished");
                     // StopEquipAnimation();
                     sentFinishMove = true;
@@ -247,11 +253,12 @@ public class LivingController : BaseObjectController
                 }
             }
             else {
-//                Debug.Log("isMoving but not grounded");
+            //    Debug.Log("isMoving but not grounded");
             }
         } else {
             if (!sentFinishMove){
-                // Debug.Log("Disable moving and send finish move");
+                Debug.Log("Disable moving and send finish move");
+                this.transform.position = targetPosition;
                 SetRestRigidbody();
                 if (anim != null)
                     anim.SetBool("isMoving",false);
@@ -281,7 +288,7 @@ public class LivingController : BaseObjectController
             // if (rot.z != 0f){
             //     transform.Rotate(new Vector3(0f,0f,-rot.z),Space.Self);
             // }
-            this.transform.eulerAngles = new Vector3(0f,this.transform.eulerAngles.y,0f);
+            // this.transform.eulerAngles = new Vector3(0f,this.transform.eulerAngles.y,0f);
             rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
             // SetRestRigidbody();
             this.SetFallRigidbody();

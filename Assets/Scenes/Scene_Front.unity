@@ -2078,15 +2078,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1330499010}
-        m_MethodName: OpenToolbar
-        m_Mode: 2
+      - m_Target: {fileID: 1138240368}
+        m_MethodName: ShowText
+        m_Mode: 5
         m_Arguments:
-          m_ObjectArgument: {fileID: 1070057117}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: "T\xEDnh n\u0103ng \u0111ang ph\xE1t tri\u1EC3n"
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &262978996
@@ -9406,15 +9406,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1330499010}
-        m_MethodName: OpenToolbar
-        m_Mode: 2
+      - m_Target: {fileID: 1138240368}
+        m_MethodName: ShowText
+        m_Mode: 5
         m_Arguments:
-          m_ObjectArgument: {fileID: 1070057117}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: "T\xEDnh n\u0103ng \u0111ang ph\xE1t tri\u1EC3n"
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1004670409
@@ -20798,15 +20798,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1330499010}
-        m_MethodName: OpenToolbar
-        m_Mode: 2
+      - m_Target: {fileID: 1138240368}
+        m_MethodName: ShowText
+        m_Mode: 5
         m_Arguments:
-          m_ObjectArgument: {fileID: 1070057117}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: "T\xEDnh n\u0103ng \u0111ang ph\xE1t tri\u1EC3n"
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2023972741
@@ -20992,15 +20992,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1330499010}
-        m_MethodName: OpenToolbar
-        m_Mode: 2
+      - m_Target: {fileID: 1138240368}
+        m_MethodName: ShowText
+        m_Mode: 5
         m_Arguments:
-          m_ObjectArgument: {fileID: 1070057117}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: "T\xEDnh n\u0103ng \u0111ang ph\xE1t tri\u1EC3n"
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2030732287
@@ -22119,6 +22119,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_EffectColor.b
       value: 0.5019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 5938992832515653681, guid: 21a953679abb4734596ff3559d17515f,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.44375357
+      objectReference: {fileID: 0}
+    - target: {fileID: 5938992832515653681, guid: 21a953679abb4734596ff3559d17515f,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.6005714
+      objectReference: {fileID: 0}
+    - target: {fileID: 5938992832515653681, guid: 21a953679abb4734596ff3559d17515f,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.62600005
       objectReference: {fileID: 0}
     - target: {fileID: 5938992832886815328, guid: 21a953679abb4734596ff3559d17515f,
         type: 3}

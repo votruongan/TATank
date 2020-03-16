@@ -316,7 +316,7 @@ public class MainPlayerController : PlayerController
 
     IEnumerator FireExecution(){    
         for (int i = 0; i < fireBuff + 1; i++){
-            gameController.MainPlayerFire(firePower*100,handRotator.currentAngle);
+            gameController.MainPlayerFire(firePower*20,-handRotator.currentAngle);
             yield return new WaitForSeconds(1.0f);
         }
         fireBuff = 0;

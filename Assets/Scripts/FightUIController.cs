@@ -22,11 +22,13 @@ public class FightUIController : UIController
     public void LoadRedPlayerPreview(PlayerInfo inf){
         if (inf == null)
             return;
+        RedPlayerPreview.gameObject.SetActive(true);    
         RedPlayerPreview.LoadFromInfo(inf);
     }
     public void LoadBluePlayerPreview(PlayerInfo inf){
         if (inf == null)
             return;
+        BluePlayerPreview.gameObject.SetActive(true);
         BluePlayerPreview.LoadFromInfo(inf);
     }
 
