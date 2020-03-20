@@ -289,7 +289,8 @@ public class GameController : MonoBehaviour
 
 #region SIGNAL_FROM_MAIN_PLAYER 
 	public void KillSelf(){
-		connector.connector.SendKillSelf();
+		connector.connector.SendLogOut();
+		GameOver();
 	}
 	public void StartMatch(){
 		connector.StartMatch();
@@ -321,7 +322,7 @@ public class GameController : MonoBehaviour
 		//Send ShootTag and Shoot packet
 		// byte tim = ((byte)(countDownController.initSeconds - ((int)countDownController.timer)));
 		byte tim = ((byte)(int)countDownController.timer);
-    	connector.SendShoot((int)pPos.x,(int)pPos.y,force,angle,(byte)tim);
+    	connector.SendShoot((int)pPos.x,(int)pPos.y+30,force,angle,(byte)tim);
     }
 
     public void MainPlayerMove(float tx, float ty, bool isHeadingRight){

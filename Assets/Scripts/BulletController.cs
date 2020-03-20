@@ -43,7 +43,7 @@ public class BulletController : MonoBehaviour
         //this.transform.position = new Vector3(verlorX,verlorY,0f);   
     }
     public void Fire(float vx, float vy){
-        // Debug.Log("vx: "+vx +" vy: "+vy);
+        Debug.Log("Bullet is firing with - vx: "+vx +" vy: "+vy);
         velorX = vx;
         velorY = vy;
         maxX = this.transform.position.x + vx;

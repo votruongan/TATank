@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 904413848871702938}
   - component: {fileID: 1359373171441614066}
   - component: {fileID: 7063824926635462982}
-  - component: {fileID: 287614798}
   - component: {fileID: 287614799}
+  - component: {fileID: 4384377506760124342}
   m_Layer: 10
   m_Name: Bullet_Hammer
   m_TagString: Untagged
@@ -120,27 +120,6 @@ MonoBehaviour:
   dT: 0.1
   liveTime: 0
   timer: 0
---- !u!50 &287614798
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6325674088689757725}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 1
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!70 &287614799
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -157,3 +136,24 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.32, y: 0.42}
   m_Direction: 0
+--- !u!50 &4384377506760124342
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325674088689757725}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 0
+  m_CollisionDetection: 0
+  m_Constraints: 0

@@ -125,6 +125,8 @@ public class BagAndInfoController : BaseToolbarController
                 infoSlots.Add(tbsc.GetComponent<BagSlotController>());
             }
         }
+        this.gameObject.SetActive(false);
+        this.gameObject.SetActive(true);
     }
     public void OnEnable()
     {
@@ -197,6 +199,7 @@ public class BagAndInfoController : BaseToolbarController
         if (slot == null)
             return;
         Texture2D te = tryLoadEquipDisplay(isMale, item);
+        // Debug.Log("Loading " + slotPrefix + " " + place + "-" + item.Pic +" : " +(te != null));
         slot.LoadDisplay(te);
     }
 

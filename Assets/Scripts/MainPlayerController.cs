@@ -239,8 +239,8 @@ public class MainPlayerController : PlayerController
         // anim.SetBool("isFired",false);
         // anim.SetBool("isMoving",true);
         this.SetMovableRigidbody();
-        this.PlayAnimation("PlayerMove");
-        this.PlayEquipAnimation("ClothMove");
+        // this.PlayAnimation("PlayerMove");
+        // this.PlayEquipAnimation("ClothMove");
         isBeginMove = true;
         startTimer = true;
         // StartCoroutine(MoveExecution());

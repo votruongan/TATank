@@ -268,14 +268,18 @@ public class LivingController : BaseObjectController
     }
 
     protected void SetMovableRigidbody(){
-        rigidBody.drag = 0.1f;
+        rigidBody.constraints = RigidbodyConstraints2D.None;
+        rigidBody.drag = 1f;
         rigidBody.gravityScale = 1f;
     }
     protected void SetRestRigidbody(){
-        rigidBody.drag = 1000f;
-        rigidBody.gravityScale = 0.5f;
+        rigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
+        rigidBody.drag = 1f;
+        rigidBody.angularDrag = 0f;
+        rigidBody.gravityScale = 1f;
     }
     protected void SetFallRigidbody(){
+        rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rigidBody.drag = 20f;
         rigidBody.gravityScale = 5f;
     }
@@ -288,9 +292,7 @@ public class LivingController : BaseObjectController
             // if (rot.z != 0f){
             //     transform.Rotate(new Vector3(0f,0f,-rot.z),Space.Self);
             // }
-            // this.transform.eulerAngles = new Vector3(0f,this.transform.eulerAngles.y,0f);
-            rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-            // SetRestRigidbody();
+            this.transform.eulerAngles = new Vector3(0f,this.transform.eulerAngles.y,0f);
             this.SetFallRigidbody();
             sentGravityNormalize = false;
             sentGroundedFunc = true;

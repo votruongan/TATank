@@ -13,6 +13,7 @@ public class PlayerPreviewLoader : BaseObjectController
     public Text pName;
     private static bool isWeaponLoaded = false;
     private static UnityEngine.Object[] weaponPaths;
+
     public void LoadFromInfo(PlayerInfo pInfo){
         // Debug.Log("Processing load request ...");
         // Debug.Log(pInfo.ToString());
@@ -31,11 +32,12 @@ public class PlayerPreviewLoader : BaseObjectController
         while (hair == null || face == null || cloth == null){
             yield return null;
         }
-        if (pName != null)
-            pName.text = pInfo.nickname;
+        if (pName == null)
+            pName = this.FindChildObject("PlayerName").GetComponent<Text>();
+        pName.text = pInfo.nickname;
         List<int> styleID = pInfo.GetStyleList();
         bool isMale = pInfo.sex;
-        this.transform.GetChild(3).gameObject.SetActive(false);
+        this.FindChildObject("LoadingPreview").gameObject.SetActive(false);
         hair.texture = loadImage("hair",isMale,styleID[(int)eItemType.hair]);
         hair.gameObject.SetActive(true);
         cloth.texture = loadImage("cloth",isMale,styleID[(int)eItemType.cloth]);
