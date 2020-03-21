@@ -280,8 +280,8 @@ public class LivingController : BaseObjectController
     }
     protected void SetFallRigidbody(){
         rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-        rigidBody.drag = 20f;
-        rigidBody.gravityScale = 5f;
+        rigidBody.drag = 1f;
+        rigidBody.gravityScale = 0.5f;
     }
 
     private bool sentGroundedFunc;

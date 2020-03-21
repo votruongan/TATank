@@ -606,10 +606,11 @@ public class ClientConnector : BaseConnector
                         // this.Act(new PlayerExecutable(this.EnterWaitingRoom));
                         // this.Act(new PlayerExecutable(this.CreateRoom));
                         // this.Act(new PlayerExecutable(this.StartGame));
+                        MatchSummary ms = ClientRecvPreparer.GameOver_MatchSummary(ref pkg, m_playerId);
                         UnityThread.executeInUpdate(() =>
                         {
                             //Call StartGameHandler in ConnectorManager
-                            connectorManager.GameOverHandler();
+                            connectorManager.GameOverHandler(ms);
                         });
                         return;
                     case eTankCmdType.GAME_TIME:

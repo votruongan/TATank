@@ -29,6 +29,7 @@ public class BulletController : MonoBehaviour
     public float dT = 0.02f;
     public float liveTime = 0f;
     public float timer = 0f;
+    private float G;
 
     //Vx = (force * cos(a)) / 5	
     //Vy = (force * sin(a)) / 5 
@@ -42,20 +43,21 @@ public class BulletController : MonoBehaviour
         // }
         //this.transform.position = new Vector3(verlorX,verlorY,0f);   
     }
-    public void Fire(float vx, float vy){
+    public void Fire(float vx, float vy, float g){
         Debug.Log("Bullet is firing with - vx: "+vx +" vy: "+vy);
         velorX = vx;
         velorY = vy;
-        maxX = this.transform.position.x + vx;
-        maxY = this.transform.position.y + vy;
-        initTransform = this.transform.position +  new Vector3(0f,0.1f,0f);
+        // maxX = this.transform.position.x + vx;
+        // maxY = this.transform.position.y + vy;
+        initTransform = this.transform.position;// +  new Vector3(0f,0.1f,0f);
         // transform.Translate(new Vector3(vx/10,vy/10,0f));
         //rigidBody.simulated = true;
         if (rigidBody == null)
             FindRigidBody();
         isFired = true;
         justFired = true;
-        this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
+        G = g;
+        // this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
         // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
     }
     // private bool isHeadingRight;
@@ -108,7 +110,7 @@ public class BulletController : MonoBehaviour
         if (isFired){
             totalTime += 0.02f;
             float xPos = initTransform.x + velorX * totalTime;
-            float yPos = initTransform.y + velorY * totalTime - 0.5f * 9.81f * totalTime * totalTime;
+            float yPos = initTransform.y + velorY * totalTime - 0.5f * G * totalTime * totalTime;
             this.transform.position = new Vector3(xPos, yPos , 0f);
             //move the bullet with diagonal 
             // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);

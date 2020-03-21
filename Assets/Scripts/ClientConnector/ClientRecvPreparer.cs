@@ -43,7 +43,7 @@ public static class ClientRecvPreparer
             pkg.ReadString();
             pkg.ReadInt();
             pkg.ReadInt();
-            //pkg.ReadInt(0);
+            //pkg.ReadInt();
             fireInfos[i].bomActionCount = pkg.ReadInt();
             //Debug.Log("Bom Action count: "+ fireInfos[i].bomActionCount.ToString());
             for (int j = 0; j < fireInfos[i].bomActionCount; j++)
@@ -58,6 +58,46 @@ public static class ClientRecvPreparer
             //Debug.Log(fireInfos[i].ToString());
         }         
         return fireInfos;
+    }
+
+
+    public static MatchSummary  GameOver_MatchSummary(ref GSPacketIn pkg, int mainPID){
+        MatchSummary ms = new MatchSummary();
+        int pCount = pkg.ReadInt();
+        int id;
+        for (int i = 0; i < pCount; i++)
+        {    
+            id = pkg.ReadInt();
+            ms.isWin = pkg.ReadBoolean();
+            ms.Grade = pkg.ReadInt();
+            ms.GP = pkg.ReadInt();
+            ms.TotalKill = pkg.ReadInt();
+            ms.TotalHurt = pkg.ReadInt();
+            ms.TotalShootCount = pkg.ReadInt();
+            ms.TotalCure = pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            ms.GainGP = pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            pkg.ReadInt();
+            ms.GainOffer = pkg.ReadInt();
+            ms.CanTakeOut = pkg.ReadInt();
+            if (id == mainPID){
+                break;
+            }
+        }
+        ms.riches = pkg.ReadInt();
+        return ms;
     }
 
     public static List<PlayerInfo> GameCreate_PlayerList(ref GSPacketIn pkg){

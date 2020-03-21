@@ -9,6 +9,7 @@ public class PlayerFightInfoDisplay: BaseObjectController
     public Slider danderSlider;
     public Slider energySlider;
     public Text bloodText;
+    public GameObject danderButton;
     
     public PlayerInfo original;
     int previousEnergy;
@@ -20,7 +21,7 @@ public class PlayerFightInfoDisplay: BaseObjectController
         bloodSlider = this.FindChildObject("HealthIndicator").GetComponent<Slider>();
         danderSlider = this.FindChildObject("DanderIndicator").GetComponent<Slider>();
         energySlider = this.FindChildObject("EnergyIndicator").GetComponent<Slider>();
-
+        danderButton = this.FindChildObject("DanderButton");
         bloodText = this.FindChildObject("HealthText").GetComponent<Text>();
     }
 

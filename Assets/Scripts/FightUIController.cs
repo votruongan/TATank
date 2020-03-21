@@ -116,12 +116,14 @@ public class FightUIController : UIController
     public override void SetFightingUI(bool isActive){
 		this.SetLoadingScreen(false);
         // mainPanel.SetActive(!isActive);
-        fightUI.SetActive(isActive);
+        if (fightUI != null)
+            fightUI.SetActive(isActive);
         if (isActive){
             // gameController.countDownController = GameObject.Find("CountDownController").GetComponent<CountDownController>();
         }
     }
     public override void SetLoadingScreen(bool isActive){
+        if (loadingScreen != null)
         loadingScreen.SetActive(isActive);
         // countUpUI.SetActive(!isActive);
     }

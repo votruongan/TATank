@@ -7,6 +7,7 @@ using ConnectorSpace;
 
 public class GameController : MonoBehaviour
 {
+	public float G = 7.2f;
 	[Header("For References")]
 	public bool isStarted = false;
     [Header("FOR DEBUGGING")]
@@ -97,6 +98,18 @@ public class GameController : MonoBehaviour
 		}
 		return pCtrl;
 	}
+	public void PlayerDander(int pId, int dander){
+		PlayerController pCtrl = FindPlayerById(pId);
+		if (pCtrl == null)
+			return;		
+		if (pId == mainPlayerController.info.id){
+			mainPlayerController.SetDander(dander);
+			return;
+		}
+		pCtrl.SetDander(dander);
+	}
+
+
 	public void PlayerDamage( int delayedTime, int pId, int damage,bool critical, int remainingBlood){
 		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
@@ -113,7 +126,7 @@ public class GameController : MonoBehaviour
 		float vx = pVx / 100;
 		float vy = -pVy / 100;
 		pCtrl.PlayAnimation("PlayerFired");
-		pCtrl.Fire(time,vx,vy,targPos);
+		pCtrl.Fire(vx,vy,targPos,G);
     	mainCamController.LockTo(pCtrl.movingBullet.transform);
     }
 
@@ -186,7 +199,7 @@ public class GameController : MonoBehaviour
 		minimapCamController.TranslateTo(foreController.transform.position);
 		connector.SendLoadComplete();
 	}
-	public void GameOver()
+	public void GameOver(MatchSummary ms)
 	{
 		Debug.Log("[GAMECONTROLLER] GAME OVER");
 		// foreach(PlayerController p in playerControllers){
@@ -290,7 +303,6 @@ public class GameController : MonoBehaviour
 #region SIGNAL_FROM_MAIN_PLAYER 
 	public void KillSelf(){
 		connector.connector.SendLogOut();
-		GameOver();
 	}
 	public void StartMatch(){
 		connector.StartMatch();
@@ -301,6 +313,9 @@ public class GameController : MonoBehaviour
 
 	public void SendUsingFly(){
 		connector.SendUsingFly();
+	}
+
+	public void SendPlayerDander(){
 	}
 
     public void MainPlayerFire(int force, int angle){
@@ -322,7 +337,7 @@ public class GameController : MonoBehaviour
 		//Send ShootTag and Shoot packet
 		// byte tim = ((byte)(countDownController.initSeconds - ((int)countDownController.timer)));
 		byte tim = ((byte)(int)countDownController.timer);
-    	connector.SendShoot((int)pPos.x,(int)pPos.y+30,force,angle,(byte)tim);
+    	connector.SendShoot((int)pPos.x,(int)pPos.y-30,force,angle,(byte)tim);
     }
 
     public void MainPlayerMove(float tx, float ty, bool isHeadingRight){

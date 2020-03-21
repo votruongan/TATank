@@ -129,7 +129,7 @@ public class ConnectorManager : MonoBehaviour
     //eTankCmdType.DANDER: Player dander (pow index)
     public void DanderHandler(int pId,int dander)
     {
-        
+        gameController.PlayerDander(pId,dander);
     }
 
     //eTankCmdType.DIRECTION
@@ -189,8 +189,8 @@ public class ConnectorManager : MonoBehaviour
         }
         gameController.GameCreate(pList);
     }
-    public void GameOverHandler(){
-        gameController.GameOver();
+    public void GameOverHandler(MatchSummary ms){
+        gameController.GameOver(ms);
     }
 #endregion
 

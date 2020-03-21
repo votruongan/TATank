@@ -34,7 +34,8 @@ public class PlayerPreviewLoader : BaseObjectController
         }
         if (pName == null)
             pName = this.FindChildObject("PlayerName").GetComponent<Text>();
-        pName.text = pInfo.nickname;
+        if (!string.IsNullOrEmpty(pInfo.nickname))
+            pName.text = pInfo.nickname;
         List<int> styleID = pInfo.GetStyleList();
         bool isMale = pInfo.sex;
         this.FindChildObject("LoadingPreview").gameObject.SetActive(false);
@@ -95,8 +96,8 @@ public class PlayerPreviewLoader : BaseObjectController
             hair.gameObject.SetActive(false);
         }
         try{
-            pName = this.transform.GetChild(4).gameObject.GetComponent<Text>();
-            pName.gameObject.SetActive(false);
+            pName = this.FindChildObject("PlayerName").GetComponent<Text>();
+            // pName.gameObject.SetActive(false);
         } catch(Exception e){
 
         }

@@ -345,6 +345,16 @@ public class MainPlayerController : PlayerController
         base.Damaged(time,damage,critical,remainingBlood);
         StartCoroutine(DelayedUpdatePlayerInfo(time));
     }
+    public void SetDander(int dander){
+        base.SetDander(dander);
+        this.info.dander = dander;
+        if (dander == originalInfo.dander){
+            fightInfoDisplay.danderButton.SetActive(true);
+        } else{
+            fightInfoDisplay.danderButton.SetActive(false);
+        }
+        fightInfoDisplay.FightInfoDisplay(-1,-1,info.dander);
+    }
 
     public override void SetPlayerInfo(PlayerInfo inf, GameController gc = null){
         this.originalInfo = inf.Clone();
@@ -355,6 +365,7 @@ public class MainPlayerController : PlayerController
         base.SetPlayerInfo(inf, gc);
         ((MainPlayerController)this).UpdatePlayerInfo(inf);
     }
+
     public override void UpdatePlayerInfo(PlayerInfo inf){
         base.UpdatePlayerInfo(inf);
         // Debug.Log("MainPlayer");

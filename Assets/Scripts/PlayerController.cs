@@ -105,6 +105,17 @@ public class PlayerController : LivingController
         }
     }
 
+    private GameObject danderDisplay;
+    public void SetDander(int dander){
+        if (danderDisplay == null)
+            danderDisplay = this.FindChildObject("DanderDisplay");
+        if (dander == originalInfo.dander){
+            danderDisplay.SetActive(true);
+        }
+        else{
+            danderDisplay.SetActive(false);
+        }
+    }
 
     public void UsingFightingProp(string propString){
         if ((!anim.GetBool("IsMoving")&&!anim.GetBool("IsFiring")&&!anim.GetBool("IsFired"))){
@@ -143,21 +154,21 @@ public class PlayerController : LivingController
     public void Fire(int time, float vx, float vy, Vector3 target){
         //System.Threading.Thread.Sleep(speedTime);
         //staticBullet.SetActive(false);
-        Fire(vx,vy, target);
+        Fire(vx,vy, target, 9.8f);
     }
 
-    public void Fire(float vx, float vy, Vector3 target){
+    public void Fire(float vx, float vy, Vector3 target, float g){
         //staticBullet.SetActive(false);
-        StartCoroutine(ExecFire(vx,vy,target));
+        StartCoroutine(ExecFire(vx,vy,target,g));
     }
-    IEnumerator ExecFire(float vx, float vy, Vector3 target){
+    IEnumerator ExecFire(float vx, float vy, Vector3 target, float g){
         while (this.isMoving)
         {
             yield return new WaitForSeconds(0.02f);
         }
         movingBullet = Instantiate(bulletPrefab,this.transform.position + new Vector3(0f,0.2f,0f),Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
-        bCtrl.Fire(vx, vy);
+        bCtrl.Fire(vx, vy, g);
         bCtrl.SetTarget(target);
     }
 
@@ -209,6 +220,7 @@ public class PlayerController : LivingController
     public virtual void UpdatePlayerInfo(PlayerInfo inf){
         this.info = inf.Clone();
         this.UpdateHealthBar(this.originalInfo.team, (float)this.info.blood/this.originalInfo.blood);
+        SetDander(inf.dander);
     }
 
     public void resetBullet(){
