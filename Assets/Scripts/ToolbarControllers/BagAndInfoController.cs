@@ -110,6 +110,19 @@ public class BagAndInfoController : BaseToolbarController
         }
         return false;
     }
+    public void ResetDisplay(){
+        if (bagSlots == null){
+            return;
+        }
+        for (int i = 0; i < 30; i++){
+            if (i < bagSlots.Count){
+                bagSlots[i].UnloadDisplay();
+            }
+            if (i < infoSlots.Count){
+                infoSlots[i].UnloadDisplay();
+            }
+        }
+    }
     protected override void Start(){
         base.Start();
         GameObject tbsc= null;
@@ -123,10 +136,10 @@ public class BagAndInfoController : BaseToolbarController
             tbsc = GameObject.Find("InfoSlot (" + i.ToString() + ")");
             if (tbsc != null){
                 infoSlots.Add(tbsc.GetComponent<BagSlotController>());
+                bagSlots[i].UnloadDisplay();
             }
         }
-        this.gameObject.SetActive(false);
-        this.gameObject.SetActive(true);
+        OnEnable();
     }
     public void OnEnable()
     {
@@ -173,14 +186,15 @@ public class BagAndInfoController : BaseToolbarController
         List<ItemInfo> items = gameController.connector.localBags[(int)eBagType.MainBag];
         localBag = items;
         while(items == null){
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.02f);
             items = gameController.connector.localBags[(int)eBagType.MainBag];
         }
-        StartCoroutine(LoadBagSlot(items,gameController.connector.localPlayerInfo.sex,"InfoSlot",0,30));
         StartCoroutine(LoadBagSlot(items,gameController.connector.localPlayerInfo.sex,"BagSlot",31));
+        StartCoroutine(LoadBagSlot(items,gameController.connector.localPlayerInfo.sex,"InfoSlot",0,30));
     }   
     
     IEnumerator LoadBagSlot(List<ItemInfo> items, bool isMale, string bagPrefix, int slotMin = 0, int slotMax = 2810){
+        yield return new WaitForSeconds(0.2f);
         foreach (ItemInfo item in items){
             if (item.Place < slotMin || item.Place > slotMax)
                 continue;

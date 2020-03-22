@@ -30,7 +30,7 @@ public class EquipController : MonoBehaviour
             pathInResource = pathInResource + gender + "/" +equipType + equipId.ToString() + "/1/";            
         }
         else{
-            pathInResource = pathInResource + gender + "/default/";   
+            pathInResource = pathInResource + gender + "/default/1/";   
         }
         if (equipType == "hair"){
             pathInResource = pathInResource + "B/";
@@ -45,7 +45,8 @@ public class EquipController : MonoBehaviour
         if (equipType == "hair"){
             //Shift position according to hair length;
             Vector3 pos = this.transform.localPosition;
-            this.transform.localPosition = new Vector3 (pos.x,(subSprite[0].rect.height<40)?(0.2f):(0.18f),0f);
+            if (subSprite.Length > 0)
+                this.transform.localPosition = new Vector3 (pos.x,(subSprite[0].rect.height<40)?(0.2f):(0.18f),0f);
         }
     }
 

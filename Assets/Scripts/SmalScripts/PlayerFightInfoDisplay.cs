@@ -39,7 +39,10 @@ public class PlayerFightInfoDisplay: BaseObjectController
             previousBlood = blood;
         }
         if (dander != -1 && dander != previousDander){
-            danderSlider.value = (float) dander/original.dander * 0.75f;
+            danderSlider.value = (float) dander/200 * 0.75f;
+            if (dander == 200){
+                danderButton.gameObject.SetActive(true);
+            }
             previousDander = dander;
         }
     }

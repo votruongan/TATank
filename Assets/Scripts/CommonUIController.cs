@@ -13,6 +13,7 @@ public class CommonUIController : UIController
     // public GameObject fightUI;
     public GameObject countUpUI;
     public NotiPanelController notiPanel;
+    public BagAndInfoController bagAndInfoController;
     public InputField loginIdText;
     public InputField loginPassText;
     public Text loginHostText;
@@ -29,6 +30,7 @@ public class CommonUIController : UIController
         PlayerPrefs.DeleteAll();
         GameObject.Find("SettingsPanel").SetActive(false);
         loginPanel.SetActive(true);
+        bagAndInfoController.ResetDisplay();
     }
 
     void Start()
@@ -283,7 +285,7 @@ public class CommonUIController : UIController
 
 
     public override void UpdateMainPlayerPreview(PlayerInfo pInfo){
-        // Debug.Log("Check at UIController");
+        Debug.Log("Check at UIController");
         mainPlayerPreview.GetComponent<PlayerPreviewLoader>().LoadFromInfo(pInfo);
         // loginPanel.SetActive(false);
     }

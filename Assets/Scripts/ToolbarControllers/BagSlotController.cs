@@ -84,6 +84,7 @@ public class BagSlotController : MonoBehaviour
     }
 
     public void UnloadDisplay(){
+        // Debug.Log("Unloading: " + this.gameObject.name);
         isEmpty = true;
         slotImage.texture = null;
         slotImage.color = new Color(0f,0f,0f,0f);

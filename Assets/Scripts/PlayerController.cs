@@ -109,7 +109,7 @@ public class PlayerController : LivingController
     public void SetDander(int dander){
         if (danderDisplay == null)
             danderDisplay = this.FindChildObject("DanderDisplay");
-        if (dander == originalInfo.dander){
+        if (dander == 200){
             danderDisplay.SetActive(true);
         }
         else{

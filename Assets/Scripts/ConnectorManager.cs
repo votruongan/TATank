@@ -66,8 +66,10 @@ public class ConnectorManager : MonoBehaviour
                     //ActionType.DANDER, p.Id, ((Player)p).Dander, 0, 0));
                         break; 
                     case ActionType.FLY_OUT:
-                    // bullet out of map -> treat as startmove
+                    // bullet out of map
                     //ActionType.FLY_OUT, 0, 0, 0, 0));
+                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]); 
+                    break;  
                     case ActionType.START_MOVE:
                     //gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy); 
                     //ActionType.START_MOVE, m_owner.Id, m_owner.X, m_owner.Y, m_owner.IsLiving ? 1 : 0));

@@ -13,6 +13,7 @@ public class PlayerPreviewLoader : BaseObjectController
     public Text pName;
     private static bool isWeaponLoaded = false;
     private static UnityEngine.Object[] weaponPaths;
+    PlayerInfo _playerInfo;
 
     public void LoadFromInfo(PlayerInfo pInfo){
         // Debug.Log("Processing load request ...");
@@ -21,11 +22,12 @@ public class PlayerPreviewLoader : BaseObjectController
             Debug.Log("PInfo is NULL");
             return;
         }
-        try{
-            StartCoroutine(ExecLoad(pInfo));
-        } catch (Exception e){
-
+        _playerInfo = pInfo;
+        // Debug.Log("hierarchy: " + this.gameObject.activeInHierarchy + " - self " + this.gameObject.activeSelf );
+        if (!this.gameObject.activeInHierarchy){
+            return;
         }
+        StartCoroutine(ExecLoad(pInfo));
     }
 
     IEnumerator ExecLoad(PlayerInfo pInfo){
@@ -100,6 +102,9 @@ public class PlayerPreviewLoader : BaseObjectController
             // pName.gameObject.SetActive(false);
         } catch(Exception e){
 
+        }
+        if (_playerInfo != null){
+            StartCoroutine(ExecLoad(_playerInfo));
         }
     }
 

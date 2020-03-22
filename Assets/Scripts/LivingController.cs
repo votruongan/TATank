@@ -273,7 +273,7 @@ public class LivingController : BaseObjectController
         rigidBody.gravityScale = 1f;
     }
     protected void SetRestRigidbody(){
-        rigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
+        rigidBody.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
         rigidBody.drag = 1f;
         rigidBody.angularDrag = 0f;
         rigidBody.gravityScale = 1f;
