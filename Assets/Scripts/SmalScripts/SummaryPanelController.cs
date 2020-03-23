@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class SummaryPanelController : BaseObjectController
 {
-    protected static SummaryPanelController _instance;
-    // Start is called before the first frame update
     public GameObject losePanel;
     public GameObject winPanel;
 
     public void DisplaySummary(MatchSummary ms){
+        Debug.Log("DisplaySummary Called!");
         this.gameObject.SetActive(true);
+        Debug.Log(ms.ToString());
         if (ms.isWin){
             winPanel.SetActive(true);
             losePanel.SetActive(false);
@@ -18,21 +18,6 @@ public class SummaryPanelController : BaseObjectController
             winPanel.SetActive(false);
             losePanel.SetActive(true);
         }
+        Debug.Log("DisplaySummary Done!");
     }
-
-    void Start()
-    {
-        if (_instance == null){
-            _instance = this;
-        } else{
-            return;
-        }
-        this.gameObject.SetActive(false);
-    }
-
-
-    public static SummaryPanelController GetInstance(){
-        return _instance;
-    }
-
 }

@@ -148,7 +148,7 @@ public class PlayerController : LivingController
         rigidBody.simulated = false;
         isMoving = false;
         this.transform.position = pos;
-        rigidBody.simulated = true;
+        SetFallRigidbody();
     }
 
     public void Fire(int time, float vx, float vy, Vector3 target){

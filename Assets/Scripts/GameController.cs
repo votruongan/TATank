@@ -7,7 +7,7 @@ using ConnectorSpace;
 
 public class GameController : MonoBehaviour
 {
-	public float G = 7.15f;
+	public float G = 7.25f;
 	[Header("For References")]
 	public bool isStarted = false;
     [Header("FOR DEBUGGING")]
@@ -206,9 +206,9 @@ public class GameController : MonoBehaviour
 		// 	Destroy(p.gameObject);
 		// }
 		uiController.SetFightingUI(false);
-		SummaryPanelController.GetInstance().DisplaySummary(ms);
+		((FightUIController)uiController).summaryPanelController.DisplaySummary(ms);
 		// SwitchScene("Scene_Game","Scene_Front");
-		TimedEndGame(5f);
+		StartCoroutine(TimedEndGame(5f));
 	}	
 
 	IEnumerator TimedEndGame(float secs){

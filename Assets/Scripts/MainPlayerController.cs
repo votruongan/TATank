@@ -156,6 +156,9 @@ public class MainPlayerController : PlayerController
             //     transform.Translate(-0.01f,0f,0f);
             //     // virtualRigidBody.MoveLeft();
             // } 
+            if (!UseEnergy(1)){
+                return;
+            }
             transform.Translate(0.015f,0.002f,0f);
             gameController.soundManager.PlayEffectOnce("move");
             // if (Vector2.Distance(virtualRbdPos, this.transform.position) >= 0.5f){
@@ -356,6 +359,16 @@ public class MainPlayerController : PlayerController
         fightInfoDisplay.FightInfoDisplay(-1,-1,info.dander);
     }
 
+    public bool UseEnergy(int usage){
+        Debug.Log("Current Energy: " + info.energy + "  -" + usage);
+        if (info.energy > usage){
+            info.energy -= usage;
+            fightInfoDisplay.FightInfoDisplay(info.energy,-1,-1);
+            return true;
+        } else {
+            return false;
+        }
+    }
     public override void SetPlayerInfo(PlayerInfo inf, GameController gc = null){
         this.originalInfo = inf.Clone();
         if (fightInfoDisplay == null){

@@ -15,9 +15,14 @@ public class FightUIController : UIController
     public bool isTakePower;
     public int power;
     public int angle;
-    public Dictionary<string, int> propDict;
+    public Dictionary<string, int> propDict  = new Dictionary<string, int>()
+            {    
+                {"X2",10001},{"X1",10002},{"S3",10003},{"P50",10004},
+                {"P40",10005},{"P30",10006},{"P20",10007},{"P10",10008}
+            };
     public PlayerPreviewLoader RedPlayerPreview;
     public PlayerPreviewLoader BluePlayerPreview;
+    public SummaryPanelController summaryPanelController;
 
     public void LoadRedPlayerPreview(PlayerInfo inf){
         if (inf == null)
@@ -167,9 +172,25 @@ public class FightUIController : UIController
         gameController.KillSelf();
     }
 
-
+    int GetPropEnergyUsage(string propString){
+        switch(propString){
+            case "P50":
+                return 85; break;
+            case "P30":
+                return 70; break;
+            case "P20":
+                return 55; break;
+            case "P10":
+                return 50; break;
+            default:
+                return 110; break;
+        }
+    }
     public override void SelectFightingProp(string propString){
-
+        int ene = GetPropEnergyUsage(propString);
+        if (!mainPlayerController.UseEnergy(ene)){
+            return;
+        }
         int propId = 0;
         try{
             propId = propDict[propString];

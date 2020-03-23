@@ -14,9 +14,10 @@ public class CommonUIController : UIController
     public GameObject countUpUI;
     public NotiPanelController notiPanel;
     public BagAndInfoController bagAndInfoController;
-    public InputField loginIdText;
-    public InputField loginPassText;
-    public Text loginHostText;
+    public LoginPanelController loginPanelController;
+    // public InputField loginIdText;
+    // public InputField loginPassText;
+    // public Text loginHostText;
     public PlayerPreviewLoader mainPlayerPreview;
     // [Header("FOR DEBUG")]
     // public MainPlayerController mainPlayerController;
@@ -76,13 +77,13 @@ public class CommonUIController : UIController
             loginPanel.SetActive(true);
             mainPanel.SetActive(false);
             countUpUI.SetActive(false);
-            loginIdText = GameObject.Find("Login_Id").GetComponent<InputField>();
-            loginPassText = GameObject.Find("Login_Password").GetComponent<InputField>();
-            loginHostText = GameObject.Find("Login_Server_Label").GetComponent<Text>();
+            // loginIdText = GameObject.Find("Login_Id").GetComponent<InputField>();
+            // loginPassText = GameObject.Find("Login_Password").GetComponent<InputField>();
+            // loginHostText = GameObject.Find("Login_Server_Label").GetComponent<Text>();
             if (!(string.IsNullOrEmpty(id) || string.IsNullOrEmpty(pass) || string.IsNullOrEmpty(host))){
-                loginIdText.text = id;
-                loginPassText.text = pass;
-                loginHostText.text = host;
+                loginPanelController.loginId.text = id;
+                loginPanelController.loginPass.text = pass;
+                loginPanelController.loginHost = host;
                 LoginToHost();
             }  
         }
@@ -94,126 +95,10 @@ public class CommonUIController : UIController
         }
         loadingScreen.SetActive(false);
     }
-    // --- Obsolete
-    // public void SetArrowButtonState(string buttonName,bool state){
-    //     switch(buttonName){
-    //         case "up":
-    //             gameController.mainPlayerController.isUpArrowDown = state;
-    //         break;
-    //         case "down":
-    //             gameController.mainPlayerController.isDownArrowDown = state;
-    //         break;
-    //         case "left":
-    //             gameController.mainPlayerController.isLeftKeyDown = state;
-    //         break;
-    //         case "right":
-    //             gameController.mainPlayerController.isRightKeyDown = state;
-    //         break;
-    //     }
-    // }
-    // public void UpdateMainPlayerController(){
-    //     mainPlayerController = gameController.mainPlayerController;
-    //     gameController.mainPlayerController.powerIndicator = GameObject.Find("PowerIndicator").GetComponent<Slider>();
-    //     gameController.mainPlayerController.prevPowerIndicator = GameObject.Find("PreviousPowerIndicator").GetComponent<Slider>();
-    //     gameController.mainPlayerController.prevPowerIndicator = GameObject.Find("PreviousPowerIndicator").GetComponent<Slider>();
-    //     gameController.mainPlayerController.handRotator = GameObject.Find("AngleHand").GetComponent<HandRotator>();
-    // }
-
-    // public void UpdatePlayerInfo(){
-    //     healthText.text = mainPlayerController.info.blood.ToString();
-    // }
-
-    // public void SetArrowButtonDown(string buttonName){
-    //     if (mainPlayerController == null)
-    //         return;
-    //     switch(buttonName){
-    //         case "up":
-    //             mainPlayerController.isUpArrowDown = true;
-    //         break;
-    //         case "down":
-    //             mainPlayerController.isDownArrowDown = true;
-    //         break;
-    //         case "left":
-    //             mainPlayerController.isLeftArrowDown = true;
-    //             mainPlayerController.BeginMove();
-    //         break;
-    //         case "right":
-    //             mainPlayerController.isRightArrowDown = true;
-    //             mainPlayerController.BeginMove();
-    //         break;
-    //     }
-    // }
-    // public void SetArrowButtonUp(string buttonName){
-    //     if (mainPlayerController == null)
-    //         return;
-    //     switch(buttonName){
-    //         case "up":
-    //             mainPlayerController.isUpArrowDown = false;
-    //         break;
-    //         case "down":
-    //             mainPlayerController.isDownArrowDown = false;
-    //         break;
-    //         case "left":
-    //             mainPlayerController.isLeftArrowDown = false;
-    //             mainPlayerController.FinishMove();
-    //         break;
-    //         case "right":
-    //             mainPlayerController.isRightArrowDown = false;
-    //             mainPlayerController.FinishMove();
-    //         break;
-    //     }
-    // }
-    // public void SetFightingUI(bool isActive){
-	// 	this.SetLoadingScreen(false);
-    //     mainPanel.SetActive(!isActive);
-    //     fightUI.SetActive(isActive);
-    //     if (isActive){
-    //         healthText = GameObject.Find("HealthText").GetComponent<Text>();
-    //         gameController.countDownController = GameObject.Find("CountDownController").GetComponent<CountDownController>();
-    //     }
-    // }
-
     public void SetLoadingScreen(bool isActive){
         loadingScreen.SetActive(isActive);
         countUpUI.SetActive(!isActive);
     }
-
-	// public void FireClicked()
-	// {
-    //     if (mainPlayerController == null)
-    //         return;
-    //     mainPlayerController.BeginTakePower();
-    //     isTakePower = true;
-	// }
-	// public void ReleasePower()
-	// {
-    //     if (mainPlayerController == null)
-    //         return;
-    //     isTakePower = false;
-    //     mainPlayerController.ReleasePower();
-	// }
-
-	// public void DisplayYourTurn()
-	// {
-	//     yourTurnPanel.SetActive(true);
-	// }
-
-    // public string FightingPropIdToName(int propId){
-    //     foreach(KeyValuePair<string,int> kvp in propDict){
-    //         // Debug.Log("kvp: "+ kvp);
-    //         if (kvp.Value == propId){
-    //             return kvp.Key;
-    //         }
-    //     }
-    //     return "";
-    // }
-
-    // public void SelectFightingProp(string propString){
-    //     int propId = propDict[propString];
-    //     Debug.Log("propID: "+ propId + " name: " + FightingPropIdToName(propId));
-    //     mainPlayerController.UsingFightingProp(propString,propId);
-    // }
-
     public void ConnectHost(){
 		gameController.ConnectHost(GameObject.Find("HsIPA_InputField_Text").GetComponent<Text>().text);
         GameObject.Find("HostIpPanel").SetActive(false);
@@ -244,22 +129,22 @@ public class CommonUIController : UIController
     }
 
     public void LoginToHost(){
-		string id = loginIdText.text;
+		string id = loginPanelController.loginId.text;
         if (string.IsNullOrEmpty(id)){
             Debug.Log("No Id entered");
             return;
         }
-		string pass = loginPassText.text;
+		string pass = loginPanelController.loginPass.text;
         if (string.IsNullOrEmpty(pass)){
             Debug.Log("No pass entered");
             return;
             
         }
-		string host = loginHostText.text;
+		string host = loginPanelController.loginHost;
         if ((string.IsNullOrEmpty(host))){
             if (host == "Test")
                 host = "127.0.0.1";
-            Debug.Log("No host entered");            
+            Debug.Log("No host entered");     
             return;
         }
         ExecLogin(id, pass,host);
@@ -289,16 +174,4 @@ public class CommonUIController : UIController
         mainPlayerPreview.GetComponent<PlayerPreviewLoader>().LoadFromInfo(pInfo);
         // loginPanel.SetActive(false);
     }
-
-    // void FixedUpdate(){
-    //     if (isTakePower){
-    //         mainPlayerController.TakePower();
-    //     }
-    // }
-
-    // void UpdateAngle(){
-    //     if (mainPlayerController != null){
-    //         mainPlayerController.TakePower();
-    //     }
-    // }
 }

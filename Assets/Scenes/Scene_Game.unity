@@ -7921,6 +7921,7 @@ MonoBehaviour:
   angle: 0
   RedPlayerPreview: {fileID: 267802446}
   BluePlayerPreview: {fileID: 624310126}
+  summaryPanelController: {fileID: 1371373388}
 --- !u!4 &1330499011
 Transform:
   m_ObjectHideFlags: 0
@@ -8616,7 +8617,7 @@ RectTransform:
   m_Father: {fileID: 1895172191}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
-  m_AnchorMin: {x: 0.71554136, y: 0.80600005}
+  m_AnchorMin: {x: 0.71052086, y: 0.80600005}
   m_AnchorMax: {x: 0.83072937, y: 0.8352574}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
@@ -11814,10 +11815,10 @@ RectTransform:
   m_Father: {fileID: 1895172191}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
-  m_AnchorMin: {x: 0.71554136, y: 0.75174266}
+  m_AnchorMin: {x: 0.71052086, y: 0.7508167}
   m_AnchorMax: {x: 0.8521881, y: 0.7992574}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.5}
+  m_SizeDelta: {x: 0, y: -1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1971786208
 MonoBehaviour:

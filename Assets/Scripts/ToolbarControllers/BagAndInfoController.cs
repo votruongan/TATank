@@ -12,7 +12,7 @@ public class BagAndInfoController : BaseToolbarController
     public GridLayoutGroup bagGrid;
     public GridLayoutGroup[] infoGrid;
     public int infoSelectingPlace = -1;
-    public int selectingPlace = -1;
+    public int bagSelectingPlace = -1;
     public int infoHightligting = -1;
     List<BagSlotController> bagSlots;
     List<BagSlotController> infoSlots;
@@ -39,7 +39,7 @@ public class BagAndInfoController : BaseToolbarController
             infoHightligting = -1;
         }
         infoSelectingPlace = -1;
-        selectingPlace = -1;
+        bagSelectingPlace = -1;
         itemInfoController.Hide();
         // Debug.Log("Deselected");
     }
@@ -55,9 +55,13 @@ public class BagAndInfoController : BaseToolbarController
             //Touch a slot in bag
             if (bagPrefix[0] == 'B'){
                 Debug.Log("BagSelected");
-                DeselectSlotInList(ref bagSlots, ref selectingPlace);
+                DeselectSlotInList(ref bagSlots, ref bagSelectingPlace);
                 slotTransform = (RectTransform) bagSlots[bagPlace].transform;
-                selectingPlace = bagPlace;
+                bagSelectingPlace = bagPlace;
+                if (infoSelectingPlace > -1){
+                    Debug.Log("Swap to bagg : " + infoSelectingPlace);
+                    gameController.connector.SendChangePlaceItem(eBagType.MainBag,infoSelectingPlace,eBagType.MainBag,bagSelectingPlace+31,0);
+                }
                 infoSelectingPlace = -1;
                 int p = (int)getEquipType(gameController.connector.localPlayerInfo.sex,item);
                 if (p > -1){
@@ -77,14 +81,19 @@ public class BagAndInfoController : BaseToolbarController
                         matchPlaceAndType(item,eItemType.ring,9,10) ||
                         matchPlaceAndType(item,eItemType.armlet,7,8)){
                         //PERFORM CHANGE PLACE
-                        gameController.connector.SendChangePlaceItem(eBagType.MainBag,selectingPlace+31,eBagType.MainBag,bagPlace,0);
-                        bagSlots[selectingPlace].Select();
+                        gameController.connector.SendChangePlaceItem(eBagType.MainBag,bagSelectingPlace+31,eBagType.MainBag,bagPlace,0);
+                        bagSlots[bagSelectingPlace].Select();
                         infoSlots[bagPlace].NormalbackGround();
                         infoSlots[bagPlace+1].NormalbackGround();
                         infoSlots[bagPlace-1].NormalbackGround();
+                        // infoSelectingPlace = -1;
+                        // bagSelectingPlace = -1;
+                        // infoHightligting = -1;
+                        // itemInfoController.Hide();
+                        return;
                     }
                 } else {
-                    selectingPlace = -1;
+                    bagSelectingPlace = -1;
                     DeselectSlotInList(ref infoSlots, ref infoSelectingPlace);
                 }
                 infoSelectingPlace = bagPlace;

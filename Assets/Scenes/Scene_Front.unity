@@ -8466,8 +8466,9 @@ GameObject:
   - component: {fileID: 923636927}
   - component: {fileID: 923636929}
   - component: {fileID: 923636930}
+  - component: {fileID: 923636931}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: MainLoginPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8563,6 +8564,22 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 1, a: 0.2509804}
   m_EffectDistance: {x: 56, y: -20}
   m_UseGraphicAlpha: 1
+--- !u!114 &923636931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923636925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 440a598f78ad27a47be55ad59bbe0bca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loginId: {fileID: 0}
+  loginPass: {fileID: 0}
+  serverDropdown: {fileID: 0}
+  loginHost: 
 --- !u!1 &931592406
 GameObject:
   m_ObjectHideFlags: 0
@@ -10294,7 +10311,7 @@ MonoBehaviour:
   - {fileID: 1378287130}
   - {fileID: 302285879}
   infoSelectingPlace: -1
-  selectingPlace: -1
+  bagSelectingPlace: -1
   infoHightligting: -1
   AttackStat: {fileID: 873017100}
   AgilityStat: {fileID: 2085290250}
@@ -12720,7 +12737,7 @@ GameObject:
   - component: {fileID: 1255129407}
   - component: {fileID: 1255129406}
   m_Layer: 5
-  m_Name: Dropdown
+  m_Name: ServerDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12793,15 +12810,24 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Test
-      m_Image: {fileID: 0}
     - m_Text: 10.0.2.2
       m_Image: {fileID: 0}
     - m_Text: 127.0.0.1
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 923636931}
+        m_MethodName: SelectServerFromDropdown
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 1255129406}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Dropdown, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1255129407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13622,9 +13648,7 @@ MonoBehaviour:
   countUpUI: {fileID: 2036126551}
   notiPanel: {fileID: 1138240368}
   bagAndInfoController: {fileID: 1070057119}
-  loginIdText: {fileID: 0}
-  loginPassText: {fileID: 0}
-  loginHostText: {fileID: 1518607621}
+  loginPanelController: {fileID: 923636931}
   mainPlayerPreview: {fileID: 0}
   matchButton: {fileID: 1095042536}
   readyButton: {fileID: 876022999}
@@ -15454,7 +15478,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Test
+  m_Text: 10.0.2.2
 --- !u!222 &1518607622
 CanvasRenderer:
   m_ObjectHideFlags: 0
