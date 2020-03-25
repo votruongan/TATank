@@ -40,7 +40,7 @@ public class PlayerFightInfoDisplay: BaseObjectController
         }
         if (dander != -1 && dander != previousDander){
             danderSlider.value = (float) dander/200 * 0.75f;
-            if (dander == 200){
+            if (dander >= 200){
                 danderButton.gameObject.SetActive(true);
             }
             previousDander = dander;

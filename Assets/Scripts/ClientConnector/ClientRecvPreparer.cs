@@ -64,11 +64,10 @@ public static class ClientRecvPreparer
     public static MatchSummary  GameOver_MatchSummary(ref GSPacketIn pkg, int mainPID){
         MatchSummary ms = new MatchSummary();
         int pCount = pkg.ReadInt();
-        int id;
         for (int i = 0; i < pCount; i++)
         {    
-            id = pkg.ReadInt();
-            if (id != mainPID){
+            ms.Id = pkg.ReadInt();
+            if (ms.Id != mainPID){
                 pkg.ReadBoolean();
                 for (int j = 0; j < 23; j ++){
                     pkg.ReadInt();

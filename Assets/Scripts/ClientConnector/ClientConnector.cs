@@ -782,8 +782,8 @@ public class ClientConnector : BaseConnector
                         byte dir = pkg.ReadByte();
                         bool isLiving = pkg.ReadBoolean();
                         string action = pkg.ReadString(); // is null or empty or "move"
-                        Debug.Log("MOVE type: "+moveType.ToString()+" tX: " + tx.ToString()+ 
-                                " tY:"+ ty.ToString()+ " dir: "+dir.ToString());        
+                        // Debug.Log("MOVE type: "+moveType.ToString()+" tX: " + tx.ToString()+ 
+                        //         " tY:"+ ty.ToString()+ " dir: "+dir.ToString());        
                         UnityThread.executeInUpdate(() =>
                         {
                             //Call MoveStartHandler in ConnectorManager

@@ -351,7 +351,7 @@ public class MainPlayerController : PlayerController
     public void SetDander(int dander){
         base.SetDander(dander);
         this.info.dander = dander;
-        if (dander == originalInfo.dander){
+        if (dander >= originalInfo.dander){
             fightInfoDisplay.danderButton.SetActive(true);
         } else{
             fightInfoDisplay.danderButton.SetActive(false);
@@ -360,8 +360,8 @@ public class MainPlayerController : PlayerController
     }
 
     public bool UseEnergy(int usage){
-        Debug.Log("Current Energy: " + info.energy + "  -" + usage);
-        if (info.energy > usage){
+        // Debug.Log("Current Energy: " + info.energy + "  -" + usage);
+        if (info.energy >= usage){
             info.energy -= usage;
             fightInfoDisplay.FightInfoDisplay(info.energy,-1,-1);
             return true;

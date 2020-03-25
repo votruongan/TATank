@@ -7,7 +7,7 @@ using ConnectorSpace;
 
 public class GameController : MonoBehaviour
 {
-	public float G = 7.25f;
+	public float G = 9.8f;
 	[Header("For References")]
 	public bool isStarted = false;
     [Header("FOR DEBUGGING")]
@@ -123,10 +123,10 @@ public class GameController : MonoBehaviour
 		Vector3 targPos = foreController.PixelToWorldPosition(targX,targY,true);
 		if (pCtrl == null)
 			return;
-		float vx = pVx / 100;
-		float vy = -pVy / 100;
+		float vx = (float)pVx / 100;
+		float vy = (float)-pVy / 100;
 		pCtrl.PlayAnimation("PlayerFired");
-		pCtrl.Fire(vx,vy,targPos,G);
+		pCtrl.Fire(time,vx,vy,targPos);
     	mainCamController.LockTo(pCtrl.movingBullet.transform);
     }
 

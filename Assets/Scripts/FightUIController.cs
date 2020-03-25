@@ -23,6 +23,7 @@ public class FightUIController : UIController
     public PlayerPreviewLoader RedPlayerPreview;
     public PlayerPreviewLoader BluePlayerPreview;
     public SummaryPanelController summaryPanelController;
+    public Button flyButton;
 
     public void LoadRedPlayerPreview(PlayerInfo inf){
         if (inf == null)
@@ -200,7 +201,9 @@ public class FightUIController : UIController
         gameController.soundManager.PlayEffect("noti");
         gameController.soundManager.PlayEffect("move");
         if (propString == "FLY"){
+            flyButton.interactable = false;
             gameController.connector.SendUsingFly();
+            return;
         }
         mainPlayerController.UsingFightingProp(propString,propId);
     }

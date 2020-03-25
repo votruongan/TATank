@@ -31,6 +31,10 @@ public class LoginPanelController : BaseObjectController
     }
 
     private void UpdateServerList(){
+        StartCoroutine(ExecUpdateList());
+    }
+
+    IEnumerator ExecUpdateList(){
         string requestUriString = ConfigMgr.ServerListUrl;
         string rawText = "";        
         using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
@@ -50,15 +54,19 @@ public class LoginPanelController : BaseObjectController
         {
             hostIP.Add(ele[i].Attributes["IP"].Value);
             hostName.Add(ele[i].Attributes["Name"].Value);
+            yield return null;
         }
         serverDropdown.ClearOptions();
         serverDropdown.AddOptions(hostName);
-        loginHost = hostIP[0];
+        if (hostIP.Count > 0)
+            loginHost = hostIP[0];
     }
+
+
     private float totalTime;
     private void FixedUpdate() {
         totalTime += Time.fixedDeltaTime;
-        if (totalTime > 0.5f){
+        if (totalTime > 5f){
             UpdateServerList();
             totalTime = 0;
         }

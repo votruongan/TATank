@@ -8576,9 +8576,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 440a598f78ad27a47be55ad59bbe0bca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loginId: {fileID: 0}
-  loginPass: {fileID: 0}
-  serverDropdown: {fileID: 0}
+  loginId: {fileID: 1390427320}
+  loginPass: {fileID: 2068694313}
+  serverDropdown: {fileID: 1255129406}
   loginHost: 
 --- !u!1 &931592406
 GameObject:

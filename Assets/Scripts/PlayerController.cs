@@ -154,21 +154,22 @@ public class PlayerController : LivingController
     public void Fire(int time, float vx, float vy, Vector3 target){
         //System.Threading.Thread.Sleep(speedTime);
         //staticBullet.SetActive(false);
-        Fire(vx,vy, target, 9.8f);
+        // Fire(vx,vy, target);
+        StartCoroutine(ExecFire(time,vx,vy,target));
     }
 
-    public void Fire(float vx, float vy, Vector3 target, float g){
+    public void Fire(float vx, float vy, Vector3 target){
         //staticBullet.SetActive(false);
-        StartCoroutine(ExecFire(vx,vy,target,g));
+        // StartCoroutine(ExecFire(vx,vy,target));
     }
-    IEnumerator ExecFire(float vx, float vy, Vector3 target, float g){
+    IEnumerator ExecFire(int time, float vx, float vy, Vector3 target){
         while (this.isMoving)
         {
             yield return new WaitForSeconds(0.02f);
         }
         movingBullet = Instantiate(bulletPrefab,this.transform.position + new Vector3(0f,0.2f,0f),Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
-        bCtrl.Fire(vx, vy, g);
+        bCtrl.Fire(time, vx, vy);
         bCtrl.SetTarget(target);
     }
 

@@ -10,13 +10,14 @@ public class BulletController : MonoBehaviour
     public Rigidbody2D rigidBody;
     public int time;
     public float currentT = 0f;
-    public float g = 9.8f; //g accelerator
     public float velorX;
     public float velorY;
-    public float maxX;
-    public float maxY;
+    // public float maxX;
+    // public float maxY;
     public bool isGrounded; 
     public bool isFired;    
+    private float xPos;
+    private float yPos;
     //public bool isDestined; // if explode position is pre-calculated
     public GameController gameController;
     public LayerMask groundMask;
@@ -26,7 +27,6 @@ public class BulletController : MonoBehaviour
     [Header("SETTINGS")]
     public Vector3 bulletOffset;
 	public float groundSensitivity = 0.1f;
-    public float dT = 0.02f;
     public float liveTime = 0f;
     public float timer = 0f;
     private float G;
@@ -43,7 +43,8 @@ public class BulletController : MonoBehaviour
         // }
         //this.transform.position = new Vector3(verlorX,verlorY,0f);   
     }
-    public void Fire(float vx, float vy, float g){
+
+    public void Fire(float vx, float vy){
         Debug.Log("Bullet is firing with - vx: "+vx +" vy: "+vy);
         velorX = vx;
         velorY = vy;
@@ -56,10 +57,12 @@ public class BulletController : MonoBehaviour
             FindRigidBody();
         isFired = true;
         justFired = true;
-        G = g;
+        // G = g;
         // this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
         // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
     }
+
+
     // private bool isHeadingRight;
     private Vector3 targetPos;
     // private Vector3 middlePos;
@@ -79,22 +82,22 @@ public class BulletController : MonoBehaviour
     // private float moveUnit = 0.01f;
     private float tanBallAngle;
     public void Fire(int time, float vx, float vy){
-        //isDestined = false;
-        initTransform = this.transform.position;
-        velorX = vx;
-        velorY = vy;
-        // transform.Translate(new Vector3(vx/10,vy/10,0f));
-        isFired = true;
-        // float dx;
-        // float dy;
-        // int times = (int) ((float)time/20);
-        // for (int i = 0; i < times/2; i++)
-        // {
-            
-        // }
-        tanBallAngle = vy/vx;
-        StartCoroutine(TimedDestroy(time/1000));
-        // this.rigidBody.AddForce(new Vector2(velorX*75,velorY*75));
+        // //isDestined = false;
+        // initTransform = this.transform.position;
+        // velorX = vx;
+        // velorY = vy;
+        // // transform.Translate(new Vector3(vx/10,vy/10,0f));
+        // isFired = true;
+        // // float dx;
+        // // float dy;
+        // // int times = (int) ((float)time/20);
+        // // for (int i = 0; i < times/2; i++)
+        // // {
+        // // }
+        // tanBallAngle = vy/vx;
+        // // this.rigidBody.AddForce(new Vector2(velorX*75,velorY*75));
+        StartCoroutine(TimedDestroy((float)time/1000));
+        this.Fire(vx,vy);
     }
     IEnumerator TimedDestroy(float secs){
         Debug.Log("Timed Destroy: "+ secs);
@@ -102,16 +105,24 @@ public class BulletController : MonoBehaviour
         Destroy(this.gameObject);
     }
     // private bool passMidCheckpoint = false;
+    private float dT = 0.02f;
     private float totalTime = 0f;
+    private float aX;
+    private float aY;
     void FixedUpdate(){
         if (this.transform.position.y <= -20f || this.transform.position.x <= -20f){
             Destroy(this.gameObject);
         }
         if (isFired){
             totalTime += 0.02f;
-            float xPos = initTransform.x + velorX * totalTime;
-            float yPos = initTransform.y + velorY * totalTime - 0.5f * G * totalTime * totalTime;
-            this.transform.position = new Vector3(xPos, yPos , 0f);
+            aX = 2 * velorX / 10f;
+            aY = (70f - 2 * velorY) / 10f;
+            velorX = velorX - aX * dT;
+            velorY = velorY - aY * dT;
+            // float yPos = initTransform.y + velorY * totalTime - G * totalTime;// 0.5f * G * totalTime * totalTime;
+            initTransform.x = initTransform.x + velorX * dT;
+            initTransform.y = initTransform.y + velorY * dT;
+            this.transform.position = initTransform;
             //move the bullet with diagonal 
             // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
             //isFired = false;

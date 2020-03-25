@@ -72,8 +72,7 @@ public class ConnectorManager : MonoBehaviour
                     break;  
                     case ActionType.START_MOVE:
                     //gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy); 
-                    //ActionType.START_MOVE, m_owner.Id, m_owner.X, m_owner.Y, m_owner.IsLiving ? 1 : 0));
-                        break;
+                    //ActionType.START_MOVE, m_owner.Id, m_owner.X, m_owner.Y, m_owner.IsLiving ? 1 : 0));\
                     case ActionType.TRANSLATE:
                     gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);  
                     gameController.PlayerFly(fire.timeInt[i],pId,fire.actionParam1[i],fire.actionParam2[i]); 

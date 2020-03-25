@@ -11,7 +11,7 @@ public class TimedController : MonoBehaviour
     public void DelayedExecute(int time, Vector3 target){
         // Debug.Log("DELAY Execute called");
         this.target = target;
-        coroutine = WaitAndExecute(time/1000);
+        coroutine = WaitAndExecute((float)time/1000);
         StartCoroutine(coroutine);
     }
     public void CancelDelayedExecution(){
