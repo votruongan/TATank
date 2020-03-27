@@ -185,12 +185,31 @@ public class LivingController : BaseObjectController
             if (isHeadingRight)
                 RotateLiving();
         }
+        if (Vector3.Distance(pos,this.transform.position)>=1.5f){
+            
+        }
         // Debug.Log("living is moving to: " + pos.ToString());
         targetPosition = pos;
         isMoving = true;
         sentFinishMove = false;
         Debug.Log("Moving to "+pos);
     }
+
+    
+    public void Teleport(float time, Vector3 pos){
+        //System.Threading.Thread.Sleep(speedTime);
+        //staticBullet.SetActive(false);
+        StartCoroutine(WaitAndTele(time,pos));
+    }
+
+    IEnumerator WaitAndTele(float time, Vector3 pos){
+        yield return new WaitForSeconds(time);
+        rigidBody.simulated = false;
+        isMoving = false;
+        this.transform.position = pos;
+        SetFallRigidbody();
+    }
+
     
 
     private void OnCollisionEnter2D(Collision2D other) {
@@ -246,6 +265,9 @@ public class LivingController : BaseObjectController
                 this.transform.Translate(pos.x,0.002f,0f);
                 // Debug.Log(Mathf.Abs(transform.position.x -targetPosition.x));
                 if (this.transform.position == targetPosition || Mathf.Abs(transform.position.x -targetPosition.x) <= 0.01f){
+                    if (Mathf.Abs(transform.position.y -targetPosition.y) >= 0.02f){
+                        this.transform.position = targetPosition;
+                    }
                     Debug.Log("MoveTo Finished");
                     // StopEquipAnimation();
                     sentFinishMove = true;
@@ -270,10 +292,10 @@ public class LivingController : BaseObjectController
     protected void SetMovableRigidbody(){
         rigidBody.constraints = RigidbodyConstraints2D.None;
         rigidBody.drag = 1f;
-        rigidBody.gravityScale = 1f;
+        rigidBody.gravityScale = 2f;
     }
     protected void SetRestRigidbody(){
-        rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
         rigidBody.drag = 1f;
         rigidBody.angularDrag = 0f;
         rigidBody.gravityScale = 1f;

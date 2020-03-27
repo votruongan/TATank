@@ -9,6 +9,7 @@ public class FightUIController : UIController
     public GameObject yourTurnPanel;
     public GameObject loadingScreen;
     public GameObject fightUI;
+    public CurrentPropDisplayer currentPropDisplayer;
     public NotiPanelController notiPanel;
     [Header("FOR DEBUG")]
     public MainPlayerController mainPlayerController;
@@ -134,13 +135,12 @@ public class FightUIController : UIController
         // countUpUI.SetActive(!isActive);
     }
 
-    private GameObject powerAudio;
 	public override void FireClicked()
 	{
         if (mainPlayerController == null)
             return;
-        gameController.soundManager.PlayEffect("releasePower");
-        powerAudio = gameController.soundManager.PlayEffect("takePower");
+        // gameController.soundManager.PlayEffect("releasePower");
+        // powerAudio = gameController.soundManager.PlayEffect("takePower");
         mainPlayerController.BeginTakePower();
         isTakePower = true;
 	}
@@ -149,8 +149,8 @@ public class FightUIController : UIController
         if (mainPlayerController == null)
             return;
         isTakePower = false;
-        Destroy(powerAudio);
-        gameController.soundManager.PlayEffect("startFire");
+        // Destroy(powerAudio);
+        // gameController.soundManager.PlayEffect("startFire");
         mainPlayerController.ReleasePower();
 	}
 
@@ -173,10 +173,12 @@ public class FightUIController : UIController
         gameController.KillSelf();
     }
 
-    int GetPropEnergyUsage(string propString){
+    public static int GetPropEnergyUsage(string propString){
         switch(propString){
             case "P50":
                 return 85; break;
+            case "P40":
+                return 80; break;
             case "P30":
                 return 70; break;
             case "P20":
@@ -186,6 +188,13 @@ public class FightUIController : UIController
             default:
                 return 110; break;
         }
+    }
+
+    public void AppendCurrentProp(Texture textur){
+        currentPropDisplayer.Append(textur);
+    }
+    public void ResetCurrentProp(){
+        currentPropDisplayer.Reset();
     }
     public override void SelectFightingProp(string propString){
         int ene = GetPropEnergyUsage(propString);

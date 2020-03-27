@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using ConnectorSpace;
 
 public class GameController : MonoBehaviour
@@ -172,7 +173,7 @@ public class GameController : MonoBehaviour
 		explosionController.CancelDelayedExecution();
 		digController.CancelDelayedExecution();
 		Vector3 toPos = foreController.PixelToWorldPosition(m_x,m_y,true);
-		pC.Teleport(time/1000,toPos);		
+		pC.Teleport(time/1000,toPos);	
     }
 
     public void AddFireTag(int pId, byte speedTime){
@@ -213,6 +214,7 @@ public class GameController : MonoBehaviour
 
 	IEnumerator TimedEndGame(float secs){
 		yield return new WaitForSeconds(secs);
+		connector.connector.SendLogOut();
 		SwitchScene("Scene_Game","Scene_Front");
 	}
 
@@ -485,7 +487,11 @@ public class GameController : MonoBehaviour
 		Debug.Log("[GameController] START DONE");
 	}
 #endregion
-	public ClientConnector GetClientConnector(){
+
+    public void ChangeHostIp(Text txt){
+        connector.ChangeHostIp(txt);
+		GameObject.Find("ChangeHostPanel").SetActive(false);
+    }	public ClientConnector GetClientConnector(){
 		return connector.GetClientConnector();
 	}
 	public PlayerInfo GetLocalPlayerInfo(){

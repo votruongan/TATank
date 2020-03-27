@@ -1,5 +1,6 @@
+using System;
 using UnityEngine;
-[System.Serializable]
+[Serializable]
 public class BaseInfoWrapper {
     
 	public virtual string ToString(){

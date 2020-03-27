@@ -4,6 +4,7 @@ using System.Xml;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.UI;
 using ConnectorSpace;
 using Game.Logic.Phy.Actions;
 
@@ -73,6 +74,7 @@ public class ConnectorManager : MonoBehaviour
                     case ActionType.START_MOVE:
                     //gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy); 
                     //ActionType.START_MOVE, m_owner.Id, m_owner.X, m_owner.Y, m_owner.IsLiving ? 1 : 0));\
+                    break;
                     case ActionType.TRANSLATE:
                     gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);  
                     gameController.PlayerFly(fire.timeInt[i],pId,fire.actionParam1[i],fire.actionParam2[i]); 
@@ -332,6 +334,9 @@ public class ConnectorManager : MonoBehaviour
             }
         }
         Debug.Log("item template length: " + templateInfos.Count);
+    }    
+    public void ChangeHostIp(Text txt){
+        connector.SetHostIp(txt.text);
     }
     public void OpenRegister(){
         Application.OpenURL(ConfigMgr.RegisterUrl);

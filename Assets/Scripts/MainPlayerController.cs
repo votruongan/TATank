@@ -107,6 +107,10 @@ public class MainPlayerController : PlayerController
 
     private bool skipChangeAngle = false;
     private void ChangeAngle(int change){
+        if (skipChangeAngle){
+            skipChangeAngle = false;
+            return;
+        }
         fireAngle += change;
         // if (fireAngle >= angleMax || fireAngle <= angleMin){
         //     fireAngle -= change;
@@ -117,11 +121,7 @@ public class MainPlayerController : PlayerController
         } else if (fireAngle > 180){
             fireAngle = -179;
         }
-        if (skipChangeAngle){
-            skipChangeAngle = false;
-            return;
-        }
-        gameController.soundManager.PlayEffectOnce("changeAngle");
+        gameController.soundManager.PlayEffect("changeAngle");
         // handRotator.SetAngle(fireAngle);
         angleIndicator.ChangeAngle(change);
         UpdateAngleIndicator();
@@ -160,7 +160,7 @@ public class MainPlayerController : PlayerController
                 return;
             }
             transform.Translate(0.015f,0.002f,0f);
-            gameController.soundManager.PlayEffectOnce("move");
+            gameController.soundManager.PlayEffect("move");
             // if (Vector2.Distance(virtualRbdPos, this.transform.position) >= 0.5f){
             //     Debug.Log("Go Go Go vrb's position: "+ virtualRbdPos);
             //     this.MoveTo(virtualRbdPos);
@@ -254,6 +254,7 @@ public class MainPlayerController : PlayerController
         anim.SetBool("isMoving",false);
         anim.SetBool("isFiring",true);
         PlayEquipAnimation("isFiring");
+        SoundManager.GetInstance().PlayEffect("takePower");
     }
 
     public void TakePower(){
@@ -275,7 +276,14 @@ public class MainPlayerController : PlayerController
         powerIndicator.value = power;
         isTakePower = false;
     }
-
+    public void SetFallRigidbody(){
+        base.SetFallRigidbody();
+        gameController.MainPlayerMove(this.transform.position.x,this.transform.position.y,isHeadingRight);
+    }
+    public void SetRestRigidbody(){
+        base.SetRestRigidbody();
+        gameController.MainPlayerMove(this.transform.position.x,this.transform.position.y,isHeadingRight);
+    }
     public void FinishMove(){
         Debug.Log("FinishMove");
         isBeginMove = false;
@@ -314,6 +322,7 @@ public class MainPlayerController : PlayerController
         // bulletRigidBody.gameObject.SendMessage("Fired");
         // power = 0f;
         StartCoroutine(FireExecution());
+        SoundManager.GetInstance().StopEffect("takePower");
         powerIndicator.value = 0f;
     }
 
@@ -351,7 +360,7 @@ public class MainPlayerController : PlayerController
     public void SetDander(int dander){
         base.SetDander(dander);
         this.info.dander = dander;
-        if (dander >= originalInfo.dander){
+        if (dander == 200){
             fightInfoDisplay.danderButton.SetActive(true);
         } else{
             fightInfoDisplay.danderButton.SetActive(false);

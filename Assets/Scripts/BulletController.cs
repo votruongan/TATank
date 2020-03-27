@@ -100,7 +100,7 @@ public class BulletController : MonoBehaviour
         this.Fire(vx,vy);
     }
     IEnumerator TimedDestroy(float secs){
-        Debug.Log("Timed Destroy: "+ secs);
+        // Debug.Log("Timed Destroy: "+ secs);
         yield return new WaitForSeconds(secs);
         Destroy(this.gameObject);
     }

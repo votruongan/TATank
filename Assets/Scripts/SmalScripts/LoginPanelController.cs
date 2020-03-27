@@ -13,6 +13,7 @@ public class LoginPanelController : BaseObjectController
     public InputField loginPass;
     public Dropdown serverDropdown;
     public string loginHost;
+    public GameObject  changeHostUrlPanel;
     // Start is called before the first frame update
     List<string> hostIP;
     List<string> hostName;
@@ -50,6 +51,9 @@ public class LoginPanelController : BaseObjectController
         XmlNodeList ele = document.GetElementsByTagName("Item");
         hostIP = new List<string>();
         hostName = new List<string>();
+        if (ele.Count < 1){
+            changeHostUrlPanel.SetActive(true);
+        }
         for (int i = 0; i < ele.Count; i++)
         {
             hostIP.Add(ele[i].Attributes["IP"].Value);
@@ -65,6 +69,8 @@ public class LoginPanelController : BaseObjectController
 
     private float totalTime;
     private void FixedUpdate() {
+        if (changeHostUrlPanel.activeInHierarchy)
+            return;
         totalTime += Time.fixedDeltaTime;
         if (totalTime > 5f){
             UpdateServerList();

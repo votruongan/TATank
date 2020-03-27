@@ -14,9 +14,14 @@ public class SoundManager : MonoBehaviour
     
     [Header("For Debugging")]
     public AudioSource player;
+    protected static SoundManager instance;
+    public static SoundManager GetInstance(){
+        return instance;
+    }
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
         player = gameObject.GetComponent<AudioSource>();
         musicVolume = PlayerPrefs.GetFloat("musicVolume",1f);
         effectVolume = PlayerPrefs.GetFloat("effectVolume",1f);
@@ -40,6 +45,11 @@ public class SoundManager : MonoBehaviour
             return;
         }
         PlayEffect(name);
+    }
+    public void StopEffect(string name){
+        GameObject go = GameObject.Find(name);
+        if (go != null)
+            Destroy(go);
     }
     public GameObject PlayEffect(string name){
         if (effectVolume <0.05f){

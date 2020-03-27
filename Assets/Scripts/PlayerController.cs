@@ -118,12 +118,14 @@ public class PlayerController : LivingController
     }
 
     public void UsingFightingProp(string propString){
+        Debug.Log("Using propstring: " + propString);
         if ((!anim.GetBool("IsMoving")&&!anim.GetBool("IsFiring")&&!anim.GetBool("IsFired"))){
             this.PlayAnimation("PlayerHappy");  
             StartCoroutine(WaitAndSetIdle(1.5f));
         }
         this.PlayEffect("EffectBuff");
         Texture propTexture = GameObject.Find("Prop_"+propString+"_Button").transform.GetChild(0).gameObject.GetComponent<RawImage>().texture;
+        ((FightUIController)gameController.uiController).AppendCurrentProp(propTexture);
         this.DisplayPropIcon(propTexture);
     }
     IEnumerator WaitAndSetIdle(float time){
@@ -135,20 +137,6 @@ public class PlayerController : LivingController
     }
     protected void FixedUpdate() {
         base.FixedUpdate();
-    }
-
-    public void Teleport(float time, Vector3 pos){
-        //System.Threading.Thread.Sleep(speedTime);
-        //staticBullet.SetActive(false);
-        StartCoroutine(WaitAndTele(time,pos));
-    }
-
-    IEnumerator WaitAndTele(float time, Vector3 pos){
-        yield return new WaitForSeconds(time);
-        rigidBody.simulated = false;
-        isMoving = false;
-        this.transform.position = pos;
-        SetFallRigidbody();
     }
 
     public void Fire(int time, float vx, float vy, Vector3 target){
@@ -167,6 +155,7 @@ public class PlayerController : LivingController
         {
             yield return new WaitForSeconds(0.02f);
         }
+        SoundManager.GetInstance().PlayEffect("startFire");
         movingBullet = Instantiate(bulletPrefab,this.transform.position + new Vector3(0f,0.2f,0f),Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
         bCtrl.Fire(time, vx, vy);
@@ -197,6 +186,7 @@ public class PlayerController : LivingController
     }
 
     public virtual void GetTurn(bool isTurn){
+        ((FightUIController)gameController.uiController).ResetCurrentProp();
         if (isTurn)
             healthBar.getTurnSprite.gameObject.SetActive(true);
         else

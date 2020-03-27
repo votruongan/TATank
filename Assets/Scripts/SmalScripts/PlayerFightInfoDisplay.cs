@@ -10,7 +10,8 @@ public class PlayerFightInfoDisplay: BaseObjectController
     public Slider energySlider;
     public Text bloodText;
     public GameObject danderButton;
-    
+    public Button[] propButtons;
+    // public FightUIController fightUI;    
     public PlayerInfo original;
     int previousEnergy;
     int previousBlood;
@@ -24,7 +25,33 @@ public class PlayerFightInfoDisplay: BaseObjectController
         danderButton = this.FindChildObject("DanderButton");
         bloodText = this.FindChildObject("HealthText").GetComponent<Text>();
     }
-
+    public void ResetPropButton(){
+        foreach(Button b in propButtons){
+            b.interactable = true;
+        }
+    }
+    public void UpdatePropButton(int energy){
+        if (energy < FightUIController.GetPropEnergyUsage("X2")){
+            for(int i = 0; i < 3; i++){
+                propButtons[i].interactable = false;
+            }
+        }
+        if (energy < FightUIController.GetPropEnergyUsage("P50")){
+            propButtons[3].interactable = false;
+        }
+        if (energy < FightUIController.GetPropEnergyUsage("P40")){
+            propButtons[4].interactable = false;
+        }
+        if (energy < FightUIController.GetPropEnergyUsage("P30")){
+            propButtons[5].interactable = false;
+        }
+        if (energy < FightUIController.GetPropEnergyUsage("P20")){
+            propButtons[6].interactable = false;
+        }
+        if (energy < FightUIController.GetPropEnergyUsage("P10")){
+            propButtons[7].interactable = false;
+        }
+    }
     // Update is called once per frame
     public void FightInfoDisplay(int energy = -1, int blood = -1, int dander = -1)
     {  
