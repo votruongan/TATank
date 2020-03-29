@@ -70,6 +70,7 @@ public class CommonUIController : UIController
         while (gameController.connector.gameController == null){
 
         }
+        // PlayerPrefs.DeleteAll();
         if (!(gameController.connector.isLogedIn)){
             string id = PlayerPrefs.GetString("Id","");
             string pass = PlayerPrefs.GetString("28102000","");

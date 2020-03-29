@@ -1,7 +1,7 @@
 ﻿namespace ConnectorSpace
 {
     using System;
-
+    using UnityEngine;
     internal class ConfigMgr
     {
         public static string AccountFormat = "test{0}";
@@ -36,6 +36,7 @@
             LoginUrl = HostUri + "request/Login.ashx";
             LoadTemplateUrl = HostUri + "Request/TemplateAllList.xml?rnd=0.3997506811283529&rnd=0%2E3997506811283529";
             ServerListUrl = HostUri + "Request/ServerList.ashx";
+            Debug.Log("UpdateHostAddress done: " + HostUri);
         }
     }
 }

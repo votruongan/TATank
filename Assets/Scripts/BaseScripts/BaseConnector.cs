@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
+using UnityEngine;
 namespace Game.Base
 {
 	public class BaseConnector : BaseClient
@@ -29,6 +30,7 @@ namespace Game.Base
 				this.m_sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 				this.m_readBufEnd = 0;
 				this.m_sock.Connect(this._remoteEP);
+				Debug.Log("Base Connecting to endpoint: " + this._remoteEP.Address+ ":" + this._remoteEP.Port);
 				BaseConnector.log.InfoFormat("Connected to {0}", this._remoteEP);
 			}
 			catch

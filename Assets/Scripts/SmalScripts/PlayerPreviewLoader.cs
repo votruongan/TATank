@@ -34,6 +34,10 @@ public class PlayerPreviewLoader : BaseObjectController
         while (hair == null || face == null || cloth == null){
             yield return null;
         }
+        face.gameObject.SetActive(false);
+        cloth.gameObject.SetActive(false);
+        hair.gameObject.SetActive(false);
+        yield return null;
         if (pName == null)
             pName = this.FindChildObject("PlayerName").GetComponent<Text>();
         if (!string.IsNullOrEmpty(pInfo.nickname))

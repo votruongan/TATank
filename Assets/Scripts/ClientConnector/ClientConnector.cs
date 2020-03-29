@@ -73,7 +73,7 @@ public class ClientConnector : BaseConnector
         base.Strict = true;
         base.Encryted = true;
         this.connectorManager = cManager;
-        this.SetHostIp(ip);
+        ConfigMgr.UpdateHostAddress(ip);
         this.lastErr = eErrorCode.DONE;
         //this.m_log = new StreamWriter(System.IO.File.Create(string.Format("./logs/{0}.log", account)));
     }
@@ -98,27 +98,43 @@ public class ClientConnector : BaseConnector
 		string str = "132178654824148372";
         string requestUriString = string.Format("{0}?content={1}", ConfigMgr.CreateLoginUrl, HttpUtility.UrlEncode(this.m_account + "|" + this.Password + "|" + str + "|" + Md5(this.m_account + this.Password + str + ConfigMgr.Md5Key)));
         string str3 = "";
-        using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
-        {
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-            {
-                str3 = reader.ReadLine();
-            }
+        Debug.Log(requestUriString);
+        try {
+            // WebRequest wR = WebRequest.Create(requestUriString);
+            // Debug.Log("Request Header is: "+ wR.Headers.Get("Host"));
+            WebResponse response = WebRequest.Create(requestUriString).GetResponse();
+            // Debug.Log("Response Header is: "+ response.Headers);
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            str3 = reader.ReadLine();
+        }catch(System.Exception e){
+            Debug.Log("WebRequest.Create fail");
         }
-		
+        
         if (str3 == "0")
         {
             this.m_state = ePlayerState.CreateLogined;
             string xml = "";
-            using (WebResponse response2 = WebRequest.Create(string.Format("{0}?username={1}", ConfigMgr.LoginSelectList, this.m_account)).GetResponse())
-            {
-                using (StreamReader reader2 = new StreamReader(response2.GetResponseStream()))
-                {
-                    xml = reader2.ReadToEnd();
-                }
+            requestUriString = string.Format("{0}?username={1}", ConfigMgr.LoginSelectList, this.m_account);
+            try {
+                // WebRequest wR = WebRequest.Create(string.Format("{0}?username={1}", ConfigMgr.LoginSelectList, this.m_account));
+                // Debug.Log("Request Header is: "+ wR.Headers.Get("Host"));
+                WebResponse response = WebRequest.Create(requestUriString).GetResponse();
+                Debug.Log(requestUriString);
+                // Debug.Log("Response Header is: "+ response.Headers);
+                StreamReader reader = new StreamReader(response.GetResponseStream());
+                xml = reader.ReadToEnd();
+            }catch(System.Exception e){
+                Debug.Log("CreateLogin-Username fail: " + e.Message);
             }
+            // using (WebResponse response2 = WebRequest.Create().GetResponse())
+            // {
+            //     using (StreamReader reader2 = new StreamReader(response2.GetResponseStream()))
+            //     {
+            //         xml = reader2.ReadToEnd();
+            //     }
+            // }
 			UnityEngine.Debug.Log("XXX" + xml);
-            GameController.LogToScreen("XXX" + xml);
+            // GameController.LogToScreen("XXX" + xml);
             if (xml.IndexOf("NickName") > 0)
             {
                 XmlDocument document = new XmlDocument();
@@ -129,7 +145,6 @@ public class ClientConnector : BaseConnector
                     this.NickName = elementsByTagName[i].Attributes["NickName"].Value;
                     this.m_grade = Int32.Parse(elementsByTagName[i].Attributes["Grade"].Value);
                 }
-                
             }
 			this.LoginWeb();
             if (lastErr == eErrorCode.LOADING)
@@ -142,7 +157,7 @@ public class ClientConnector : BaseConnector
             this.m_state = ePlayerState.Stopped;
             lastErr = eErrorCode.LOGIN_FAILED;
             this.LastError = "CreateLogin Failed!";
-            GameController.LogToScreen("CreateLogin Failed");
+            // GameController.LogToScreen("CreateLogin Failed");
         }
         
     }
@@ -162,7 +177,7 @@ public class ClientConnector : BaseConnector
 
     public override void Disconnect()
     {
-        Console.WriteLine("hello world");
+        Debug.Log(string.Format("hello world"));
         //base.Disconnect();
         //this.m_state = ePlayerState.Stopped;
         //this.LastError = "Bị kick khỏi game!";
@@ -242,29 +257,51 @@ public class ClientConnector : BaseConnector
     public string LoadTemplate(){
         string requestUriString = ConfigMgr.LoadTemplateUrl;
         string str3 = "";
-        Debug.Log("LOADING TEMPLATE");
-        using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
-        {
-            string decStr;
-            using (var ms = new MemoryStream()){
-                response.GetResponseStream().CopyTo(ms);
-                byte[] dat = Marshal.Uncompress(ms.ToArray());
-                Debug.Log("Template loaded and decompressed: rawLength - compLength: " + dat.Length + " - " + ms.Length);
-                decStr = Encoding.UTF8.GetString(dat);
-            }
-            return decStr;
-            // saveTo = tempList.ToArray();
+        Debug.Log("LOADING TEMPLATE: " + requestUriString);
+
+        string decStr;
+        var ms = new MemoryStream();
+        try {
+            WebRequest wR = WebRequest.Create(requestUriString);
+            Debug.Log("Request Header is: "+ wR.Headers.Get("Host"));
+            WebResponse response = wR.GetResponse();
+            Debug.Log("Response Header is: "+ response.Headers);
+            response.GetResponseStream().CopyTo(ms);
+        }catch(System.Exception e){
+            Debug.Log("Cannot copy GetResponseStream to MemoryStream");
         }
+        byte[] dat = Marshal.Uncompress(ms.ToArray());
+        Debug.Log("Template loaded and decompressed: rawLength - compLength: " + dat.Length + " - " + ms.Length);
+        decStr = Encoding.UTF8.GetString(dat);
+        return decStr;
+        // using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
+        // {
+        //     string decStr;
+        //     using (var ms = new MemoryStream()){
+        //         response.GetResponseStream().CopyTo(ms);
+        //         byte[] dat = Marshal.Uncompress(ms.ToArray());
+        //         Debug.Log("Template loaded and decompressed: rawLength - compLength: " + dat.Length + " - " + ms.Length);
+        //         decStr = Encoding.UTF8.GetString(dat);
+        //     }
+        //     return decStr;
+        //     // saveTo = tempList.ToArray();
+        // }
     }
 
     public void LoginWeb()
     {
         this.InnerPwd = this.GrenateInnerPassword();
-        string s = this.m_account + "," + Md5(this.Password) + "," + this.InnerPwd + "," + this.NickName;
+        string s ;
+        if (string.IsNullOrEmpty(this.NickName)){
+            s = this.m_account + "," + Md5(this.Password) + "," + this.InnerPwd + "," + this.m_account;
+        } else{
+            s = this.m_account + "," + Md5(this.Password) + "," + this.InnerPwd + "," + this.NickName;
+        }
         MemoryStream output = new MemoryStream();
         string requestUriString = "";
-        using (BinaryWriter writer = new BinaryWriter(output))
-        {
+        Debug.Log("LoginWeb");
+        try{
+            BinaryWriter writer = new BinaryWriter(output);
             writer.Write((short) DateTime.UtcNow.Year);
             writer.Write((byte) DateTime.UtcNow.Month);
             writer.Write((byte) DateTime.UtcNow.Date.Day);
@@ -275,30 +312,55 @@ public class ClientConnector : BaseConnector
             // Debug.Log(Encoding.UTF8.GetString(output.ToArray(), 7, output.ToArray().Length - 7));
             byte[] inArray = Rsa(output.ToArray());
             requestUriString = string.Format("{0}?p={1}&v=0", ConfigMgr.LoginUrl, HttpUtility.UrlEncode(Convert.ToBase64String(inArray)));
-			Debug.Log(requestUriString);
-        }   
-        string str3 = "";
-        using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
-        {
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-            {
-                str3 = reader.ReadLine();
-            }
+
+        } catch (System.Exception e){
+            Debug.Log("Cannot generate requestUriString");
         }
+        // using (BinaryWriter writer = new BinaryWriter(output))
+        // {
+        //     writer.Write((short) DateTime.UtcNow.Year);
+        //     writer.Write((byte) DateTime.UtcNow.Month);
+        //     writer.Write((byte) DateTime.UtcNow.Date.Day);
+        //     writer.Write((byte) DateTime.UtcNow.Hour);
+        //     writer.Write((byte) DateTime.UtcNow.Minute);
+        //     writer.Write((byte) DateTime.UtcNow.Second);
+        //     writer.Write(Encoding.UTF8.GetBytes(s));
+        //     // Debug.Log(Encoding.UTF8.GetString(output.ToArray(), 7, output.ToArray().Length - 7));
+        //     byte[] inArray = Rsa(output.ToArray());
+        //     requestUriString = string.Format("{0}?p={1}&v=0", ConfigMgr.LoginUrl, HttpUtility.UrlEncode(Convert.ToBase64String(inArray)));
+		// 	Debug.Log(requestUriString);
+        // }   
+        string str3 = "";
+        Debug.Log(requestUriString);
+        try{
+            WebResponse response = WebRequest.Create(requestUriString).GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            str3 = reader.ReadLine();
+        } catch (System.Exception e){
+            Debug.Log("Cannot getResponse");
+        }
+        // using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
+        // {
+        //     using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+        //     {
+        //         str3 = reader.ReadLine();
+        //     }
+        // }
+        Debug.Log("str3 value: " + str3);
         if (str3.IndexOf("true") > 0)
         {
-            Console.WriteLine("{0} web login success....", this.m_account);
+            Debug.Log(string.Format("{0} web login success....", this.m_account));
             this.m_state = ePlayerState.WebLogined;
             if (!base.Connect())
             { 
                 this.lastErr = eErrorCode.SERVER_FAILED;
-                Console.WriteLine("{0} connect to server failed...", this.m_account);
+                Debug.Log(string.Format("{0} connect to server failed...", this.m_account));
                 this.m_state = ePlayerState.Stopped;
                 this.LastError = "Kh\x00f4ng thể kết nối tới server.";
             }
             else
             {
-                Console.WriteLine("{0} socket connected....", this.m_account);
+                Debug.Log(string.Format("{0} socket connected....", this.m_account));
                 if (this.m_state == ePlayerState.WebLogined)
                 {
 					// this.LoginSocket();
@@ -342,8 +404,8 @@ public class ClientConnector : BaseConnector
                 {
                     this.m_state = ePlayerState.Stopped;
                     this.LastError = exception.Message;
-                    Console.WriteLine("player[{0}] execute error:{1}", this.m_account, exception.Message);
-                    Console.WriteLine(exception.StackTrace);
+                    Debug.Log(string.Format("player[{0}] execute error:{1}", this.m_account, exception.Message));
+                    Debug.Log(string.Format(exception.StackTrace));
                 }
             }
         }
@@ -1038,9 +1100,6 @@ public class ClientConnector : BaseConnector
         pkg.WriteInt(templateId);
         this.SendTCP(pkg);
         Debug.Log("Send USING_PROP successfully");
-    }
-    public void SetHostIp(string hostIp){
-        ConfigMgr.UpdateHostAddress(hostIp);
     }
     public void Start()
     {

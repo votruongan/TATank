@@ -489,9 +489,12 @@ public class GameController : MonoBehaviour
 #endregion
 
     public void ChangeHostIp(Text txt){
-        connector.ChangeHostIp(txt);
+		Debug.Log(txt.text);
+        connector.ChangeHostIp(txt.text);
 		GameObject.Find("ChangeHostPanel").SetActive(false);
-    }	public ClientConnector GetClientConnector(){
+		GameObject.Find("MainLoginPanel").SendMessage("UpdateServerList");
+    }
+	public ClientConnector GetClientConnector(){
 		return connector.GetClientConnector();
 	}
 	public PlayerInfo GetLocalPlayerInfo(){

@@ -4,7 +4,6 @@ using System.Xml;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using UnityEngine.UI;
 using ConnectorSpace;
 using Game.Logic.Phy.Actions;
 
@@ -274,7 +273,7 @@ public class ConnectorManager : MonoBehaviour
 
     public bool ConnectToHost(string id, string password, string HostIp){
         connector = new ClientConnector(id, password, 100, HostIp, 9200, this);
-        GameController.LogToScreen("Connector Created");
+        // GameController.LogToScreen("Connector Created");
         Debug.Log("Connector Created");
         connector.Start();
         StartCoroutine(InteruptStallConnector());
@@ -335,8 +334,8 @@ public class ConnectorManager : MonoBehaviour
         }
         Debug.Log("item template length: " + templateInfos.Count);
     }    
-    public void ChangeHostIp(Text txt){
-        connector.SetHostIp(txt.text);
+    public void ChangeHostIp(string txt){
+        ConfigMgr.UpdateHostAddress(txt);
     }
     public void OpenRegister(){
         Application.OpenURL(ConfigMgr.RegisterUrl);
@@ -347,6 +346,7 @@ public class ConnectorManager : MonoBehaviour
 
     IEnumerator InteruptStallConnector(){
         int count = 0;
+        yield return new WaitForSeconds(0.3f);
         while (connector.lastErr == eErrorCode.LOADING)
         {
             yield return new WaitForSeconds(0.5f);

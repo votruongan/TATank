@@ -28,24 +28,35 @@ public class LoginPanelController : BaseObjectController
             loginPass = this.FindChildObject("Login_Password").GetComponent<InputField>();
             serverDropdown = this.FindChildObject("ServerDropdown").GetComponent<Dropdown>();
         }
+        ConfigMgr.UpdateHostAddress("127.0.0.1");
         UpdateServerList();
     }
 
-    private void UpdateServerList(){
+    public void UpdateServerList(){
         StartCoroutine(ExecUpdateList());
     }
 
+    public Text attemptDisplay;
+    int attemptCount;
     IEnumerator ExecUpdateList(){
         string requestUriString = ConfigMgr.ServerListUrl;
-        string rawText = "";        
-        using (WebResponse response = WebRequest.Create(requestUriString).GetResponse())
+        string rawText = "";
+        try
         {
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-            {
-                rawText = reader.ReadToEnd();
-            }
+            WebResponse response = WebRequest.Create(requestUriString).GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            rawText = reader.ReadToEnd();
         }
-		
+        catch (System.Exception)
+        {
+        }
+        attemptCount++;
+        attemptDisplay.text = attemptCount.ToString();
+        if (string.IsNullOrEmpty(rawText)){
+            PlayerPrefs.DeleteAll();
+            changeHostUrlPanel.SetActive(true);
+        }
+        Debug.Log(rawText);
         XmlDocument document = new XmlDocument();
         document.LoadXml(rawText);
         XmlNodeList ele = document.GetElementsByTagName("Item");
@@ -53,17 +64,22 @@ public class LoginPanelController : BaseObjectController
         hostName = new List<string>();
         if (ele.Count < 1){
             changeHostUrlPanel.SetActive(true);
+        }else{
+            for (int i = 0; i < ele.Count; i++)
+            {
+                if (ele[i].Attributes["IP"].Value != "127.0.0.1"){
+                    hostIP.Add(ele[i].Attributes["IP"].Value);
+                }else{
+                    hostIP.Add(ConfigMgr.ServerIp);
+                }
+                hostName.Add(ele[i].Attributes["Name"].Value);
+                yield return null;
+            }
+            serverDropdown.ClearOptions();
+            serverDropdown.AddOptions(hostName);
+            if (hostIP.Count > 0)
+                loginHost = hostIP[0];
         }
-        for (int i = 0; i < ele.Count; i++)
-        {
-            hostIP.Add(ele[i].Attributes["IP"].Value);
-            hostName.Add(ele[i].Attributes["Name"].Value);
-            yield return null;
-        }
-        serverDropdown.ClearOptions();
-        serverDropdown.AddOptions(hostName);
-        if (hostIP.Count > 0)
-            loginHost = hostIP[0];
     }
 
 
@@ -72,7 +88,7 @@ public class LoginPanelController : BaseObjectController
         if (changeHostUrlPanel.activeInHierarchy)
             return;
         totalTime += Time.fixedDeltaTime;
-        if (totalTime > 5f){
+        if (totalTime > 15f){
             UpdateServerList();
             totalTime = 0;
         }

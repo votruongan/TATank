@@ -336,7 +336,7 @@ public class MainPlayerController : PlayerController
     }
 
     public void UsingFightingProp(string name, int id){
-        this.UsingFightingProp(name);
+        // this.UsingFightingProp(name);
         gameController.SendUsingFightingProp(id);
         switch (name){
             case "X2":
