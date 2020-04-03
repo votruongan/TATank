@@ -110,15 +110,24 @@ public class GameController : MonoBehaviour
 		pCtrl.SetDander(dander);
 	}
 
+	public void PlayerUpdateBall(int pId, bool special, int ballId){
+		PlayerController pCtrl = FindPlayerById(pId);
+		if (special){
+			//perform player using dander
+			pCtrl.SetBullet("special");
+			pCtrl.UsingFightingProp("DANDER");
+			return;
+		}
+	}
 
 	public void PlayerDamage( int delayedTime, int pId, int damage,bool critical, int remainingBlood){
 		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
 			return;
-		pCtrl.Damaged(delayedTime,damage,critical,remainingBlood);
+		pCtrl.Damaged(delayedTime + 300,damage,critical,remainingBlood);
 	}
-
     // add the destination to explode
+	private int delayCameraCount = 0;
     public void PlayerFire(int pId, int time, int pVx, int pVy, int targX, int targY){
 		PlayerController pCtrl = FindPlayerById(pId);
 		Vector3 targPos = foreController.PixelToWorldPosition(targX,targY,true);
@@ -128,10 +137,12 @@ public class GameController : MonoBehaviour
 		float vy = (float)-pVy / 100;
 		pCtrl.PlayAnimation("PlayerFired");
 		pCtrl.Fire(time,vx,vy,targPos);
-    	mainCamController.LockTo(pCtrl.movingBullet.transform);
+		if (delayCameraCount == 0){
+    		mainCamController.LockTo(pCtrl.movingBullet.transform);
+		} else {
+			delayCameraCount --;
+		}
     }
-
-
     public void PlayerDirection(int pId, int dir){
 		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
@@ -141,9 +152,7 @@ public class GameController : MonoBehaviour
 			pCtrl.RotateLiving();
 		}
     }
-
-
-    public void PlayerMove(int pId, int x, int y, byte dir){
+	 public void PlayerMove(int pId, int x, int y, byte dir){
 		if (pId == mainPlayerController.info.id){
 			return;
 		}
@@ -154,20 +163,27 @@ public class GameController : MonoBehaviour
 		Vector3 pos = foreController.PixelToWorldPosition(x,y,true);
     	pC.MoveTo(pos,dir);
     }
+	
     public void PlayerUsingProp(int pId, byte propType,int place,int templateId){
 		PlayerController pC = FindPlayerById(pId);
 		if (pC == null)
 			return;
-			
+		string propName = uiController.FightingPropIdToName(templateId);
+		if (propName == "X2"){
+			delayCameraCount = 2;
+		} if (propName == "X1"){
+			delayCameraCount = 1;			
+		}
+		Debug.Log("Go Fighting Prop: name:"+ propName +" type:" + propType + " place:"+ place);
 		//254, -2, propId
 		if (propType == 254 && place == -2){
-			Debug.Log("Go Fighting Prop " + uiController.FightingPropIdToName(templateId));
-    		pC.UsingFightingProp(uiController.FightingPropIdToName(templateId));
+    		pC.UsingFightingProp(propName);
 		}
 
     }
     public void PlayerFly(int time, int pId, int m_x,int m_y){
 		PlayerController pC = FindPlayerById(pId);
+		pC.SetBullet("fly");
 		if (pC == null)
 			return;
 		explosionController.CancelDelayedExecution();
@@ -196,7 +212,7 @@ public class GameController : MonoBehaviour
 		backgroundSprite.transform.position = foreController.transform.position;
 		digController.CheckIfDiggable();
 		digController.isDiggable  = false;
-		mainCamController.UpdateClamp(foreController.transform.position,foreController.bottomLeftPosition);
+		mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
 		minimapCamController.TranslateTo(foreController.transform.position);
 		connector.SendLoadComplete();
 	}
@@ -312,6 +328,7 @@ public class GameController : MonoBehaviour
 #region SIGNAL_FROM_MAIN_PLAYER 
 	public void KillSelf(){
 		connector.connector.SendLogOut();
+		StartCoroutine(TimedEndGame(2f));
 	}
 	public void StartMatch(){
 		connector.StartMatch();
@@ -325,6 +342,9 @@ public class GameController : MonoBehaviour
 	}
 
 	public void SendPlayerDander(){
+		// connector.SendSecondWeapon();
+		if (mainPlayerController.isOnTurn)
+			connector.SendStunt();
 	}
 
     public void MainPlayerFire(int force, int angle){
@@ -489,7 +509,6 @@ public class GameController : MonoBehaviour
 #endregion
 
     public void ChangeHostIp(Text txt){
-		Debug.Log(txt.text);
         connector.ChangeHostIp(txt.text);
 		GameObject.Find("ChangeHostPanel").SetActive(false);
 		GameObject.Find("MainLoginPanel").SendMessage("UpdateServerList");

@@ -1,5 +1,5 @@
 using Game.Base.Packets;
-using log4net;
+// using log4net;
 using System;
 using System.Net.Sockets;
 using System.Reflection;
@@ -8,7 +8,7 @@ namespace Game.Base
 {
 	public class BaseClient
 	{
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+		// private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 		protected Socket m_sock;
 		protected byte[] m_readBuffer;
 		protected int m_readBufEnd;
@@ -166,18 +166,18 @@ namespace Game.Base
 				int num = this.m_readBuffer.Length;
 				if (this.m_readBufEnd >= num)
 				{
-					if (BaseClient.log.IsErrorEnabled)
-					{
-						BaseClient.log.Error(this.TcpEndpoint + " disconnected because of buffer overflow!");
-						BaseClient.log.Error(string.Concat(new object[]
-						{
-							"m_pBufEnd=",
-							this.m_readBufEnd,
-							"; buf size=",
-							num
-						}));
-						BaseClient.log.Error(this.m_readBuffer);
-					}
+					// if (BaseClient.log.IsErrorEnabled)
+					// {
+					// 	BaseClient.log.Error(this.TcpEndpoint + " disconnected because of buffer overflow!");
+					// 	BaseClient.log.Error(string.Concat(new object[]
+					// 	{
+					// 		"m_pBufEnd=",
+					// 		this.m_readBufEnd,
+					// 		"; buf size=",
+					// 		num
+					// 	}));
+					// 	BaseClient.log.Error(this.m_readBuffer);
+					// }
 					this.Disconnect();
 				}
 				else
@@ -206,13 +206,13 @@ namespace Game.Base
 				}
 				else
 				{
-					BaseClient.log.InfoFormat("Disconnecting client ({0}), received bytes={1}", this.TcpEndpoint, bytesTransferred);
+					// BaseClient.log.InfoFormat("Disconnecting client ({0}), received bytes={1}", this.TcpEndpoint, bytesTransferred);
 					this.Disconnect();
 				}
 			}
 			catch (Exception arg)
 			{
-				BaseClient.log.ErrorFormat("{0} RecvCallback:{1}", this.TcpEndpoint, arg);
+				// BaseClient.log.ErrorFormat("{0} RecvCallback:{1}", this.TcpEndpoint, arg);
 				this.Disconnect();
 			}
 		}
@@ -223,7 +223,7 @@ namespace Game.Base
 		public bool SendAsync(SocketAsyncEventArgs e)
 		{
 			int tickCount = Environment.TickCount;
-			BaseClient.log.Debug(string.Format("Send To ({0}) {1} bytes", this.TcpEndpoint, e.Count));
+			// BaseClient.log.Debug(string.Format("Send To ({0}) {1} bytes", this.TcpEndpoint, e.Count));
 			bool result = true;
 			if (this.m_sock.Connected)
 			{
@@ -232,7 +232,7 @@ namespace Game.Base
 			int num = Environment.TickCount - tickCount;
 			if (num > 100)
 			{
-				BaseClient.log.WarnFormat("AsyncTcpSendCallback.BeginSend took {0}ms! (TCP to client: {1})", num, this.TcpEndpoint);
+				// BaseClient.log.WarnFormat("AsyncTcpSendCallback.BeginSend took {0}ms! (TCP to client: {1})", num, this.TcpEndpoint);
 			}
 			return result;
 		}
@@ -290,10 +290,10 @@ namespace Game.Base
 			}
 			catch (Exception exception)
 			{
-				if (BaseClient.log.IsErrorEnabled)
-				{
-					BaseClient.log.Error("Exception", exception);
-				}
+				// if (BaseClient.log.IsErrorEnabled)
+				// {
+				// 	BaseClient.log.Error("Exception", exception);
+				// }
 			}
 		}
 		public virtual void DisplayMessage(string msg)

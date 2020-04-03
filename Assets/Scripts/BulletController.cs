@@ -12,24 +12,16 @@ public class BulletController : MonoBehaviour
     public float currentT = 0f;
     public float velorX;
     public float velorY;
-    // public float maxX;
-    // public float maxY;
     public bool isGrounded; 
-    public bool isFired;    
-    private float xPos;
-    private float yPos;
+    public bool isFired;
     //public bool isDestined; // if explode position is pre-calculated
     public GameController gameController;
     public LayerMask groundMask;
     public LayerMask backgroundMask;
     public Vector3 initTransform;
-    public Vector3 explodePosition;
     [Header("SETTINGS")]
-    public Vector3 bulletOffset;
 	public float groundSensitivity = 0.1f;
-    public float liveTime = 0f;
     public float timer = 0f;
-    private float G;
 
     //Vx = (force * cos(a)) / 5	
     //Vy = (force * sin(a)) / 5 
@@ -44,6 +36,9 @@ public class BulletController : MonoBehaviour
         //this.transform.position = new Vector3(verlorX,verlorY,0f);   
     }
 
+    public void SetBall(Sprite spr){
+        this.gameObject.GetComponent<SpriteRenderer>().sprite = spr;
+    }
     public void Fire(float vx, float vy){
         Debug.Log("Bullet is firing with - vx: "+vx +" vy: "+vy);
         velorX = vx;
@@ -57,45 +52,20 @@ public class BulletController : MonoBehaviour
             FindRigidBody();
         isFired = true;
         justFired = true;
-        // G = g;
         // this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
         // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
-    }
+    } 
+    
 
-
-    // private bool isHeadingRight;
-    private Vector3 targetPos;
-    // private Vector3 middlePos;
+    private Vector3 targetPos;    
     public void SetTarget(Vector3 targ){
         targetPos = targ;
-        // middlePos = Vector3.zero;
-        // middlePos.x = targetPos.x + this.transform.position.x;
-        // middlePos.y = this.transform.position.y + velorY;
-        // if (this.transform.position.x - targetPos.x < 0){
-        //     isHeadingRight = true;
-        // } else {
-        //     isHeadingRight = false;
-        // }
+
         isFired = true;
         initTransform = this.transform.position;
     }
-    // private float moveUnit = 0.01f;
-    private float tanBallAngle;
+    
     public void Fire(int time, float vx, float vy){
-        // //isDestined = false;
-        // initTransform = this.transform.position;
-        // velorX = vx;
-        // velorY = vy;
-        // // transform.Translate(new Vector3(vx/10,vy/10,0f));
-        // isFired = true;
-        // // float dx;
-        // // float dy;
-        // // int times = (int) ((float)time/20);
-        // // for (int i = 0; i < times/2; i++)
-        // // {
-        // // }
-        // tanBallAngle = vy/vx;
-        // // this.rigidBody.AddForce(new Vector2(velorX*75,velorY*75));
         StartCoroutine(TimedDestroy((float)time/1000));
         this.Fire(vx,vy);
     }
@@ -104,9 +74,9 @@ public class BulletController : MonoBehaviour
         yield return new WaitForSeconds(secs);
         Destroy(this.gameObject);
     }
-    // private bool passMidCheckpoint = false;
+    
     private float dT = 0.02f;
-    private float totalTime = 0f;
+    // private float totalTime = 0f;
     private float aX;
     private float aY;
     void FixedUpdate(){
@@ -114,28 +84,14 @@ public class BulletController : MonoBehaviour
             Destroy(this.gameObject);
         }
         if (isFired){
-            totalTime += 0.02f;
+            // totalTime += 0.02f;
             aX = 2 * velorX / 10f;
             aY = (70f - 2 * velorY) / 10f;
             velorX = velorX - aX * dT;
             velorY = velorY - aY * dT;
-            // float yPos = initTransform.y + velorY * totalTime - G * totalTime;// 0.5f * G * totalTime * totalTime;
             initTransform.x = initTransform.x + velorX * dT;
             initTransform.y = initTransform.y + velorY * dT;
             this.transform.position = initTransform;
-            //move the bullet with diagonal 
-            // Debug.Log("[BULLET] moving speed "+rigidBody.velocity);
-            //isFired = false;
-            // if (!passMidCheckpoint){
-            //     this.transform.Translate(new Vector3(moveUnit,moveUnit*tanBallAngle));
-            //     if (this.transform.position.x - targetPos.x < moveUnit){
-            //         passMidCheckpoint = true;
-            //     }
-            // } else {
-            //     this.transform.Translate(new Vector3(moveUnit,moveUnit*tanBallAngle - 2 * moveUnit * tanBallAngle));
-            // }
-            //this.transform.Translate(new Vector3(velorX*dT,velorY*dT,0f));
-            // Debug.Log("[BULLET] this pos - x "+transform.position.x.ToString()+" - y "+transform.position.y.ToString());
         }
         //check if bullet is grounded
         Vector2 topLeft = new Vector2(transform.position.x - groundSensitivity, transform.position.y - groundSensitivity);
@@ -185,11 +141,5 @@ public class BulletController : MonoBehaviour
             Destroy(this.gameObject);
             //rigidBody.simulated = false;
         }
-        // if (this.transform.position.y >= maxX){
-        //     //Debug.Log("Over X. ");
-        // }
-        // if (this.transform.position.y >= maxY){
-        //    // Debug.Log("Over Y. ");
-        // }
     }
 }

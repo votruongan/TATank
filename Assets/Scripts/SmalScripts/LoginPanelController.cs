@@ -83,14 +83,14 @@ public class LoginPanelController : BaseObjectController
     }
 
 
-    private float totalTime;
-    private void FixedUpdate() {
-        if (changeHostUrlPanel.activeInHierarchy)
-            return;
-        totalTime += Time.fixedDeltaTime;
-        if (totalTime > 15f){
-            UpdateServerList();
-            totalTime = 0;
-        }
-    }
+    // private float totalTime;
+    // private void FixedUpdate() {
+    //     if (changeHostUrlPanel.activeInHierarchy)
+    //         return;
+    //     totalTime += Time.fixedDeltaTime;
+    //     if (totalTime > 15f){
+    //         UpdateServerList();
+    //         totalTime = 0;
+    //     }
+    // }
 }

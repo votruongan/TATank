@@ -24,7 +24,7 @@ public class FightUIController : UIController
     public PlayerPreviewLoader RedPlayerPreview;
     public PlayerPreviewLoader BluePlayerPreview;
     public SummaryPanelController summaryPanelController;
-    public Button flyButton;
+    public Button[] InteractableButtons;
 
     public void LoadRedPlayerPreview(PlayerInfo inf){
         if (inf == null)
@@ -169,6 +169,48 @@ public class FightUIController : UIController
         return "";
     }
 
+    int times = 0;
+    Dictionary<string,bool> buttonsInteractable;
+
+    public void ResetPropInteractable(){
+        foreach(Button b in InteractableButtons){
+            b.interactable = true;
+        }
+    }
+    public void UpdatePropInteractable(int energyLeft){
+        foreach(Button b in InteractableButtons){
+            string prpName = b.name.Split('_')[1];
+            if (energyLeft < GetPropEnergyUsage(prpName)){
+                b.interactable = false;
+            }
+        }
+    }
+
+    public void SetButtonInteractable(string bName, bool state){
+        if (buttonsInteractable == null){
+            buttonsInteractable = new Dictionary<string,bool>();
+            foreach(Button b in InteractableButtons){
+                buttonsInteractable[b.name] = b.gameObject.activeInHierarchy;
+            }
+        }
+        buttonsInteractable[bName] = state;
+        times++;
+        if (times <= 1)
+        StartCoroutine(ExecSetButtonInteractable());
+    }
+
+    IEnumerator ExecSetButtonInteractable(){  
+        while (times > 0)
+        {
+            yield return new WaitForSeconds(0.2f);
+            foreach(Button b in InteractableButtons){
+                b.interactable = buttonsInteractable[b.name];
+                yield return null;
+            }            
+            times--;
+        }      
+    }
+
     public void SelectQuitGame(){
         gameController.KillSelf();
     }
@@ -190,6 +232,7 @@ public class FightUIController : UIController
         }
     }
 
+
     public void AppendCurrentProp(Texture textur){
         currentPropDisplayer.Append(textur);
     }
@@ -210,7 +253,7 @@ public class FightUIController : UIController
         gameController.soundManager.PlayEffect("noti");
         gameController.soundManager.PlayEffect("move");
         if (propString == "FLY"){
-            flyButton.interactable = false;
+            SetButtonInteractable("Prop_FLY_Button",false);
             gameController.connector.SendUsingFly();
             return;
         }

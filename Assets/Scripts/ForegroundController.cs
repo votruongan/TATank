@@ -8,9 +8,9 @@ public class ForegroundController : MonoBehaviour
 	public Rect mapRect;
 	public PolygonCollider2D foreCollider;
 	public Vector3 bottomLeftPosition;
+	public Vector3 topRightPosition;
 	[Header("FOR DEBUG")]
 	public bool isUpdatedBLP;
-	public Vector3 topLeftPosition;
 	public GameObject deadLayer;
 	public SpriteRenderer deadSprite;
 	public PolygonCollider2D deadCollider;
@@ -109,6 +109,8 @@ public class ForegroundController : MonoBehaviour
 		UpdateMapRect();
 		bottomLeftPosition = transform.position;
 		bottomLeftPosition -= new Vector3 (mapRect.width/200, mapRect.height/200, 0f);
+		topRightPosition = transform.position;
+		topRightPosition += new Vector3 (mapRect.width/200, mapRect.height/200, 0f); 
 		isUpdatedBLP = true;
 	}
 
@@ -128,7 +130,7 @@ public class ForegroundController : MonoBehaviour
 		deadSprite.sprite = Resources.Load<Sprite>(mapPath+"dead");
 		RefreshCollider(this.gameObject);
 		RefreshCollider(deadLayer);
-		UpdateMapRect();
+		UpdateBottomLeftPosition();
 	}
 
 

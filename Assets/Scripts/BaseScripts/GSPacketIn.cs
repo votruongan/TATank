@@ -1,4 +1,4 @@
-using log4net;
+// using log4net;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -9,7 +9,7 @@ namespace Game.Base.Packets
 	{
 		public const ushort HDR_SIZE = 20;
 		public const short HEADER = 29099;
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+		// private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 		protected short m_code;
 		protected int m_cliendId;
 		protected int m_parameter1;

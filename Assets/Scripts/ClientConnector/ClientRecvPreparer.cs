@@ -67,13 +67,13 @@ public static class ClientRecvPreparer
         for (int i = 0; i < pCount; i++)
         {    
             ms.Id = pkg.ReadInt();
-            if (ms.Id != mainPID){
-                pkg.ReadBoolean();
-                for (int j = 0; j < 23; j ++){
-                    pkg.ReadInt();
-                }
-                continue;
-            }
+            // if (ms.Id != mainPID){
+            //     pkg.ReadBoolean();
+            //     for (int j = 0; j < 23; j ++){
+            //         pkg.ReadInt();
+            //     }
+            //     continue;
+            // }
             ms.isWin = pkg.ReadBoolean();
             ms.Grade = pkg.ReadInt();
             ms.GP = pkg.ReadInt();
@@ -98,6 +98,9 @@ public static class ClientRecvPreparer
             pkg.ReadInt();
             ms.GainOffer = pkg.ReadInt();
             ms.CanTakeOut = pkg.ReadInt();
+            if (ms.Id == mainPID){
+                return ms;
+            }
         }
         ms.riches = pkg.ReadInt();
         return ms;

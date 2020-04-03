@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TimedController : MonoBehaviour	
+public class TimedController : MonoBehaviour
 {
 	public GameObject prefab;
 	protected Vector3 target;

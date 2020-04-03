@@ -100,9 +100,15 @@ public class ConnectorManager : MonoBehaviour
             gameController.AddFireTag(pId,spdTime);
         } 
     }
+    //eTankCmdType.CURRENTBALL
+    public void CurrentBallHandler(int pId, bool special,int ballId){
+        Debug.Log("[Connector - CURRENTBALL] id:"+ pId + " special:"+ special + " ballId:"+ ballId);
+        gameController.PlayerUpdateBall(pId, special, ballId);
+    }
+
     //eTankCmdType.USING_PROP
     public void UsingPropHandler(int pId, byte propType,int place,int templateId){
-        Debug.Log("[PROP] id: "+ pId + " type: "+ propType + " place: "+ place + " templateId: "+ templateId);
+        Debug.Log("[Connector - PROP] id: "+ pId + " type: "+ propType + " place: "+ place + " templateId: "+ templateId);
         gameController.PlayerUsingProp(pId, propType, place, templateId);
     }
 
@@ -124,10 +130,6 @@ public class ConnectorManager : MonoBehaviour
         }
     }
 
-    //eTankCmdType.CURRENTBALL
-    public void CurrentBallHandler(int pId, bool special, int curBallId){
-
-    }
     //eTankCmdType.DANDER: Player dander (pow index)
     public void DanderHandler(int pId,int dander)
     {
@@ -148,7 +150,7 @@ public class ConnectorManager : MonoBehaviour
         Debug.Log("LoadMapHandler : " + mapId.ToString());
         while(gameController.backgroundSprite == null){
             yield return null;
-            Debug.Log("backgroundSprite null");
+            // Debug.Log("backgroundSprite null");
         }
         gameController.LoadMap(mapId);
     }
@@ -215,7 +217,12 @@ public class ConnectorManager : MonoBehaviour
         this.connector.ShootTag(true,shootTime);
         this.connector.Shoot(x, y, force, angle);
     }
-
+    public void SendStunt(){
+        this.connector.SendStunt();
+    }
+    public void SendSecondWeapon(){
+        this.connector.SendSecondWeapon();
+    }
     public void SendDirection(int dir){
         this.connector.SendGameCMDDirection(dir);
     }
@@ -272,7 +279,7 @@ public class ConnectorManager : MonoBehaviour
     }
 
     public bool ConnectToHost(string id, string password, string HostIp){
-        connector = new ClientConnector(id, password, 100, HostIp, 9200, this);
+        connector = new ClientConnector(id, password, 100, ConfigMgr.ServerIp, 9200, this);
         // GameController.LogToScreen("Connector Created");
         Debug.Log("Connector Created");
         connector.Start();

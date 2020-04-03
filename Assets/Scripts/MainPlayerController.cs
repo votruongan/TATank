@@ -18,13 +18,14 @@ public class MainPlayerController : PlayerController
     public GameObject angleBackground;
     public AngleIndicatorController angleIndicator;
     public PlayerFightInfoDisplay fightInfoDisplay;
-    public UIController uiController;
+    public FightUIController uiController;
 
 	[Header("UISignal")]
     public bool isUpArrowDown;
     public bool isDownArrowDown;
     public bool isLeftArrowDown;
     public bool isRightArrowDown;
+    byte flySkipCount;
 
 	[Header("MOVING")]
     public GameObject virtualRigidbodyPrefab;
@@ -72,6 +73,13 @@ public class MainPlayerController : PlayerController
                 
             }
         }
+        if (uiController == null){
+            try{
+                uiController = GameObject.Find("UIController").GetComponent<FightUIController>();
+            } catch (Exception e){
+                
+            }
+        }
         handRotator.SetIsHeadRight(this.isHeadingRight);
         // try {
         //     virtualRigidBody = GameObject.Find("VirtualRigidbody").GetComponent<VirtualRigidbodyHandler>();
@@ -103,6 +111,13 @@ public class MainPlayerController : PlayerController
     public override void GetTurn(bool isMainTurn){
         base.GetTurn(isMainTurn);
         isOnTurn = isMainTurn;
+        uiController.ResetPropInteractable();
+        if (flySkipCount > 0){
+            flySkipCount--;
+            uiController.SetButtonInteractable("Prop_FLY_Button",false);
+        }else {
+            uiController.SetButtonInteractable("Prop_FLY_Button",true);
+        }
     }
 
     private bool skipChangeAngle = false;
@@ -160,7 +175,7 @@ public class MainPlayerController : PlayerController
                 return;
             }
             transform.Translate(0.015f,0.002f,0f);
-            gameController.soundManager.PlayEffect("move");
+            gameController.soundManager.PlayEffectOnce("move");
             // if (Vector2.Distance(virtualRbdPos, this.transform.position) >= 0.5f){
             //     Debug.Log("Go Go Go vrb's position: "+ virtualRbdPos);
             //     this.MoveTo(virtualRbdPos);
@@ -185,6 +200,12 @@ public class MainPlayerController : PlayerController
             //     this.MoveTo(virtualRigidBody.GetFinePosition());
             // }
         }
+    }
+
+    public override void Teleport(float time, Vector3 pos){
+        base.Teleport(time,pos);
+        uiController.SetButtonInteractable("Prop_FLY_Button",false);
+        flySkipCount = 2;
     }
 
     private void OnDestroy() {
@@ -373,6 +394,7 @@ public class MainPlayerController : PlayerController
         if (info.energy >= usage){
             info.energy -= usage;
             fightInfoDisplay.FightInfoDisplay(info.energy,-1,-1);
+            uiController.UpdatePropInteractable(info.energy);
             return true;
         } else {
             return false;

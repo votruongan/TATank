@@ -1,4 +1,4 @@
-using log4net;
+// using log4net;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -9,7 +9,7 @@ namespace Game.Base
 {
 	public class BaseConnector : BaseClient
 	{
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+		// private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 		private static readonly int RECONNECT_INTERVAL = 10000;
 		private SocketAsyncEventArgs e;
 		private IPEndPoint _remoteEP;
@@ -31,11 +31,11 @@ namespace Game.Base
 				this.m_readBufEnd = 0;
 				this.m_sock.Connect(this._remoteEP);
 				Debug.Log("Base Connecting to endpoint: " + this._remoteEP.Address+ ":" + this._remoteEP.Port);
-				BaseConnector.log.InfoFormat("Connected to {0}", this._remoteEP);
+				// BaseConnector.log.InfoFormat("Connected to {0}", this._remoteEP);
 			}
 			catch
 			{
-				BaseConnector.log.ErrorFormat("Connect {0} failed!", this._remoteEP);
+				// BaseConnector.log.ErrorFormat("Connect {0} failed!", this._remoteEP);
 				this.m_sock = null;
 				result = false;
 				return result;
@@ -58,8 +58,8 @@ namespace Game.Base
 			}
 			else
 			{
-				BaseConnector.log.ErrorFormat("Reconnect {0} failed:", this._remoteEP);
-				BaseConnector.log.ErrorFormat("Retry after {0} ms!", BaseConnector.RECONNECT_INTERVAL);
+				// BaseConnector.log.ErrorFormat("Reconnect {0} failed:", this._remoteEP);
+				// BaseConnector.log.ErrorFormat("Retry after {0} ms!", BaseConnector.RECONNECT_INTERVAL);
 				if (this.timer == null)
 				{
 					this.timer = new Timer(new TimerCallback(BaseConnector.RetryTimerCallBack), this, -1, -1);
@@ -76,7 +76,7 @@ namespace Game.Base
 			}
 			else
 			{
-				BaseConnector.log.Error("BaseConnector retryconnect timer return NULL!");
+				// BaseConnector.log.Error("BaseConnector retryconnect timer return NULL!");
 			}
 		}
 		public BaseConnector(string ip, int port, bool autoReconnect, byte[] readBuffer, byte[] sendBuffer) : base(readBuffer, sendBuffer)

@@ -41,9 +41,13 @@ public class InitTestGameScene : MonoBehaviour
     }
     
     IEnumerator WaitStartMatch(){
-        yield return new WaitForSeconds(1f);
         // gC.StartMatch();
-        gC.mainPlayerController = GameObject.Find("MainPlayer").GetComponent<MainPlayerController>();
+        GameObject gO = null;
+        while(gO == null){
+            gO = GameObject.Find("MainPlayer");
+            yield return new WaitForSeconds(0.04f);   
+        }
+        gC.mainPlayerController = gO.GetComponent<MainPlayerController>();
         gC.mainCamController.LockTo(gC.mainPlayerController.gameObject.transform);
         gC.mainPlayerController.isOnTurn = true;
         PlayerInfo pInf = new PlayerInfo();

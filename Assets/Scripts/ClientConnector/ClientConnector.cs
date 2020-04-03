@@ -871,8 +871,9 @@ public class ClientConnector : BaseConnector
                             connectorManager.DanderHandler(pId,dander);
                         });
                         return;
+                        
                     default:
-                        Debug.Log("Unhandled type: " + type.ToString());
+                        Debug.Log("Unhandled GAME_CMD type: " + type.ToString());
                         return;
                 }
                 break;  
@@ -903,6 +904,12 @@ public class ClientConnector : BaseConnector
                 // this.Act(new PlayerExecutable(this.StartGame));
                 break;
             }
+            case (int)ePackageType.GAME_PAIRUP_ROOM_SETUP:
+                // this.Act(new PlayerExecutable(this.StartGame));
+                break;
+            default:
+                Debug.Log("Unhandled Package type: " + ((ePackageType)pkg.Code).ToString());
+                break;
         }
     }
 	
@@ -1087,6 +1094,32 @@ public class ClientConnector : BaseConnector
         this.SendTCP(pkg);
         //this.FindTarget();
     }
+    public void SendStunt()
+    {
+        // this.SendGameCMDShoot(x, y, force, angle);
+        GSPacketIn pkg = new GSPacketIn((short)GAME_CMD);
+        pkg.Parameter1 = this.m_playerId;
+        //pkg.Parameter2 = -1;
+        // Debug.Log("pkg.Parameter1: "+pkg.Parameter1.ToString() + " lifeTime: "+m_lifeTime.ToString());
+        pkg.WriteByte((byte)eTankCmdType.STUNT);
+        Debug.LogFormat("Send Stunt");
+        this.SendTCP(pkg);
+        //this.FindTarget();
+    }
+
+    public void SendSecondWeapon()
+    {
+        // this.SendGameCMDShoot(x, y, force, angle);
+        GSPacketIn pkg = new GSPacketIn((short)GAME_CMD);
+        pkg.Parameter1 = this.m_playerId;
+        //pkg.Parameter2 = -1;
+        // Debug.Log("pkg.Parameter1: "+pkg.Parameter1.ToString() + " lifeTime: "+m_lifeTime.ToString());
+        pkg.WriteByte((byte)eTankCmdType.SECONDWEAPON);
+        Debug.LogFormat("Send SecondWeapon");
+        this.SendTCP(pkg);
+        //this.FindTarget();
+    }
+
 
     public void UsingProp(byte type, int place, int templateId)
     {

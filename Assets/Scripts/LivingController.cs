@@ -196,7 +196,7 @@ public class LivingController : BaseObjectController
     }
 
     
-    public void Teleport(float time, Vector3 pos){
+    public virtual void Teleport(float time, Vector3 pos){
         //System.Threading.Thread.Sleep(speedTime);
         //staticBullet.SetActive(false);
         StartCoroutine(WaitAndTele(time,pos));
@@ -291,19 +291,20 @@ public class LivingController : BaseObjectController
 
     protected void SetMovableRigidbody(){
         rigidBody.constraints = RigidbodyConstraints2D.None;
-        rigidBody.drag = 1f;
+        rigidBody.drag = 0f;
+        rigidBody.angularDrag = 0f;
         rigidBody.gravityScale = 2f;
     }
     protected void SetRestRigidbody(){
         rigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
-        rigidBody.drag = 1f;
+        rigidBody.drag = 100f;
         rigidBody.angularDrag = 0f;
-        rigidBody.gravityScale = 1f;
+        rigidBody.gravityScale = 0.2f;
     }
     protected void SetFallRigidbody(){
         rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rigidBody.drag = 1f;
-        rigidBody.gravityScale = 0.5f;
+        rigidBody.gravityScale = 2f;
     }
 
     private bool sentGroundedFunc;

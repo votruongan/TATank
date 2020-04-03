@@ -1,4 +1,4 @@
-using log4net;
+// using log4net;
 using System;
 using System.Reflection;
 using System.Text;
@@ -24,7 +24,7 @@ namespace Game.Base
         public volatile bool isSended = true;
         public volatile int m_sended = 0;
         public volatile int packetNum = 0;
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public byte[] Buffer
         {
             get
@@ -200,19 +200,19 @@ namespace Game.Base
                         {
                             if (indexKey == 0)
                             {
-                                PacketIn.log.Error(string.Concat(new object[]
-								{
-									"IndexKey :  ",
-									indexKey,
-									"  i : ",
-									i,
-									"m_sended: ",
-									this.m_sended,
-									"  dstOffset :",
-									dstOffset,
-									"indexBuffex :",
-									indexBuffex
-								}));
+                                // PacketIn.log.Error(string.Concat(new object[]
+								// {
+								// 	"IndexKey :  ",
+								// 	indexKey,
+								// 	"  i : ",
+								// 	i,
+								// 	"m_sended: ",
+								// 	this.m_sended,
+								// 	"  dstOffset :",
+								// 	dstOffset,
+								// 	"indexBuffex :",
+								// 	indexBuffex
+								// }));
                                 result = 0;
                                 return result;
                             }

@@ -10,6 +10,8 @@ public class PlayerController : LivingController
     public GameController gameController;
     public byte speedTime;
 
+    Sprite bulletSprite;
+    Sprite defaultBulletSprtite;
     [Header("FOR ASSIGNMENT")]
     public GameObject movingBullet;
 
@@ -36,7 +38,7 @@ public class PlayerController : LivingController
         base.Start();
         if (gameController == null)
             gameController = GameObject.Find("GameController").GetComponent<GameController>();
-
+        defaultBulletSprtite = Resources.Load<Sprite>("bullet/hammer");
         bulletJoint = this.GetComponent<FixedJoint2D>();
 
         ClothSprite = this.FindChildObject("ClothSprite").GetComponent<EquipController>();
@@ -117,10 +119,17 @@ public class PlayerController : LivingController
         }
     }
 
+    public override void Teleport(float time, Vector3 pos){
+        this.PlayEffect("EffectBuff");
+        this.PlayAnimation("PlayerHappy");
+        StartCoroutine(WaitAndSetIdle(1.5f));
+        base.Teleport(time,pos);
+    }
+
     public void UsingFightingProp(string propString){
         Debug.Log("Using propstring: " + propString);
         if ((!anim.GetBool("IsMoving")&&!anim.GetBool("IsFiring")&&!anim.GetBool("IsFired"))){
-            this.PlayAnimation("PlayerHappy");  
+            this.PlayAnimation("PlayerHappy");
             StartCoroutine(WaitAndSetIdle(1.5f));
         }
         this.PlayEffect("EffectBuff");
@@ -128,6 +137,7 @@ public class PlayerController : LivingController
         ((FightUIController)gameController.uiController).AppendCurrentProp(propTexture);
         this.DisplayPropIcon(propTexture);
     }
+    
     IEnumerator WaitAndSetIdle(float time){
         yield return new WaitForSeconds(time);
         this.PlayAnimation("PlayerIdle");
@@ -138,6 +148,13 @@ public class PlayerController : LivingController
     protected void FixedUpdate() {
         base.FixedUpdate();
     }
+	public void SetBullet(string bulletName){
+		Sprite tryLoad = Resources.Load<Sprite>("bullet/" + bulletName);
+        if (tryLoad == null){
+            return;
+        }
+        bulletSprite = tryLoad;
+	}
 
     public void Fire(int time, float vx, float vy, Vector3 target){
         //System.Threading.Thread.Sleep(speedTime);
@@ -158,6 +175,7 @@ public class PlayerController : LivingController
         SoundManager.GetInstance().PlayEffect("startFire");
         movingBullet = Instantiate(bulletPrefab,this.transform.position + new Vector3(0f,0.2f,0f),Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
+        bCtrl.SetBall(bulletSprite);
         bCtrl.Fire(time, vx, vy);
         bCtrl.SetTarget(target);
     }
@@ -187,6 +205,7 @@ public class PlayerController : LivingController
 
     public virtual void GetTurn(bool isTurn){
         ((FightUIController)gameController.uiController).ResetCurrentProp();
+        bulletSprite = defaultBulletSprtite;
         if (isTurn)
             healthBar.getTurnSprite.gameObject.SetActive(true);
         else
