@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BackgroundImageAnimation : MonoBehaviour
 {
+    public bool isSmooth = true;
     public float speed;
     public float horizontalAmplitude;
     public float verticalAmplitude;
@@ -12,18 +13,21 @@ public class BackgroundImageAnimation : MonoBehaviour
     private int dirHor = -1;
     private float movedVer;
     private float movedHor;
+    private float realSpeed;
     // Start is called before the first frame update
     void Start()
     {
-        
+        realSpeed = speed;
     }
-
     // Update is called once per frame
     void FixedUpdate()
     {
         Vector3 newPos = this.transform.position;
-        newPos.y += dirVer * speed;
-        newPos.x += dirHor * speed;
+        realSpeed = (movedHor-horizontalAmplitude)/horizontalAmplitude * speed;
+        realSpeed += (movedVer-verticalAmplitude)/verticalAmplitude * speed;
+        realSpeed /= 2;
+        newPos.y += dirVer * realSpeed;
+        newPos.x += dirHor * realSpeed;
         movedHor += speed;
         movedVer += speed;
         this.transform.position = newPos;

@@ -96,11 +96,13 @@ public class CommonUIController : UIController
         }
         loadingScreen.SetActive(false);
     }
-    public void SetLoadingScreen(bool isActive){
-        loadingScreen.SetActive(isActive);
-        countUpUI.SetActive(!isActive);
+    public override void SetLoadingScreen(bool isActive){
+        if (loadingScreen != null)
+            loadingScreen.SetActive(isActive);
+        if (countUpUI != null)
+            countUpUI.SetActive(!isActive);
     }
-    public void ConnectHost(){
+    public override void ConnectHost(){
 		gameController.ConnectHost(GameObject.Find("HsIPA_InputField_Text").GetComponent<Text>().text);
         GameObject.Find("HostIpPanel").SetActive(false);
     }
@@ -110,16 +112,19 @@ public class CommonUIController : UIController
     public GameObject cancelButton;
 
     public void OpenMatch(){
-        matchButton.SetActive(false);
-        countUpUI.SetActive(true);
         gameController.StartMatch();
     }
-    public void SoloPVPMatch(){
+    public void ConfirmOpenMatch(){
+        matchButton.SetActive(false);
+        countUpUI.SetActive(true);
+    }
+
+    public override void SoloPVPMatch(){
         countUpUI.SetActive(true);
         gameController.StartMatch();
     }
     
-    public void CancelMatch(){
+    public override void CancelMatch(){
         matchButton.SetActive(true);
         countUpUI.SetActive(false);
         gameController.StopMatch();
@@ -129,7 +134,7 @@ public class CommonUIController : UIController
         gameController.connector.OpenRegister();
     }
 
-    public void LoginToHost(){
+    public override void LoginToHost(){
 		string id = loginPanelController.loginId.text;
         if (string.IsNullOrEmpty(id)){
             Debug.Log("No Id entered");
@@ -159,19 +164,19 @@ public class CommonUIController : UIController
         bool res = gameController.ConnectHost(id, pass, host);
         if (res){
             //login succeed
-            notiPanel.ShowTextAndClose("Đăng nhập thành công");
+            notiPanel.ShowTextAndClose("Đăng nhập\nThành công");
             loginPanel.SetActive(false);
             // GameObject.Find("FogCamera").SetActive(false);
             // fightUI.SetActive(false);
             mainPanel.SetActive(true);
             return;
         }
-        notiPanel.ShowTextAndClose("Đăng nhập lỗi: "+gameController.GetClientConnector().lastErr.ToString());
+        notiPanel.ShowTextAndClose("Đăng nhập\nlỗi: "+gameController.GetClientConnector().lastErr.ToString());
     }
 
 
     public override void UpdateMainPlayerPreview(PlayerInfo pInfo){
-        Debug.Log("Check at UIController");
+        // Debug.Log("Check at UIController");
         mainPlayerPreview.GetComponent<PlayerPreviewLoader>().LoadFromInfo(pInfo);
         // loginPanel.SetActive(false);
     }

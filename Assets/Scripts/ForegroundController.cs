@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using ConnectorSpace;
 
 public class ForegroundController : MonoBehaviour
-{
+{	
+	public bool isTest;
 	public Rect mapRect;
 	public PolygonCollider2D foreCollider;
 	public Vector3 bottomLeftPosition;
@@ -12,9 +15,13 @@ public class ForegroundController : MonoBehaviour
 	[Header("FOR DEBUG")]
 	public bool isUpdatedBLP;
 	public GameObject deadLayer;
+	public SpriteRenderer backgroundSprite;
 	public SpriteRenderer deadSprite;
 	public PolygonCollider2D deadCollider;
+	
+	int inLoading;
 	public SpriteRenderer foreSprite;
+	public GameController gameController;
 
 	public bool IsForegroundLoaded(){
 		return (foreSprite.sprite != null);
@@ -91,18 +98,23 @@ public class ForegroundController : MonoBehaviour
 		}
 		if (foreSprite.sprite != null){
 			mapRect = foreSprite.sprite.rect;
-			Debug.Log("Updated BottomLeftPosition ");
 			return;
 		}
-		mapRect = deadSprite.sprite.rect;
+		if (deadSprite.sprite!= null)
+			mapRect = deadSprite.sprite.rect;
 	}
 
 	void Start(){
 		isUpdatedBLP = false;
+		gameController = GameObject.Find("GameController").GetComponent<GameController>();
 		deadLayer = this.transform.GetChild(0).gameObject;
 		deadSprite = deadLayer.GetComponent<SpriteRenderer>();
 		deadCollider = deadLayer.GetComponent<PolygonCollider2D>();
 		foreSprite = this.GetComponent<SpriteRenderer>();
+		if (backgroundSprite == null)
+			backgroundSprite = GameObject.Find("Background").GetComponent<SpriteRenderer>();
+		// if (isTest)
+		// 	LoadMapOnline(1028);
 	}
 
 	void UpdateBottomLeftPosition(){
@@ -112,28 +124,65 @@ public class ForegroundController : MonoBehaviour
 		topRightPosition = transform.position;
 		topRightPosition += new Vector3 (mapRect.width/200, mapRect.height/200, 0f); 
 		isUpdatedBLP = true;
+		Debug.Log("Updated BottomLeftPosition " + bottomLeftPosition);
 	}
 
-	public void LoadSprite(Sprite sp){
-		foreSprite.sprite = sp;
-		RefreshCollider(this.gameObject);
+	// public void LoadMap(int mapId){
+	// 	string path = "map/"+mapId.ToString()+"/";
+	// 	this.LoadMap(path);
+	// }
+	public void LoadMapOnline(int id){
+		string mapId = id.ToString();
+		StartCoroutine(GetMapTexture(mapId,"fore.png",foreSprite));
+		StartCoroutine(GetMapTexture(mapId,"dead.png",deadSprite));
+		StartCoroutine(GetMapTexture(mapId,"back.jpg",backgroundSprite,true));
 	}
 
-	public void LoadMap(int mapId){
-		string path = "map/"+mapId.ToString()+"/";
-		this.LoadMap(path);
+	// public void LoadMap(string mapPath){
+	// 	this.isUpdatedBLP = false;
+	// 	this.LoadSprite(Resources.Load<Sprite>(mapPath+"fore"));
+	// 	deadSprite.sprite = Resources.Load<Sprite>(mapPath+"dead");
+	// 	ForceUpdate();
+	// }
+
+	Sprite makeSimpleSrite(Texture tex){
+		return Sprite.Create(tex as Texture2D,new Rect(0.0f, 0.0f, tex.width, tex.height),new Vector2(0.5f,0.5f),100.0f);
 	}
 
-	public void LoadMap(string mapPath){
-		this.isUpdatedBLP = false;
-		this.LoadSprite(Resources.Load<Sprite>(mapPath+"fore"));
-		deadSprite.sprite = Resources.Load<Sprite>(mapPath+"dead");
+    IEnumerator GetMapTexture(string mapId, string name, SpriteRenderer applyTo, bool forceUpdate=false) {
+		if (applyTo == null){
+			yield break;
+		}
+		inLoading++;
+		string foreDir = ConfigMgr.ResourcesUrl + "/image/map/" + mapId +"/"+ name + "?lv=14&";
+		// Debug.Log(foreDir);
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(foreDir);
+        yield return www.SendWebRequest();
+		Texture tex;
+        if(www.isNetworkError || www.isHttpError) {
+            Debug.Log("get "+name+" error: " + www.error);
+        }
+        else {
+            tex = ((DownloadHandlerTexture)www.downloadHandler).texture;
+			while(foreSprite == null){
+				yield return null;
+			}
+			applyTo.sprite = makeSimpleSrite(tex);
+        }
+		inLoading--;
+		if (forceUpdate){
+			while(inLoading > 0){
+				yield return new WaitForSeconds(0.04f);
+			}
+			ForceUpdate();
+			gameController.LoadComplete();
+		}
+    }
+	public void ForceUpdate(){
 		RefreshCollider(this.gameObject);
 		RefreshCollider(deadLayer);
 		UpdateBottomLeftPosition();
 	}
-
-
 	public void RefreshCollider(GameObject gObject){
 		PolygonCollider2D col = gObject.GetComponent<PolygonCollider2D>();
 		if (col != null){
@@ -141,6 +190,7 @@ public class ForegroundController : MonoBehaviour
 		}
 		//No sprite to draw on screen -> don't add polygon
 		if (gObject.GetComponent<SpriteRenderer>().sprite == null){
+			Debug.Log("[RefreshCollider] go name " + gObject.name + " null sprite");
 			return;
 		}
 		foreCollider = gObject.AddComponent<PolygonCollider2D>();

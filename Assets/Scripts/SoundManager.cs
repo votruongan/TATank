@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using ConnectorSpace;
 
 public class SoundManager : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class SoundManager : MonoBehaviour
     [Header("Audio Clips")]
     public AudioClip bgm;
     public AudioClip testClip;
+    List<AudioClip> audioQueue;
     
     [Header("For Debugging")]
     public AudioSource player;
@@ -26,7 +29,7 @@ public class SoundManager : MonoBehaviour
         musicVolume = PlayerPrefs.GetFloat("musicVolume",1f);
         effectVolume = PlayerPrefs.GetFloat("effectVolume",1f);
         player.volume = musicVolume;
-        LoadAndPlay("bgm");
+        // LoadAndPlay("bgm");
     }
 
     public void ChangeVolume(float music = -1f, float effect = -1f){
@@ -51,20 +54,22 @@ public class SoundManager : MonoBehaviour
         if (go != null)
             Destroy(go);
     }
-    public GameObject PlayEffect(string name){
-        if (effectVolume <0.05f){
-            return null;
-        }
-        AudioClip src = Resources.Load<AudioClip>("sound/"+name);
-        return PlayEffect(src,name);
+    public void PlayBGM(string name){
+        PlaySound(name,true);
     }
-    public GameObject PlayEffect(AudioClip src,string name){
+    public void PlayEffect(string name){
+        if (effectVolume <0.05f){
+            return;
+        }
+        PlaySound(name);
+    }
+    GameObject PlayEffect(AudioClip src,string gameObjectName){
         // Debug.Log("Sfx check0");
         if (src == null){
             return null;
         }
         // Debug.Log("Sfx check1");
-        GameObject gO = new GameObject(name);
+        GameObject gO = new GameObject(gameObjectName);
         AudioSource sfx = gO.AddComponent(typeof(AudioSource)) as AudioSource;
         DelayedSelfDestroy dsd = gO.AddComponent(typeof(DelayedSelfDestroy)) as DelayedSelfDestroy;
         dsd.delayedSeconds = src.length;
@@ -73,18 +78,77 @@ public class SoundManager : MonoBehaviour
         sfx.Play();
         return gO;
     }
-
-    public void LoadAudio(string name){
+    void PlayBGM(AudioClip src){
         if (player == null)
             player = gameObject.GetComponent<AudioSource>();
         player.Stop();
-        AudioClip aud = Resources.Load<AudioClip>("sound/"+name);
-        if (aud == null)
-            aud = Resources.Load<AudioClip>("sound/1008");
+        AudioClip aud = src;
         player.clip = aud;
-    }
-    public void LoadAndPlay(string name){
-        LoadAudio(name);
         player.Play();
+    }
+    private void PlaySound(string name, bool isBGM=false){
+        // try load built-in sound
+        // Debug.Log("PlaySound: " + name);
+        AudioClip au = Resources.Load<AudioClip>("sound/" + name);
+        if (au != null){
+            BasePlaySound(au,isBGM);
+            return;
+        }
+        // No built-in sound -> try to fetch the sound in cache
+        byte[] rawData = null;
+        string filePath = Application.persistentDataPath +"/" + name +".ogg";
+        if (!System.IO.File.Exists(filePath)){
+            //No sound in cache -> download the sound from server
+            StartCoroutine(DownloadAndPlay(name, filePath));
+            return;
+        }
+        // cached sound
+        StartCoroutine(PlayFromCache(filePath,isBGM));
+    }
+    private void BasePlaySound(AudioClip ac, bool isBGM=false){
+        if (ac == null){
+            Debug.Log("BasePlaySound: ac is null ");
+            return;
+        }
+        // Debug.Log("BasePlaySound: isBGM: " + isBGM +ac);
+        if (isBGM){
+            PlayBGM(ac);
+        }else{
+            PlayEffect(ac,name);
+        }
+    }
+    IEnumerator DownloadAndPlay(string name, string filePath, bool isBGM=false)
+    {
+        // Debug.Log("DownloadAndPlay: " + filePath);
+        string url = ConfigMgr.ResourcesUrl +"/sounds/" + name + ".ogg";
+        UnityWebRequest www = UnityWebRequest.Get(url);
+        yield return www.Send();
+        if (www.isNetworkError || www.isHttpError)
+        {
+            Debug.Log(url + "\n Get SOUND " + name  +" failed: "+www.error);
+            PlaySound("1028");
+        }
+        else
+        {
+            string savePath = string.Format("{0}/{1}.ogg", Application.persistentDataPath, name);        
+            System.IO.File.WriteAllBytes(savePath, www.downloadHandler.data);
+            Debug.Log("DownloadAndPlay: WritetoFile: " + savePath);
+            Debug.Log("DownloadAndPlay: Check filePath Existed: " + System.IO.File.Exists(filePath));
+            yield return StartCoroutine( PlayFromCache(filePath,isBGM));
+        }
+    }
+    IEnumerator PlayFromCache(string filePath, bool isBGM=false){
+        // Debug.Log("PlayFromCache: " + filePath);
+        UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(ConfigMgr.FileScheme+filePath, AudioType.OGGVORBIS);
+        yield return req.Send();            
+        if (req.isNetworkError)
+        {
+            Debug.Log("Convert SOUND " + name +" failed: "+req.error);
+        }
+        else
+        {
+            AudioClip ac = DownloadHandlerAudioClip.GetContent(req);
+            BasePlaySound(ac,isBGM);
+        }
     }
 }

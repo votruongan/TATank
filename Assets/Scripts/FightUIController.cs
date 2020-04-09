@@ -11,6 +11,8 @@ public class FightUIController : UIController
     public GameObject fightUI;
     public CurrentPropDisplayer currentPropDisplayer;
     public NotiPanelController notiPanel;
+    public GameObject redFrameObject;
+    public DanderEffectScreen danderScreen;
     [Header("FOR DEBUG")]
     public MainPlayerController mainPlayerController;
     public bool isTakePower;
@@ -31,12 +33,21 @@ public class FightUIController : UIController
             return;
         RedPlayerPreview.gameObject.SetActive(true);    
         RedPlayerPreview.LoadFromInfo(inf);
+        danderScreen.PrepareLoader(1,inf);
+		Debug.Log("-- -- -- Load Red: " + inf);
     }
+    
     public void LoadBluePlayerPreview(PlayerInfo inf){
         if (inf == null)
             return;
         BluePlayerPreview.gameObject.SetActive(true);
         BluePlayerPreview.LoadFromInfo(inf);
+        danderScreen.PrepareLoader(2,inf);
+		Debug.Log("-- -- -- LoadBlue: " + inf);
+    }
+    public void PlayDanderScreen(bool isHeadingRight, int team){
+        string t = (team == 2)?("BLUE"):("RED");
+        danderScreen.CallDanderScreen(isHeadingRight,t);
     }
 
     // Start is called before the first frame update
@@ -232,7 +243,9 @@ public class FightUIController : UIController
         }
     }
 
-
+    public void ShowRedFrame(){
+        redFrameObject.SetActive(true);
+    }
     public void AppendCurrentProp(Texture textur){
         currentPropDisplayer.Append(textur);
     }

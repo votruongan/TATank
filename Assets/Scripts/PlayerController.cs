@@ -9,7 +9,7 @@ public class PlayerController : LivingController
     [Header("FOR DEBUG")]
     public GameController gameController;
     public byte speedTime;
-
+    int firedTime;
     Sprite bulletSprite;
     Sprite defaultBulletSprtite;
     [Header("FOR ASSIGNMENT")]
@@ -24,6 +24,8 @@ public class PlayerController : LivingController
     public GameObject bulletPrefab;
     public GameObject normalDamagePrefab;
     public GameObject criticalDamagePrefab;
+    bool isOnDander = false;
+    bool needSendDanderScreen = false;
 
 	[Header("GROUND")]
 	protected FixedJoint2D bulletJoint;
@@ -136,6 +138,10 @@ public class PlayerController : LivingController
         Texture propTexture = GameObject.Find("Prop_"+propString+"_Button").transform.GetChild(0).gameObject.GetComponent<RawImage>().texture;
         ((FightUIController)gameController.uiController).AppendCurrentProp(propTexture);
         this.DisplayPropIcon(propTexture);
+        if (propString == "DANDER"){
+            isOnDander = true;
+            needSendDanderScreen = true;
+        }
     }
     
     IEnumerator WaitAndSetIdle(float time){
@@ -149,35 +155,48 @@ public class PlayerController : LivingController
         base.FixedUpdate();
     }
 	public void SetBullet(string bulletName){
+        Debug.Log("Loading Bullet: " + bulletName);
 		Sprite tryLoad = Resources.Load<Sprite>("bullet/" + bulletName);
         if (tryLoad == null){
             return;
         }
         bulletSprite = tryLoad;
 	}
-
     public void Fire(int time, float vx, float vy, Vector3 target){
         //System.Threading.Thread.Sleep(speedTime);
         //staticBullet.SetActive(false);
         // Fire(vx,vy, target);
+        if (needSendDanderScreen){
+            gameController.PlayDanderScreen(this.isHeadingRight, this.info.team);
+            StartCoroutine(WaitAndCloseDanderFlag(2.0f));
+            needSendDanderScreen = false;
+        }
         StartCoroutine(ExecFire(time,vx,vy,target));
     }
-
+    IEnumerator WaitAndCloseDanderFlag(float secs){
+        yield return new WaitForSeconds(secs-0.02f);
+        isOnDander  = false;
+    }
     public void Fire(float vx, float vy, Vector3 target){
         //staticBullet.SetActive(false);
         // StartCoroutine(ExecFire(vx,vy,target));
     }
     IEnumerator ExecFire(int time, float vx, float vy, Vector3 target){
-        while (this.isMoving)
+        firedTime++;
+        float waitSecs = (firedTime-1) * 0.2f;
+        while (this.isMoving || isOnDander)
         {
             yield return new WaitForSeconds(0.02f);
         }
+        yield return new WaitForSeconds(waitSecs);
         SoundManager.GetInstance().PlayEffect("startFire");
         movingBullet = Instantiate(bulletPrefab,this.transform.position + new Vector3(0f,0.2f,0f),Quaternion.identity);
         BulletController bCtrl = movingBullet.GetComponent<BulletController>();
         bCtrl.SetBall(bulletSprite);
         bCtrl.Fire(time, vx, vy);
         bCtrl.SetTarget(target);
+        gameController.CameraToBullet(this);
+		this.PlayAnimation("PlayerFired");
     }
 
 
@@ -195,6 +214,8 @@ public class PlayerController : LivingController
             damPanelController = damPanel.GetComponent<DamagePanelController>();
             damPanelController.SetDamage(damage);
         }
+        gameController.mainCamController.Shake();
+        ((FightUIController)gameController.uiController).ShowRedFrame();
         UpdateHealthBar(info.team,(float)remainingBlood/originalInfo.blood);
     }
     public virtual void Damaged(int time, int damage, bool critical, int remainingBlood){
@@ -205,6 +226,9 @@ public class PlayerController : LivingController
 
     public virtual void GetTurn(bool isTurn){
         ((FightUIController)gameController.uiController).ResetCurrentProp();
+        firedTime = 0;
+        if (defaultBulletSprtite == null)
+            defaultBulletSprtite = Resources.Load<Sprite>("bullet/hammer");
         bulletSprite = defaultBulletSprtite;
         if (isTurn)
             healthBar.getTurnSprite.gameObject.SetActive(true);

@@ -65,7 +65,7 @@ public class LivingController : BaseObjectController
     public void UpdateHealthBar(int colorCode, float percent){
         if (healthBar == null)
             healthBar = this.FindChildObject("ForeHealth").GetComponent<HealthBarSprite>();
-        if (colorCode == 1)
+        if (colorCode == 2)
             healthBar.ChangeToBlue();
         else
             healthBar.ChangeToRed();

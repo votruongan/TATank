@@ -48,7 +48,7 @@ public class BagAndInfoController : BaseToolbarController
         foreach(ItemInfo item in localBag){
             if (item.Place != bagPlace + offset)
                 continue;
-            ItemTemplateInfo iti = gameController.connector.FindItemTemplateInfo(item.Pic,gameController.connector.localPlayerInfo.sex);
+            ItemTemplateInfo iti = ConnectorManager.FindItemTemplateInfo(item.TemplateID,gameController.connector.localPlayerInfo.sex);
             // Debug.Log(item.ToString());
             // Debug.Log(iti);
             RectTransform slotTransform = null;
@@ -292,7 +292,7 @@ public class BagAndInfoController : BaseToolbarController
     }
 
     
-    public virtual void Close(){
+    public override void Close(){
         gameController.uiController.UpdateMainPlayerPreview(gameController.GetLocalPlayerInfo());
         base.Close();
     }

@@ -39,7 +39,7 @@ public class PlayerInfo : BaseInfoWrapper
 	public string color;
 	public string skin;
 	public int mainWeapon;
-	public int team;	// 1: blue, 2: red
+	public int team;	// 2: blue, 1: red
 	public PlayerInfo(){}
 
     public PlayerInfo Clone()

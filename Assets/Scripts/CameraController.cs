@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class CameraController : MonoBehaviour
     public Vector3 clampMax;
     public Vector3 clampMin;
      
+    Vector3 tmpV3;
+    bool isShaking;
     public void UpdateClamp(Vector3 bottomLeftPos, Vector3 topRightPos){
         // Vector3 halfDimension = center - bottomLeftPos;
         // clampMin = bottomLeftPos + cameraOffset;
@@ -28,6 +31,12 @@ public class CameraController : MonoBehaviour
         Vector3 offset = new Vector3 (7.3f,4.1f,0f);
         clampMax = topRightPos - offset;
         clampMin = bottomLeftPos + offset;
+        if (clampMax.x < clampMin.x){
+            clampMax.x = clampMin.x;
+        }
+        if (clampMax.y < clampMin.y){
+            clampMax.y = clampMin.y;
+        }
     }
     // Move to target pos in about 20 frame
     public void TranslateTo(Vector3 pos){
@@ -43,11 +52,10 @@ public class CameraController : MonoBehaviour
         moveTarget = pos;
         moveSpeed = mSpeed; 
         isMove = true;
-        Debug.Log("Translating to " + pos + " at " + mSpeed);
+        // Debug.Log("Translating to " + pos + " at " + mSpeed);
             // StartCoroutine(ExecTranslate());
     }
 
-    Vector3 tmpV3;
     // IEnumerator ExecTranslate(){
     //     while (isMove)
     //     {
@@ -61,11 +69,32 @@ public class CameraController : MonoBehaviour
     //     }
     // }
     void BaseTranslateTo(float vx, float vy){
-        Debug.Log(" Basetranslate : vx:" + vx + " vy:" + vy);
+        // Debug.Log(" Basetranslate : vx:" + vx + " vy:" + vy);
         tmpV3 = this.transform.position;
         tmpV3.x = Mathf.Clamp(tmpV3.x + vx,clampMin.x,clampMax.x);
         tmpV3.y = Mathf.Clamp(tmpV3.y + vy,clampMin.y,clampMax.y);
         transform.position = tmpV3;
+    }
+    void NoClampTranslateTo(float vx, float vy){
+        // Debug.Log(" Basetranslate : vx:" + vx + " vy:" + vy);
+        tmpV3 = this.transform.position;
+        tmpV3.x += vx;
+        tmpV3.y += vy;
+        transform.position = tmpV3;
+    }
+
+    public void Shake(){
+        isShaking = true;
+        StartCoroutine(ExecShake());
+    }
+
+    IEnumerator ExecShake(){
+        NoClampTranslateTo(-0.1f,0.2f);
+        yield return new WaitForSeconds(0.01f);
+        NoClampTranslateTo(0.2f,-0.4f);
+        yield return new WaitForSeconds(0.01f);
+        NoClampTranslateTo(-0.1f,0.2f);
+        isShaking = false;
     }
 
     public void LockTo(Transform pos){
@@ -76,12 +105,14 @@ public class CameraController : MonoBehaviour
 
 //Move camera
     void FixedUpdate() {
-        if (isStatic){
+        if (isStatic || isShaking){
             return;
         }
         if (isLockTo){
             if (lockToObject == null){
                 isLockTo = false;
+                isMove = false;
+                moveSpeed = Vector3.zero;               
                 return;
             }
             TranslateTo(lockToObject.transform.position);
@@ -90,8 +121,8 @@ public class CameraController : MonoBehaviour
         // Debug.Log("checking ismove: " + isMove);
         if (isMove){
             float dist = Vector3.Distance(transform.position,moveTarget);
-            Debug.Log(dist);
-            if (dist < 0.05f){
+            // Debug.Log(dist);
+            if (dist < 0.086f){
                 isMove = false;
                 return;
             }
@@ -103,18 +134,23 @@ public class CameraController : MonoBehaviour
 #if UNITY_STANDALONE || UNITY_EDITOR
         // Debug.Log("Unity Standalone");
         if (Input.GetMouseButtonDown(0)) {
-            Debug.Log("GetMouse");
+            // Check if the mouse was clicked over a UI element
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+            // Debug.Log("GetMouse");
             isLockTo = false;
             isMove = false;
             lastMousePos = Input.mousePosition;
             return;
         }
         if (Input.GetMouseButtonUp(0)) {
-            Debug.Log("ReleaseMouse");
+            // Debug.Log("ReleaseMouse");
         }
 
         if (Input.GetMouseButton(0)) {
-            Debug.Log("OnMouse");
+            // Debug.Log("OnMouse");    
             Vector2 mousePos = Input.mousePosition;
             // calculate the difference in prev and post mouse position
             mousePos -= lastMousePos;
@@ -126,6 +162,11 @@ public class CameraController : MonoBehaviour
 #else 
         // Debug.Log("Unity Mobile devices");
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved) {
+            // Check if the mouse was clicked over a UI element
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
             isLockTo = false;
             isMove = false;
             Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
@@ -135,9 +176,15 @@ public class CameraController : MonoBehaviour
         }
 #endif
     }
+    
+    IEnumerator TimedTest(){
+        yield return new WaitForSeconds(0.2f);
+        Shake();
+    }
 
     void Start(){
     	lastMousePos = Input.mousePosition;
+        isMove = false;
         // StartCoroutine(TimedTest());
     }
 }

@@ -5,10 +5,10 @@ using UnityEngine;
 public class DelayedDisable : MonoBehaviour
 {
     public bool isStarted;
-	public float timer = 0f;
+    protected float timer = 0f;
 	public float delayedSeconds = 1.5f;
     // Start is called before the first frame update
-    void OnEnable()
+    protected void OnEnable()
     {
         isStarted = true;
     }

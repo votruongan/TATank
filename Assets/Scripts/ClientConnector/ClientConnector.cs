@@ -592,6 +592,8 @@ public class ClientConnector : BaseConnector
                 break;
             }
             case (byte)ePlayerPackageType.UPDATE_PlAYER_INFO:{
+                localPlayerInfo.nickname = this.m_account;
+                localPlayerInfo.id = this.m_playerId;
                 localPlayerInfo.grade = this.m_grade;
                 localPlayerInfo.gp = pkg.ReadInt();//info.GP);
                 pkg.ReadInt();//info.Offer);
@@ -647,7 +649,8 @@ public class ClientConnector : BaseConnector
                 Debug.Log(localPlayerInfo.ToString());
                 UnityThread.executeInUpdate(() =>
                 {
-                    //Call LoadMapHandler in ConnectorManager
+                    //Call Update mainplayer info in ConnectorManager
+                    connectorManager.UpdateLocalPlayerPreview();
                     connectorManager.UpdateStatsDisplay();
                 });
                 break;
@@ -904,8 +907,11 @@ public class ClientConnector : BaseConnector
                 // this.Act(new PlayerExecutable(this.StartGame));
                 break;
             }
-            case (int)ePackageType.GAME_PAIRUP_ROOM_SETUP:
-                // this.Act(new PlayerExecutable(this.StartGame));
+            case (int)ePackageType.GAME_PAIRUP_START:      
+                UnityThread.executeInUpdate(() =>
+                {
+                    connectorManager.ConfirmMatching();
+                });
                 break;
             default:
                 Debug.Log("Unhandled Package type: " + ((ePackageType)pkg.Code).ToString());

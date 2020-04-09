@@ -31,6 +31,8 @@ public class GameController : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject mainPlayerPrefab;
 	private int[] playerIdCache;
+    [Header("DEBUG")]
+	bool isOnDander;
 
     public static void LogToScreen(string log){
         debugString += "\n" + log;
@@ -44,6 +46,7 @@ public class GameController : MonoBehaviour
 	public GameObject BoxSprite;
     public void PlayerTurn(int pId, List<BoxInfo> newBoxes, List<PlayerInfo> playerList){
 		PlayerController pCtrl = null;
+		isOnDander = false;
     	if (pId == mainPlayerController.info.id){
 			uiController.DisplayYourTurn();
 	    	mainPlayerController.GetTurn(true);
@@ -74,8 +77,9 @@ public class GameController : MonoBehaviour
 
 	public void BombExplodeAt(int time, int pId,int ePPosX,int ePPosY){
 		Vector3 explodePos = foreController.PixelToWorldPosition(ePPosX,ePPosY,true);
-		explosionController.DelayedExecute(time,explodePos);
-		digController.DelayedExecute(time,explodePos);
+		int offset = (isOnDander)?(2200):(0);
+		explosionController.DelayedExecute(time+offset,explodePos);
+		digController.DelayedExecute(time+offset,explodePos);
 	}
 
 
@@ -111,12 +115,28 @@ public class GameController : MonoBehaviour
 	}
 
 	public void PlayerUpdateBall(int pId, bool special, int ballId){
+		Debug.Log("[GameController] CURRENTBALL - special:" + special);
 		PlayerController pCtrl = FindPlayerById(pId);
 		if (special){
 			//perform player using dander
+			isOnDander = true;
 			pCtrl.SetBullet("special");
 			pCtrl.UsingFightingProp("DANDER");
 			return;
+		}
+	}
+
+	public void PlayDanderScreen(bool headingRight, int team){
+		((FightUIController)uiController).PlayDanderScreen(headingRight,team);
+	}
+
+	private int delayCameraCount = 0;
+
+	public void CameraToBullet(PlayerController pCtrl){
+		if (delayCameraCount == 0){
+    		mainCamController.LockTo(pCtrl.movingBullet.transform);
+		} else {
+			delayCameraCount --;
 		}
 	}
 
@@ -124,10 +144,10 @@ public class GameController : MonoBehaviour
 		PlayerController pCtrl = FindPlayerById(pId);
 		if (pCtrl == null)
 			return;
-		pCtrl.Damaged(delayedTime + 300,damage,critical,remainingBlood);
+		int offset = (isOnDander)?(2400):(400);
+		pCtrl.Damaged(delayedTime + offset,damage,critical,remainingBlood);
 	}
     // add the destination to explode
-	private int delayCameraCount = 0;
     public void PlayerFire(int pId, int time, int pVx, int pVy, int targX, int targY){
 		PlayerController pCtrl = FindPlayerById(pId);
 		Vector3 targPos = foreController.PixelToWorldPosition(targX,targY,true);
@@ -135,13 +155,8 @@ public class GameController : MonoBehaviour
 			return;
 		float vx = (float)pVx / 100;
 		float vy = (float)-pVy / 100;
-		pCtrl.PlayAnimation("PlayerFired");
+		pCtrl.PlayAnimation("PlayerFiring");
 		pCtrl.Fire(time,vx,vy,targPos);
-		if (delayCameraCount == 0){
-    		mainCamController.LockTo(pCtrl.movingBullet.transform);
-		} else {
-			delayCameraCount --;
-		}
     }
     public void PlayerDirection(int pId, int dir){
 		PlayerController pCtrl = FindPlayerById(pId);
@@ -200,6 +215,18 @@ public class GameController : MonoBehaviour
     		}
     	}
     }
+	int loadCount = 0;
+	public void LoadComplete(){
+		loadCount++;
+		Debug.Log("-- -- -- LoadComplete: " + loadCount);
+		if (loadCount > 0){
+			connector.SendLoadComplete();
+			if (mainCamController == null)
+				mainCamController = GameObject.Find("MainCamera").GetComponent<CameraController>();
+			mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
+			minimapCamController.TranslateTo(foreController.transform.position);
+		}
+	}
 	public void LoadMap(int mapId)
 	{
 		uiController.SetLoadingScreen(true);
@@ -207,14 +234,12 @@ public class GameController : MonoBehaviour
 		//Change background according to mapid
 		backgroundSprite.sprite = Resources.Load<Sprite>(path+"back");
 		//Change foreground and dead sprite, and update their collider
-		foreController.LoadMap(path);
-		soundManager.LoadAndPlay(mapId.ToString());
+		foreController.LoadMapOnline(mapId);
+		// foreController.LoadMap(path);
+		soundManager.PlayBGM(mapId.ToString());
 		backgroundSprite.transform.position = foreController.transform.position;
 		digController.CheckIfDiggable();
-		digController.isDiggable  = false;
-		mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
-		minimapCamController.TranslateTo(foreController.transform.position);
-		connector.SendLoadComplete();
+		// digController.isDiggable  = false;
 	}
 	public void GameOver(MatchSummary ms)
 	{
@@ -225,7 +250,12 @@ public class GameController : MonoBehaviour
 		uiController.SetFightingUI(false);
 		((FightUIController)uiController).summaryPanelController.DisplaySummary(ms);
 		// SwitchScene("Scene_Game","Scene_Front");
-		StartCoroutine(TimedEndGame(5f));
+		StartCoroutine(TimedEndGame(17f));
+	}
+
+	public void ConfirmMatching()
+	{
+		((CommonUIController)uiController).ConfirmOpenMatch();
 	}	
 
 	IEnumerator TimedEndGame(float secs){
@@ -261,7 +291,7 @@ public class GameController : MonoBehaviour
         while (!lao.isDone){
             if (lao.progress >= 0.9f)
             {
-                Debug.Log("load done");
+                Debug.Log("load scene done");
                 break;
             }
         	yield return null;
@@ -295,7 +325,7 @@ public class GameController : MonoBehaviour
 			if (uiController == null){
 				uiController = GameObject.Find("UIController").GetComponent<FightUIController>();
 			}
-			if (p.team == 1){
+			if (p.team == 2){
 				((FightUIController)uiController).LoadBluePlayerPreview(p);
 			} else{
 				((FightUIController)uiController).LoadRedPlayerPreview(p);
@@ -328,6 +358,8 @@ public class GameController : MonoBehaviour
 #region SIGNAL_FROM_MAIN_PLAYER 
 	public void KillSelf(){
 		connector.connector.SendLogOut();
+		if (this == null)
+			return;
 		StartCoroutine(TimedEndGame(2f));
 	}
 	public void StartMatch(){
@@ -347,7 +379,7 @@ public class GameController : MonoBehaviour
 			connector.SendStunt();
 	}
 
-    public void MainPlayerFire(int force, int angle){
+    public void SendPlayerFire(int force, int angle){
 		// PlayerController enemyControl = mainPlayerController;
 		// foreach(PlayerController pc in playerControllers){
 		// 	if (pc.info.id != mainPlayerController.info.id){
@@ -434,7 +466,7 @@ public class GameController : MonoBehaviour
 			soundManager = GameObject.Find("SoundManager").GetComponent<SoundManager>();
 		}
 		connector.gameController = this;
-		soundManager.LoadAndPlay("bgm");
+		soundManager.PlayBGM("062");
 		if (uiController == null){
 			uiController = GameObject.Find("UIController").GetComponent<UIController>();
 			uiController.SetLoadingScreen(true);
@@ -460,6 +492,7 @@ public class GameController : MonoBehaviour
 			}
 			if (mainCamController == null){
 				mainCamController = GameObject.Find("MainCamera").GetComponent<CameraController>();	
+				mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
 			}
 			if (minimapCamController == null){
 				minimapCamController = GameObject.Find("MinimapCamera").GetComponent<CameraController>();	
@@ -478,7 +511,8 @@ public class GameController : MonoBehaviour
 				}
 			}
 			foreach(PlayerInfo inf in connector.playerInfos){
-				if (inf.team == 1){
+				// Debug.Log(inf);
+				if (inf.team == 2){
 					((FightUIController)uiController).LoadBluePlayerPreview(inf);
 				} else{
 					((FightUIController)uiController).LoadRedPlayerPreview(inf);

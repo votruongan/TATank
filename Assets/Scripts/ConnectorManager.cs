@@ -12,7 +12,7 @@ public class ConnectorManager : MonoBehaviour
     public bool isSceneTransforming = false;
     public bool isLogedIn = false;
 	public GameController gameController;
-    public List<ItemTemplateInfo> templateInfos;
+    public static List<ItemTemplateInfo> templateInfos;
     public List<PlayerInfo> playerInfos;
     public List<ItemInfo>[] localBags = new List<ItemInfo>[16];
 
@@ -20,7 +20,7 @@ public class ConnectorManager : MonoBehaviour
 	public ClientConnector connector;
     UnityThread uThread;
 
-    public ItemTemplateInfo FindItemTemplateInfo(string pic, bool isMale){
+    public static ItemTemplateInfo FindItemTemplateInfo(string pic, bool isMale){
         // Debug.Log("FindItemTemplateInfo: " + pic);
         int needSex = (isMale)?(1):(2);
         foreach(ItemTemplateInfo iti in templateInfos){
@@ -38,6 +38,33 @@ public class ConnectorManager : MonoBehaviour
         }
         return null;
     }   
+    // use binary search to find the item having templateId
+    public static ItemTemplateInfo FindItemTemplateInfo(int templateId, bool isMale){
+        // Debug.Log("FindItemTemplateInfo: " + pic);
+        int needSex = (isMale)?(1):(2);
+        int start = 0, end = templateInfos.Count -1, index = 0;
+        while (start != end){
+            index = (start + end) /2;
+            if (templateInfos[index].TemplateID == templateId){
+                if (needSex == templateInfos[index].NeedSex || templateInfos[index].NeedSex==0)
+                    return templateInfos[index];
+            }
+            if (templateInfos[index].TemplateID > templateId){
+                if (index == end)
+                    end = start;
+                end = index;
+            } else {
+                if (index == start)
+                    start = end;
+                start = index;
+            }
+        }
+        if (templateInfos[start].TemplateID == templateId 
+            && needSex == templateInfos[index].NeedSex)
+                    return templateInfos[index];
+        return null;
+    }   
+
 
 #region ConnectorHandler
     //eTankCmdType.FIRE
@@ -196,6 +223,9 @@ public class ConnectorManager : MonoBehaviour
     public void GameOverHandler(MatchSummary ms){
         gameController.GameOver(ms);
     }
+    public void ConfirmMatching(){
+        gameController.ConfirmMatching();
+    }
 #endregion
 
 #region SendCommandToConnector
@@ -226,7 +256,6 @@ public class ConnectorManager : MonoBehaviour
     public void SendDirection(int dir){
         this.connector.SendGameCMDDirection(dir);
     }
-
 
     public void SendSkip(){
         this.connector.Skip();

@@ -77,7 +77,7 @@ public class ItemInfo
         pkg.ReadInt();
     }
     
-	public string ToString(){
+	public override string ToString(){
         string output = JsonUtility.ToJson(this, true);
         return output;
 	}

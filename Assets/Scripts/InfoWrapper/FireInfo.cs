@@ -31,7 +31,7 @@ public class FireInfo
 
 	}
 
-	public string ToString(){
+	public override string ToString(){
 		string str = "list";
 		str += "/ id: " + bomId.ToString() + " x: " + x.ToString()+ 
 				" y: "+y.ToString()+ " vx: "+vx.ToString()+
