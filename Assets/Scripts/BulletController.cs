@@ -5,9 +5,9 @@ using UnityEngine;
 public class BulletController : MonoBehaviour
 {
     [Header("FOR DEBUGGING")]
-    public List<Vector3> positionList;
+    // public List<Vector3> positionList;
     public bool justFired = true;
-    public Rigidbody2D rigidBody;
+    // public Rigidbody2D rigidBody;
     public int time;
     public float currentT = 0f;
     public float velorX;
@@ -48,8 +48,8 @@ public class BulletController : MonoBehaviour
         initTransform = this.transform.position;// +  new Vector3(0f,0.1f,0f);
         // transform.Translate(new Vector3(vx/10,vy/10,0f));
         //rigidBody.simulated = true;
-        if (rigidBody == null)
-            FindRigidBody();
+        // if (rigidBody == null)
+            // FindRigidBody();
         isFired = true;
         justFired = true;
         // this.rigidBody.AddForce(new Vector2(velorX*66,velorY*66));
@@ -66,7 +66,7 @@ public class BulletController : MonoBehaviour
     }
     
     public void Fire(int time, float vx, float vy){
-        StartCoroutine(TimedDestroy((float)time/1000));
+        // StartCoroutine(TimedDestroy((float)time/1000));
         this.Fire(vx,vy);
     }
     IEnumerator TimedDestroy(float secs){
@@ -105,15 +105,15 @@ public class BulletController : MonoBehaviour
         }
     }
     
-    void FindRigidBody(){
-        rigidBody = this.gameObject.GetComponent<Rigidbody2D>();
-        rigidBody.simulated = true;
-    }
+    // void FindRigidBody(){
+    //     rigidBody = this.gameObject.GetComponent<Rigidbody2D>();
+    //     rigidBody.simulated = true;
+    // }
 
     // Start is called before the first frame update
     void Start()
     {
-        FindRigidBody();
+        // FindRigidBody();
     	//gameController = GameObject.Find("GameController").GetComponent<GameController>();
         groundMask = LayerMask.GetMask("Ground"); 
         backgroundMask = LayerMask.GetMask("Background");
@@ -139,6 +139,7 @@ public class BulletController : MonoBehaviour
             //     gameController.BulletExplodeAt(this.transform.position);
             // }
             Destroy(this.gameObject);
+            GameController.GetInstance().BombExplodeAt(this.transform.position);
             //rigidBody.simulated = false;
         }
     }

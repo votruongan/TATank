@@ -12,7 +12,6 @@ public class CommonUIController : UIController
     public GameObject loadingScreen;
     // public GameObject fightUI;
     public GameObject countUpUI;
-    public NotiPanelController notiPanel;
     public BagAndInfoController bagAndInfoController;
     public LoginPanelController loginPanelController;
     // public InputField loginIdText;
@@ -112,6 +111,7 @@ public class CommonUIController : UIController
     public GameObject cancelButton;
 
     public void OpenMatch(){
+        SoundManager.GetInstance().PlayEffect("sound451");
         gameController.StartMatch();
     }
     public void ConfirmOpenMatch(){

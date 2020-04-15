@@ -135,6 +135,9 @@ public class PlayerController : LivingController
             StartCoroutine(WaitAndSetIdle(1.5f));
         }
         this.PlayEffect("EffectBuff");
+        gameController.soundManager.PlayEffect("choose");
+        gameController.soundManager.PlayEffect("noti");
+        gameController.soundManager.PlayEffect("move");
         Texture propTexture = GameObject.Find("Prop_"+propString+"_Button").transform.GetChild(0).gameObject.GetComponent<RawImage>().texture;
         ((FightUIController)gameController.uiController).AppendCurrentProp(propTexture);
         this.DisplayPropIcon(propTexture);
@@ -182,8 +185,10 @@ public class PlayerController : LivingController
         // StartCoroutine(ExecFire(vx,vy,target));
     }
     IEnumerator ExecFire(int time, float vx, float vy, Vector3 target){
-        firedTime++;
-        float waitSecs = (firedTime-1) * 0.2f;
+        if (isOnDander){
+            firedTime++;
+        }
+        float waitSecs = (firedTime-1) * 0.5f;
         while (this.isMoving || isOnDander)
         {
             yield return new WaitForSeconds(0.02f);

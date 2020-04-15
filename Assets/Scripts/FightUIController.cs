@@ -10,7 +10,6 @@ public class FightUIController : UIController
     public GameObject loadingScreen;
     public GameObject fightUI;
     public CurrentPropDisplayer currentPropDisplayer;
-    public NotiPanelController notiPanel;
     public GameObject redFrameObject;
     public DanderEffectScreen danderScreen;
     [Header("FOR DEBUG")]
@@ -34,7 +33,7 @@ public class FightUIController : UIController
         RedPlayerPreview.gameObject.SetActive(true);    
         RedPlayerPreview.LoadFromInfo(inf);
         danderScreen.PrepareLoader(1,inf);
-		Debug.Log("-- -- -- Load Red: " + inf);
+		// Debug.Log("-- -- -- Load Red: " + inf);
     }
     
     public void LoadBluePlayerPreview(PlayerInfo inf){
@@ -43,11 +42,11 @@ public class FightUIController : UIController
         BluePlayerPreview.gameObject.SetActive(true);
         BluePlayerPreview.LoadFromInfo(inf);
         danderScreen.PrepareLoader(2,inf);
-		Debug.Log("-- -- -- LoadBlue: " + inf);
+		// Debug.Log("-- -- -- LoadBlue: " + inf);
     }
     public void PlayDanderScreen(bool isHeadingRight, int team){
-        string t = (team == 2)?("BLUE"):("RED");
-        danderScreen.CallDanderScreen(isHeadingRight,t);
+        // string t = (team == 1)?("RED"):("BLUE");
+        danderScreen.CallDanderScreen(isHeadingRight,team);
     }
 
     // Start is called before the first frame update
@@ -262,9 +261,6 @@ public class FightUIController : UIController
             propId = propDict[propString];
         } catch (KeyNotFoundException e){}
         Debug.Log("propID: "+ propId + " name: " + FightingPropIdToName(propId));
-        gameController.soundManager.PlayEffect("choose");
-        gameController.soundManager.PlayEffect("noti");
-        gameController.soundManager.PlayEffect("move");
         if (propString == "FLY"){
             SetButtonInteractable("Prop_FLY_Button",false);
             gameController.connector.SendUsingFly();

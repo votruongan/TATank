@@ -20,16 +20,13 @@ public class PlayerPreviewLoader : BaseObjectController
 
     public void LoadFromInfo(PlayerInfo pInfo){
         Debug.Log(this.gameObject.name + " processing load request ...");
-        Debug.Log(pInfo.ToString());
+        this.gameObject.SetActive(true);
         if (pInfo == null){
             Debug.Log("PInfo is NULL");
             return;
         }
         _playerInfo = pInfo;
         // Debug.Log("hierarchy: " + this.gameObject.activeInHierarchy + " - self " + this.gameObject.activeSelf );
-        if (!this.gameObject.activeInHierarchy){
-            return;
-        }
         StartCoroutine(ExecLoad(pInfo));
     }
 
@@ -41,6 +38,7 @@ public class PlayerPreviewLoader : BaseObjectController
     }
 
     IEnumerator ExecLoad(PlayerInfo pInfo){
+        Debug.Log( this.gameObject.name + " : " + pInfo.ToString());
         while (hair == null || face == null || cloth == null){
             this.gameObject.SetActive(false);
             yield return new WaitForSeconds(0.02f);
@@ -60,6 +58,7 @@ public class PlayerPreviewLoader : BaseObjectController
         this.FindChildObject("LoadingPreview").gameObject.SetActive(false);
     }
     private void SetDisplayerTexture(RawImage target, string type, bool isMale, int id){
+        target.gameObject.SetActive(false);
         StartCoroutine(LoadImageOnline(target, type, isMale,id));
     }
 
@@ -89,7 +88,7 @@ public class PlayerPreviewLoader : BaseObjectController
         }
         // yield return StartCoroutine(GetImage(pathInResource, downloaded, isDone));
         yield return StartCoroutine(GetImage(pathInResource, (result) => {
-            // Debug.Log("Setting " + pic);
+            Debug.Log("Setting " + pic);
             target.texture = result;
             if (result == null){
                 target.gameObject.SetActive(false);
@@ -213,9 +212,9 @@ public class PlayerPreviewLoader : BaseObjectController
         } catch(Exception e){
 
         }
-        // if (_playerInfo != null){
-        //     StartCoroutine(ExecLoad(_playerInfo));
-        // }
+        if (_playerInfo != null){
+            StartCoroutine(ExecLoad(_playerInfo));
+        }
     }
 
 }

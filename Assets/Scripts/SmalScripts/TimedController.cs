@@ -16,6 +16,8 @@ public class TimedController : MonoBehaviour
     }
     public void CancelDelayedExecution(){
         Debug.Log("CancelExecution Called");
+        if (coroutine == null)
+            return;
         StopCoroutine(coroutine);
     }
     protected virtual void Execute(){

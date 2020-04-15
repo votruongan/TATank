@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {       
     
+    public NotiPanelController notiPanel;
     public GameController gameController;
 	public void ChangeMusicVolume(Slider doer){
         gameController.soundManager.ChangeVolume(doer.value,-1f);

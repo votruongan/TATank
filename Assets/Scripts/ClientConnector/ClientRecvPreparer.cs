@@ -60,6 +60,43 @@ public static class ClientRecvPreparer
         return fireInfos;
     }
 
+    public static void PlayerInfo_LOGIN(ref PlayerInfo localPlayerInfo, ref GSPacketIn pkg){
+        localPlayerInfo.attack = pkg.ReadInt(); //attack
+        localPlayerInfo.defence = pkg.ReadInt();//def
+        localPlayerInfo.agility = pkg.ReadInt();//agil
+        localPlayerInfo.luck = pkg.ReadInt();//luck
+        pkg.ReadInt();//gp
+        pkg.ReadInt();//repute
+        pkg.ReadInt();//gold
+        pkg.ReadInt();//money
+        pkg.ReadInt();//PropBag.GetItemCount
+        pkg.ReadInt();//PlayerCharacter.Hide
+        localPlayerInfo.fightPower = pkg.ReadInt();//PlayerCharacter.FightPower
+        pkg.ReadInt();
+        pkg.ReadInt();
+        pkg.ReadString(); //Master
+        pkg.ReadInt();
+        pkg.ReadString(); //HoNorMaster
+        pkg.ReadDateTime();
+        pkg.ReadBoolean(); //true
+        pkg.ReadInt();
+        pkg.ReadInt();
+        pkg.ReadDateTime();
+
+        pkg.ReadDateTime();
+        pkg.ReadInt();
+        pkg.ReadDateTime();
+        pkg.ReadBoolean(); // false
+        pkg.ReadInt(); //1599
+        pkg.ReadInt(); //1599
+        pkg.ReadString(); //honor
+
+        pkg.ReadInt(); // 0
+        localPlayerInfo.sex = pkg.ReadBoolean(); //sex
+        string tmpStr = pkg.ReadString(); //style & color
+        localPlayerInfo.style = tmpStr.Split('&')[0];
+        pkg.ReadString(); //skin
+    }
 
     public static MatchSummary  GameOver_MatchSummary(ref GSPacketIn pkg, int mainPID){
         MatchSummary ms = new MatchSummary();
@@ -106,7 +143,7 @@ public static class ClientRecvPreparer
         return ms;
     }
 
-    public static List<PlayerInfo> GameCreate_PlayerList(ref GSPacketIn pkg){
+    public static List<PlayerInfo> GameCreate_PlayerList(ref PlayerInfo localPlayerInfo, ref GSPacketIn pkg){
         int num2 = pkg.ReadInt(); // number of players
         List<PlayerInfo> playersList = new List<PlayerInfo>();
         for (int i = 0; i < num2; i++)
@@ -116,6 +153,9 @@ public static class ClientRecvPreparer
             pkg.ReadString();
             playersList[i].id = pkg.ReadInt();
             playersList[i].nickname = pkg.ReadString();
+            if (localPlayerInfo.nickname == playersList[i].nickname){
+                localPlayerInfo.id = playersList[i].id;
+            }
             pkg.ReadBoolean(); // is vip
             pkg.ReadInt();  // vip level
             playersList[i].sex = pkg.ReadBoolean(); // sex

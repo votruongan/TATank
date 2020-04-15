@@ -177,7 +177,9 @@ public class ClientConnector : BaseConnector
 
     public override void Disconnect()
     {
-        Debug.Log(string.Format("hello world"));
+        // Debug.Log(string.Format("ClientDisconnected"));
+        connectorManager.Disconnected();
+        base.Disconnect();
         //base.Disconnect();
         //this.m_state = ePlayerState.Stopped;
         //this.LastError = "Bị kick khỏi game!";
@@ -466,43 +468,12 @@ public class ClientConnector : BaseConnector
                 pkg.ReadInt(); //4
                 this.m_playerId = pkg.Parameter1;
                 localPlayerInfo  = new PlayerInfo();
-                localPlayerInfo.attack = pkg.ReadInt(); //attack
-                localPlayerInfo.defence = pkg.ReadInt();//def
-                localPlayerInfo.agility = pkg.ReadInt();//agil
-                localPlayerInfo.luck = pkg.ReadInt();//luck
-                pkg.ReadInt();//gp
-                pkg.ReadInt();//repute
-                pkg.ReadInt();//gold
-                pkg.ReadInt();//money
-                pkg.ReadInt();//PropBag.GetItemCount
-                pkg.ReadInt();//PlayerCharacter.Hide
-                localPlayerInfo.fightPower = pkg.ReadInt();//PlayerCharacter.FightPower
-                pkg.ReadInt();
-                pkg.ReadInt();
-                pkg.ReadString(); //Master
-                pkg.ReadInt();
-                pkg.ReadString(); //HoNorMaster
-                pkg.ReadDateTime();
-                pkg.ReadBoolean(); //true
-                pkg.ReadInt();
-                pkg.ReadInt();
-                pkg.ReadDateTime();
-
-                pkg.ReadDateTime();
-                pkg.ReadInt();
-                pkg.ReadDateTime();
-                pkg.ReadBoolean(); // false
-                pkg.ReadInt(); //1599
-                pkg.ReadInt(); //1599
-                pkg.ReadString(); //honor
-
-                pkg.ReadInt(); // 0
-                localPlayerInfo.sex = pkg.ReadBoolean(); //sex
-                string tmpStr = pkg.ReadString(); //style & color
-                localPlayerInfo.style = tmpStr.Split('&')[0];
-                pkg.ReadString(); //skin
+                localPlayerInfo.id = this.m_playerId;
+                localPlayerInfo.nickname = this.NickName;
+                ClientRecvPreparer.PlayerInfo_LOGIN(ref localPlayerInfo, ref pkg);
 
                 Debug.Log("login socket success! pid " +  this.m_playerId+" uid: "+this.UserId);
+                // Debug.Log("login info: "+ localPlayerInfo.ToString());
                 // Debug.Log("localPlayerInfo style: " + localPlayerInfo.style);
                 UnityThread.executeInUpdate(() =>
                 {
@@ -731,7 +702,8 @@ public class ClientConnector : BaseConnector
                         pkg.ReadInt(); //Roomtype
                         pkg.ReadInt(); //gametype
                         pkg.ReadInt(); //Timetype
-                        this.playersList = ClientRecvPreparer.GameCreate_PlayerList(ref pkg);
+                        this.playersList = ClientRecvPreparer.GameCreate_PlayerList(ref localPlayerInfo, ref pkg);
+                        this.m_playerId = localPlayerInfo.id;
                         this.m_state = ePlayerState.CreateGame;
                         UnityThread.executeInUpdate(() =>
                         {

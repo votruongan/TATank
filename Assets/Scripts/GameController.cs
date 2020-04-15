@@ -33,6 +33,11 @@ public class GameController : MonoBehaviour
 	private int[] playerIdCache;
     [Header("DEBUG")]
 	bool isOnDander;
+	public static GameController instance;
+
+	public static GameController GetInstance(){
+		return instance;
+	}
 
     public static void LogToScreen(string log){
         debugString += "\n" + log;
@@ -47,6 +52,7 @@ public class GameController : MonoBehaviour
     public void PlayerTurn(int pId, List<BoxInfo> newBoxes, List<PlayerInfo> playerList){
 		PlayerController pCtrl = null;
 		isOnDander = false;
+		ExplosionController.GetInstance().ResetQueue();
     	if (pId == mainPlayerController.info.id){
 			uiController.DisplayYourTurn();
 	    	mainPlayerController.GetTurn(true);
@@ -78,10 +84,14 @@ public class GameController : MonoBehaviour
 	public void BombExplodeAt(int time, int pId,int ePPosX,int ePPosY){
 		Vector3 explodePos = foreController.PixelToWorldPosition(ePPosX,ePPosY,true);
 		int offset = (isOnDander)?(2200):(0);
-		explosionController.DelayedExecute(time+offset,explodePos);
+		// explosionController.DelayedExecute(time+offset,explodePos);
+		ExplosionController.GetInstance().WillExplode(explodePos);
 		digController.DelayedExecute(time+offset,explodePos);
 	}
 
+	public void BombExplodeAt(Vector3 pos){
+		ExplosionController.GetInstance().ExplodeNearest(pos);
+	}
 
 	PlayerController FindPlayerById(int pId){
 		PlayerController pCtrl = null;
@@ -221,12 +231,22 @@ public class GameController : MonoBehaviour
 		Debug.Log("-- -- -- LoadComplete: " + loadCount);
 		if (loadCount > 0){
 			connector.SendLoadComplete();
-			if (mainCamController == null)
-				mainCamController = GameObject.Find("MainCamera").GetComponent<CameraController>();
-			mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
-			minimapCamController.TranslateTo(foreController.transform.position);
+			// Debug.Log(" fore:" + foreController + " mainCam:"+ mainCamController);
+			// Debug.Log(" botl:" + foreController.bottomLeftPosition + " topr:"+ foreController.topRightPosition);
+			StartCoroutine(WaitAndUpdateCamera(foreController.bottomLeftPosition,foreController.topRightPosition));
+			// minimapCamController.TranslateTo(foreController.transform.position);
 		}
 	}
+
+	IEnumerator WaitAndUpdateCamera(Vector3 clampMin, Vector3 clampMax){
+		yield return new WaitForSeconds(0.2f);
+		if (mainCamController == null)
+			mainCamController = GameObject.Find("MainCamera").GetComponent<CameraController>();
+		if (foreController == null)
+			foreController = GameObject.Find("Foreground").GetComponent<ForegroundController>();
+		mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
+	}
+
 	public void LoadMap(int mapId)
 	{
 		uiController.SetLoadingScreen(true);
@@ -454,6 +474,7 @@ public class GameController : MonoBehaviour
 		// if (connector == null){
 		// 	connector = GameObject.Find("ConnectorManager").GetComponent<ConnectorManager>();
 		// }
+		instance = this;
 		GameObject g = GameObject.Find("ConnectorManager");
 		if (g == null){
 			connector.gameObject.SetActive(true);

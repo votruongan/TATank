@@ -356,6 +356,12 @@ public class MainPlayerController : PlayerController
         power = 0f;
     }
 
+    
+    public void UsingFightingProp(string propString){
+        base.UsingFightingProp(propString);
+    }
+    
+
     public void UsingFightingProp(string name, int id){
         // this.UsingFightingProp(name);
         gameController.SendUsingFightingProp(id);

@@ -11,7 +11,7 @@ public class NotiPanelController : MonoBehaviour
     public void ShowText(string txt){
         notiText.text = txt;
         this.gameObject.SetActive(true);
-        Close(2000);
+        // Close(2000);
     }
 
     public void ShowTextAndClose(string txt, int ms = 1000){

@@ -15,7 +15,7 @@ public class DanderEffectScreen : DelayedDisable
     public void PrepareLoader(int team, PlayerInfo inf, bool exec=false){
         this.gameObject.SetActive(true);
         Debug.Log("PrepareLoaderPrepareLoaderPrepareLoaderPrepareLoaderPrepareLoader");
-        Debug.Log(inf);
+        // Debug.Log(inf);
         if (exec){
             if (team == 2)
                 StartCoroutine(ExecPrepareBlue(inf));
@@ -24,13 +24,25 @@ public class DanderEffectScreen : DelayedDisable
             return;
         }
         if (team == 2){
+            ResetBlue();
             blueInfo = inf.Clone();
             // gC.LoadComplete();
         }
         else{
+            ResetRed();
             redInfo = inf.Clone();
             // gC.LoadComplete();
         }
+    }
+
+    void ResetRed(){
+        RedLoader[0].gameObject.SetActive(false);
+        RedLoader[1].gameObject.SetActive(false);
+    }
+
+    void ResetBlue(){
+        BlueLoader[0].gameObject.SetActive(false);
+        BlueLoader[1].gameObject.SetActive(false);
     }
 
     IEnumerator ExecPrepareRed(PlayerInfo inf){
@@ -39,7 +51,6 @@ public class DanderEffectScreen : DelayedDisable
         yield return null;
         RedLoader[1].LoadFromInfo(inf);
         RedLoader[1].gameObject.SetActive(false);
-        GameObject.Find("GameController").SendMessage("LoadComplete");
     }
 
     IEnumerator ExecPrepareBlue(PlayerInfo inf){
@@ -48,24 +59,23 @@ public class DanderEffectScreen : DelayedDisable
         yield return null;
         BlueLoader[1].LoadFromInfo(inf);
         BlueLoader[1].gameObject.SetActive(false);
-        GameObject.Find("GameController").SendMessage("LoadComplete");
     }
 
-    public void CallDanderScreen(bool isHeadingRight, string team){
+    public void CallDanderScreen(bool isHeadingRight, int team){
         int ind = isHeadingRight ? 1 : 0;
+        ResetRed();
+        ResetBlue();
         this.gameObject.SetActive(true);
-        if (isHeadingRight){
-            switch (team)
-            {
-                case "RED": 
-                    RedLoader[ind].gameObject.SetActive(true);
-                    PrepareLoader(1,redInfo,true);
-                    break;
-                default:
-                    BlueLoader[ind].gameObject.SetActive(true);
-                    PrepareLoader(2,blueInfo,true);
-                    break;
-            }
+        switch (team)
+        {
+            case 1:
+                RedLoader[ind].gameObject.SetActive(true);
+                RedLoader[ind].LoadFromInfo(redInfo);
+                break;
+            default:
+                BlueLoader[ind].gameObject.SetActive(true);
+                BlueLoader[ind].LoadFromInfo(blueInfo);
+                break;
         }
     }
 
@@ -99,7 +109,7 @@ public class DanderEffectScreen : DelayedDisable
     }
 
     void ToggleBlackBack(float toAlpha){
-        Debug.Log("ToggleBlackBack "+ toAlpha);
+        // Debug.Log("ToggleBlackBack "+ toAlpha);
         fadingDisplay.CrossFadeAlpha(toAlpha, 1.0f, false);
     }
 }

@@ -91,7 +91,7 @@ public class SoundManager : MonoBehaviour
         // Debug.Log("PlaySound: " + name);
         AudioClip au = Resources.Load<AudioClip>("sound/" + name);
         if (au != null){
-            BasePlaySound(au,isBGM);
+            BasePlaySound(name, au,isBGM);
             return;
         }
         // No built-in sound -> try to fetch the sound in cache
@@ -103,9 +103,9 @@ public class SoundManager : MonoBehaviour
             return;
         }
         // cached sound
-        StartCoroutine(PlayFromCache(filePath,isBGM));
+        StartCoroutine(PlayFromCache(name, filePath,isBGM));
     }
-    private void BasePlaySound(AudioClip ac, bool isBGM=false){
+    private void BasePlaySound(string name, AudioClip ac, bool isBGM=false){
         if (ac == null){
             Debug.Log("BasePlaySound: ac is null ");
             return;
@@ -134,10 +134,10 @@ public class SoundManager : MonoBehaviour
             System.IO.File.WriteAllBytes(savePath, www.downloadHandler.data);
             Debug.Log("DownloadAndPlay: WritetoFile: " + savePath);
             Debug.Log("DownloadAndPlay: Check filePath Existed: " + System.IO.File.Exists(filePath));
-            yield return StartCoroutine( PlayFromCache(filePath,isBGM));
+            yield return StartCoroutine( PlayFromCache(name, filePath,isBGM));
         }
     }
-    IEnumerator PlayFromCache(string filePath, bool isBGM=false){
+    IEnumerator PlayFromCache(string name, string filePath, bool isBGM=false){
         // Debug.Log("PlayFromCache: " + filePath);
         UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(ConfigMgr.FileScheme+filePath, AudioType.OGGVORBIS);
         yield return req.Send();            
@@ -148,7 +148,7 @@ public class SoundManager : MonoBehaviour
         else
         {
             AudioClip ac = DownloadHandlerAudioClip.GetContent(req);
-            BasePlaySound(ac,isBGM);
+            BasePlaySound(name, ac,isBGM);
         }
     }
 }

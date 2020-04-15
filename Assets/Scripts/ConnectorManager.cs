@@ -74,13 +74,14 @@ public class ConnectorManager : MonoBehaviour
             Debug.Log(fire.ToString());
             Debug.Log(fire.DetailString());
             for (int i = 0; i < fire.actionType.Count; i++){
-                switch ((ActionType)fire.actionType[i]){
+                ActionType at = (ActionType)fire.actionType[i];
+                switch (at){
                     case ActionType.PICK:
                     //ActionType.PICK, phy.Id, 0, 0, 0));
                         break;
                     case ActionType.BOMB:
                     gameController.BombExplodeAt(fire.timeInt[i], pId,fire.actionParam1[i],fire.actionParam2[i]);
-                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);     
+                    // gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);     
                     //ActionType.BOMB, m_x, m_y, digMap ? 1 : 0, 0));
                         break;
                     case ActionType.KILL_PLAYER:
@@ -91,18 +92,18 @@ public class ConnectorManager : MonoBehaviour
                         break;
                     case ActionType.DANDER:
                     //ActionType.DANDER, p.Id, ((Player)p).Dander, 0, 0));
+                    // gameController.PlayerDander(pId,fire.actionParam1[i]);
                         break; 
                     case ActionType.FLY_OUT:
                     // bullet out of map
                     //ActionType.FLY_OUT, 0, 0, 0, 0));
-                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]); 
+                    // gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]); 
                     break;  
                     case ActionType.START_MOVE:
-                    //gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy); 
+                    // gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]); 
                     //ActionType.START_MOVE, m_owner.Id, m_owner.X, m_owner.Y, m_owner.IsLiving ? 1 : 0));\
                     break;
                     case ActionType.TRANSLATE:
-                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);  
                     gameController.PlayerFly(fire.timeInt[i],pId,fire.actionParam1[i],fire.actionParam2[i]); 
                     //ActionType.TRANSLATE, m_x, m_y, 0, 0));
                         break;
@@ -116,6 +117,9 @@ public class ConnectorManager : MonoBehaviour
                     case ActionType.UNANGLE:
                     //ActionType.UNANGLE, p.Id, 0, 0, 0));
                         break;
+                }
+                if (at == ActionType.BOMB || at == ActionType.TRANSLATE || at == ActionType.FLY_OUT){
+                    gameController.PlayerFire(pId,fire.timeInt[i],fire.vx,fire.vy,fire.actionParam1[i],fire.actionParam2[i]);  
                 }
             }
         }
@@ -215,9 +219,9 @@ public class ConnectorManager : MonoBehaviour
         gameController.StartGame(Players);
     }
     public void GameCreateHandler(List<PlayerInfo> pList){
-        foreach(PlayerInfo pI in pList){
-            Debug.Log(pI.ToString());
-        }
+        // foreach(PlayerInfo pI in pList){
+        //     Debug.Log(pI.ToString());
+        // }
         gameController.GameCreate(pList);
     }
     public void GameOverHandler(MatchSummary ms){
@@ -397,6 +401,10 @@ public class ConnectorManager : MonoBehaviour
         // Debug.Log("Check at ConnectorManager");
         localPlayerInfo = connector.GetLocalPlayerInfo();
         gameController.uiController.UpdateMainPlayerPreview(localPlayerInfo);
+    }
+
+    public void Disconnected(){
+        gameController.uiController.notiPanel.ShowText("Mất kết nối");
     }
 
     public void UpdateStatsDisplay(){

@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
     [Header("SETTINGS")]
     public bool isStatic;
     public float speed = 0.1f;
-    public Vector3 cameraOffset;
+    public Vector3 clampOffset;
     [Header("FOR DEBUGGING")]
     public bool isLockTo = false;
     public GameObject lockToObject;
@@ -28,7 +28,7 @@ public class CameraController : MonoBehaviour
         // clampMax = center + halfDimension - cameraOffset;
         // clampMax -= new Vector3 (4.5f,2.5f,0f);
         Debug.Log("Updating Clamp: min: " + bottomLeftPos + " - max: " + topRightPos);
-        Vector3 offset = new Vector3 (7.3f,4.1f,0f);
+        Vector3 offset = clampOffset;
         clampMax = topRightPos - offset;
         clampMin = bottomLeftPos + offset;
         if (clampMax.x < clampMin.x){
@@ -130,15 +130,15 @@ public class CameraController : MonoBehaviour
             // Debug.Log(" Cam pos : " + transform.position);
             // return;
         }
+        // Check if the mouse was clicked over a UI element
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
         //Windows, MacOS, Linux
 #if UNITY_STANDALONE || UNITY_EDITOR
         // Debug.Log("Unity Standalone");
         if (Input.GetMouseButtonDown(0)) {
-            // Check if the mouse was clicked over a UI element
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
             // Debug.Log("GetMouse");
             isLockTo = false;
             isMove = false;
@@ -162,11 +162,6 @@ public class CameraController : MonoBehaviour
 #else 
         // Debug.Log("Unity Mobile devices");
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved) {
-            // Check if the mouse was clicked over a UI element
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
             isLockTo = false;
             isMove = false;
             Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
