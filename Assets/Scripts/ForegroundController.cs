@@ -175,6 +175,8 @@ public class ForegroundController : MonoBehaviour
 				yield return new WaitForSeconds(0.04f);
 			}
 			ForceUpdate();
+			yield return new WaitForSeconds(0.5f);
+			gameController = GameObject.Find("GameController").GetComponent<GameController>();
 			gameController.LoadComplete();
 		}
     }

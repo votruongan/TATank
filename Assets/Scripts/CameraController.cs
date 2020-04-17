@@ -39,10 +39,10 @@ public class CameraController : MonoBehaviour
         }
     }
     // Move to target pos in about 20 frame
-    public void TranslateTo(Vector3 pos){
+    public void TranslateTo(Vector3 pos, float inFrame=20f){
         moveSpeed = pos - this.transform.position;
-        moveSpeed.x = moveSpeed.x/20f;
-        moveSpeed.y = moveSpeed.y/20f;
+        moveSpeed.x = moveSpeed.x/inFrame;
+        moveSpeed.y = moveSpeed.y/inFrame;
         moveSpeed.z = 0f;
         this.TranslateTo(pos,moveSpeed);
     }
@@ -55,7 +55,7 @@ public class CameraController : MonoBehaviour
         // Debug.Log("Translating to " + pos + " at " + mSpeed);
             // StartCoroutine(ExecTranslate());
     }
-
+ 
     // IEnumerator ExecTranslate(){
     //     while (isMove)
     //     {
@@ -84,17 +84,30 @@ public class CameraController : MonoBehaviour
     }
 
     public void Shake(){
+        isStatic = true;
+        if (isShaking)
+            return;
         isShaking = true;
-        StartCoroutine(ExecShake());
+        if (isLockTo){
+            isLockTo = false;
+            StartCoroutine(ExecShake(true));
+        }else{
+            StartCoroutine(ExecShake());
+        }
     }
 
-    IEnumerator ExecShake(){
+    IEnumerator ExecShake(bool finalLock=false,float smoothAmount=0.0f){
         NoClampTranslateTo(-0.1f,0.2f);
-        yield return new WaitForSeconds(0.01f);
+        yield return new WaitForSeconds(0.05f);
         NoClampTranslateTo(0.2f,-0.4f);
-        yield return new WaitForSeconds(0.01f);
-        NoClampTranslateTo(-0.1f,0.2f);
+        yield return new WaitForSeconds(0.05f);
+        NoClampTranslateTo(0.0f,0.4f);
+        yield return new WaitForSeconds(0.05f);
+        NoClampTranslateTo(-0.2f,-0.4f);
+        yield return new WaitForSeconds(0.05f);
+        NoClampTranslateTo(0.2f,0.2f);
         isShaking = false;
+        isStatic = false;
     }
 
     public void LockTo(Transform pos){
@@ -115,7 +128,7 @@ public class CameraController : MonoBehaviour
                 moveSpeed = Vector3.zero;               
                 return;
             }
-            TranslateTo(lockToObject.transform.position);
+            TranslateTo(lockToObject.transform.position,7f);
             // this.transform.position = lockToObject.transform.position;
         }
         // Debug.Log("checking ismove: " + isMove);

@@ -44,9 +44,9 @@ public class FightUIController : UIController
         danderScreen.PrepareLoader(2,inf);
 		// Debug.Log("-- -- -- LoadBlue: " + inf);
     }
-    public void PlayDanderScreen(bool isHeadingRight, int team){
+    public void PlayDanderScreen(bool isHeadingRight, PlayerInfo inf){
         // string t = (team == 1)?("RED"):("BLUE");
-        danderScreen.CallDanderScreen(isHeadingRight,team);
+        danderScreen.CallDanderScreen(isHeadingRight,inf);
     }
 
     // Start is called before the first frame update

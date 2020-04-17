@@ -39,7 +39,7 @@ public class CountUpController : MonoBehaviour
             if (sec < 10)
                 displayText.text += "0";
             displayText.text += sec.ToString();
-
+            SoundManager.GetInstance().PlayEffect("changeAngle");
         }
     }
 

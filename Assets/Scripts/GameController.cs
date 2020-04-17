@@ -127,6 +127,7 @@ public class GameController : MonoBehaviour
 	public void PlayerUpdateBall(int pId, bool special, int ballId){
 		Debug.Log("[GameController] CURRENTBALL - special:" + special);
 		PlayerController pCtrl = FindPlayerById(pId);
+		pCtrl.SetBulletId(ballId);
 		if (special){
 			//perform player using dander
 			isOnDander = true;
@@ -136,8 +137,9 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	public void PlayDanderScreen(bool headingRight, int team){
-		((FightUIController)uiController).PlayDanderScreen(headingRight,team);
+	public void PlayDanderScreen(bool headingRight, PlayerInfo inf){
+		Debug.Log("PLayDanderScreen = [GameController]");
+		((FightUIController)uiController).PlayDanderScreen(headingRight,inf);
 	}
 
 	private int delayCameraCount = 0;
@@ -233,12 +235,13 @@ public class GameController : MonoBehaviour
 			connector.SendLoadComplete();
 			// Debug.Log(" fore:" + foreController + " mainCam:"+ mainCamController);
 			// Debug.Log(" botl:" + foreController.bottomLeftPosition + " topr:"+ foreController.topRightPosition);
-			StartCoroutine(WaitAndUpdateCamera(foreController.bottomLeftPosition,foreController.topRightPosition));
+			// StartCoroutine(WaitAndUpdateCamera());
+			mainCamController.UpdateClamp(foreController.bottomLeftPosition,foreController.topRightPosition);
 			// minimapCamController.TranslateTo(foreController.transform.position);
 		}
 	}
 
-	IEnumerator WaitAndUpdateCamera(Vector3 clampMin, Vector3 clampMax){
+	IEnumerator WaitAndUpdateCamera(){
 		yield return new WaitForSeconds(0.2f);
 		if (mainCamController == null)
 			mainCamController = GameObject.Find("MainCamera").GetComponent<CameraController>();

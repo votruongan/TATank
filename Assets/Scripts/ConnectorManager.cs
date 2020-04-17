@@ -133,7 +133,7 @@ public class ConnectorManager : MonoBehaviour
     }
     //eTankCmdType.CURRENTBALL
     public void CurrentBallHandler(int pId, bool special,int ballId){
-        Debug.Log("[Connector - CURRENTBALL] id:"+ pId + " special:"+ special + " ballId:"+ ballId);
+        Debug.Log("[Connector - CURRENTBALL] pid:"+ pId + " special:"+ special + " ballId:"+ ballId);
         gameController.PlayerUpdateBall(pId, special, ballId);
     }
 

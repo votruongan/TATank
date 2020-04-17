@@ -27,7 +27,8 @@ public class PlayerPreviewLoader : BaseObjectController
         }
         _playerInfo = pInfo;
         // Debug.Log("hierarchy: " + this.gameObject.activeInHierarchy + " - self " + this.gameObject.activeSelf );
-        StartCoroutine(ExecLoad(pInfo));
+        if (this.gameObject.activeSelf)
+            StartCoroutine(ExecLoad(pInfo));
     }
 
     void DisableDisplay(){
@@ -149,43 +150,43 @@ public class PlayerPreviewLoader : BaseObjectController
     // }
 
     // Load from built-in
-    private Texture2D loadImage(string equipType, bool isMale, int equipId){
-        string pathInResource = "Equip";
-        string gender = (isMale)?("/m"):("/f");
-        gender = gender +"/" + equipType;
-        gender = (equipType=="arm")?("/notype"):(gender);
-        // equipId = PlayerInfo.ConvertStyleId(equipType,isMale,equipId);
-        string pic = ConnectorManager.FindItemTemplateInfo(equipId,isMale).Pic;
-        if (equipType == "face"){
-            // if (equipId > 0){
-            //     pathInResource = pathInResource + gender + "/" +equipType + equipId.ToString() + "/icon_1";            
-            // }
-            // else{
-            //     pathInResource = pathInResource + gender + "/default/icon_1";   
-            // }
-            // Debug.Log(pathInResource);
-            pathInResource = pathInResource + gender + "/" +pic+ "/icon_1"; 
-            return Resources.Load<Texture2D>(pathInResource);
-        }
-        if (equipType == "arm"){
-            pathInResource = pathInResource + "/notype/" +pic+ "/1/0/show"; 
-            return Resources.Load<Texture2D>(pathInResource);
-        }
-        // if (equipId > 0){
-        //     pathInResource = pathInResource + gender + "/" +equipType + equipId.ToString() + "/1/";                        
-        // }
-        // else{
-        //     pathInResource = pathInResource + gender + "/default/1/";   
-        // }
-        pathInResource = pathInResource + gender + "/" +pic+ "/1"; 
+    // private Texture2D loadImage(string equipType, bool isMale, int equipId){
+    //     string pathInResource = "Equip";
+    //     string gender = (isMale)?("/m"):("/f");
+    //     gender = gender +"/" + equipType;
+    //     gender = (equipType=="arm")?("/notype"):(gender);
+    //     // equipId = PlayerInfo.ConvertStyleId(equipType,isMale,equipId);
+    //     string pic = ConnectorManager.FindItemTemplateInfo(equipId,isMale).Pic;
+    //     if (equipType == "face"){
+    //         // if (equipId > 0){
+    //         //     pathInResource = pathInResource + gender + "/" +equipType + equipId.ToString() + "/icon_1";            
+    //         // }
+    //         // else{
+    //         //     pathInResource = pathInResource + gender + "/default/icon_1";   
+    //         // }
+    //         // Debug.Log(pathInResource);
+    //         pathInResource = pathInResource + gender + "/" +pic+ "/icon_1"; 
+    //         return Resources.Load<Texture2D>(pathInResource);
+    //     }
+    //     if (equipType == "arm"){
+    //         pathInResource = pathInResource + "/notype/" +pic+ "/1/0/show"; 
+    //         return Resources.Load<Texture2D>(pathInResource);
+    //     }
+    //     // if (equipId > 0){
+    //     //     pathInResource = pathInResource + gender + "/" +equipType + equipId.ToString() + "/1/";                        
+    //     // }
+    //     // else{
+    //     //     pathInResource = pathInResource + gender + "/default/1/";   
+    //     // }
+    //     pathInResource = pathInResource + gender + "/" +pic+ "/1"; 
 
-        if (equipType == "hair"){
-            pathInResource = pathInResource + "/B";
-        }
-        // Debug.Log(pathInResource);
-        Texture2D res = Resources.Load<Texture2D>(pathInResource+"/show");
-        return res;
-    }
+    //     if (equipType == "hair"){
+    //         pathInResource = pathInResource + "/B";
+    //     }
+    //     // Debug.Log(pathInResource);
+    //     Texture2D res = Resources.Load<Texture2D>(pathInResource+"/show");
+    //     return res;
+    // }
 
     // Start is called before the first frame update
     void Start()

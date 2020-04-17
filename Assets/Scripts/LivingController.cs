@@ -138,9 +138,9 @@ public class LivingController : BaseObjectController
     }
 
     public void PlayAnimation(string AnimName){
-        anim.Play(AnimName,0,0f);
+        anim.Play("Player"+AnimName,0,0f);
         if (equipAnimators.Length > 0){
-            PlayEquipAnimation(AnimName);
+            PlayEquipAnimation("Cloth"+AnimName);
         }
     }
 
@@ -151,6 +151,7 @@ public class LivingController : BaseObjectController
     }
 
     public void PlayEquipAnimation(string animName){
+        Debug.Log("Calling Equip Animation : "+animName);
         foreach(Animator anima in equipAnimators){
             anima.Play(animName,0,0f);
         }
@@ -188,6 +189,7 @@ public class LivingController : BaseObjectController
         if (Vector3.Distance(pos,this.transform.position)>=1.5f){
             
         }
+        PlayAnimation("Move");
         // Debug.Log("living is moving to: " + pos.ToString());
         targetPosition = pos;
         isMoving = true;
@@ -290,18 +292,21 @@ public class LivingController : BaseObjectController
     }
 
     protected void SetMovableRigidbody(){
+        rigidBody.simulated = true;
         rigidBody.constraints = RigidbodyConstraints2D.None;
         rigidBody.drag = 0f;
         rigidBody.angularDrag = 0f;
         rigidBody.gravityScale = 2f;
     }
     protected void SetRestRigidbody(){
+        rigidBody.simulated = false;
         rigidBody.constraints = RigidbodyConstraints2D.FreezePositionY;
         rigidBody.drag = 100f;
         rigidBody.angularDrag = 0f;
         rigidBody.gravityScale = 0.2f;
     }
     protected void SetFallRigidbody(){
+        rigidBody.simulated = true;
         rigidBody.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rigidBody.drag = 1f;
         rigidBody.gravityScale = 2f;

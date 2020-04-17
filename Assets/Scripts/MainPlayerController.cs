@@ -454,7 +454,7 @@ public class MainPlayerController : PlayerController
         {
             this.anim.SetBool("isFired",false);
             this.anim.SetBool("isMoving",true);
-            this.PlayEquipAnimation("PlayerMove");
+            this.PlayEquipAnimation("Move");
         }
 
         if (Input.GetKeyUp(KeyCode.LeftArrow)||Input.GetKeyUp(KeyCode.RightArrow))

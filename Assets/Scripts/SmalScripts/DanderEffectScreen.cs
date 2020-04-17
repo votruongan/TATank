@@ -6,8 +6,7 @@ using UnityEngine.UI;
 public class DanderEffectScreen : DelayedDisable
 {
     public RawImage fadingDisplay;
-    PlayerInfo blueInfo;
-    PlayerInfo redInfo;
+    List<PlayerInfo> infos = new List<PlayerInfo>();
     public PlayerPreviewLoader[] RedLoader; //0 is left, 1 is right
     public PlayerPreviewLoader[] BlueLoader;
     // public GameController gC;
@@ -25,12 +24,14 @@ public class DanderEffectScreen : DelayedDisable
         }
         if (team == 2){
             ResetBlue();
-            blueInfo = inf.Clone();
+            // blueInfo = inf.Clone();
+            infos.Add(inf.Clone());
             // gC.LoadComplete();
         }
         else{
             ResetRed();
-            redInfo = inf.Clone();
+            // redInfo = inf.Clone();
+            infos.Add(inf.Clone());
             // gC.LoadComplete();
         }
     }
@@ -62,20 +63,37 @@ public class DanderEffectScreen : DelayedDisable
     }
 
     public void CallDanderScreen(bool isHeadingRight, int team){
+        Debug.Log("PLayDanderScreen = [DanderControoler] = team");
         int ind = isHeadingRight ? 1 : 0;
         ResetRed();
-        ResetBlue();
         this.gameObject.SetActive(true);
         switch (team)
         {
             case 1:
                 RedLoader[ind].gameObject.SetActive(true);
-                RedLoader[ind].LoadFromInfo(redInfo);
+                // RedLoader[ind].LoadFromInfo(redInfo);
                 break;
             default:
                 BlueLoader[ind].gameObject.SetActive(true);
-                BlueLoader[ind].LoadFromInfo(blueInfo);
+                // BlueLoader[ind].LoadFromInfo(blueInfo);
                 break;
+        }
+    }
+
+    public void CallDanderScreen(bool isHeadingRight, PlayerInfo inf){
+        Debug.Log("PLayDanderScreen = [DanderControoler] = info");
+        // foreach (PlayerInfo p in cache)
+        // {
+            
+        // }
+        ResetBlue();
+        int ind = isHeadingRight ? 1 : 0;
+        this.gameObject.SetActive(true);
+        foreach(PlayerInfo p in infos){
+            if (p.id != inf.id)
+                continue;
+            BlueLoader[ind].gameObject.SetActive(true);
+            BlueLoader[ind].LoadFromInfo(p);
         }
     }
 

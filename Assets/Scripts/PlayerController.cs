@@ -11,6 +11,7 @@ public class PlayerController : LivingController
     public byte speedTime;
     int firedTime;
     Sprite bulletSprite;
+    int bulletId;
     Sprite defaultBulletSprtite;
     [Header("FOR ASSIGNMENT")]
     public GameObject movingBullet;
@@ -123,7 +124,7 @@ public class PlayerController : LivingController
 
     public override void Teleport(float time, Vector3 pos){
         this.PlayEffect("EffectBuff");
-        this.PlayAnimation("PlayerHappy");
+        this.PlayAnimation("Happy");
         StartCoroutine(WaitAndSetIdle(1.5f));
         base.Teleport(time,pos);
     }
@@ -131,7 +132,7 @@ public class PlayerController : LivingController
     public void UsingFightingProp(string propString){
         Debug.Log("Using propstring: " + propString);
         if ((!anim.GetBool("IsMoving")&&!anim.GetBool("IsFiring")&&!anim.GetBool("IsFired"))){
-            this.PlayAnimation("PlayerHappy");
+            this.PlayAnimation("Happy");
             StartCoroutine(WaitAndSetIdle(1.5f));
         }
         this.PlayEffect("EffectBuff");
@@ -149,7 +150,7 @@ public class PlayerController : LivingController
     
     IEnumerator WaitAndSetIdle(float time){
         yield return new WaitForSeconds(time);
-        this.PlayAnimation("PlayerIdle");
+        this.PlayAnimation("Idle");
     }
     public void AddFireTag(byte time){
         speedTime = time;
@@ -157,6 +158,10 @@ public class PlayerController : LivingController
     protected void FixedUpdate() {
         base.FixedUpdate();
     }
+	public void SetBulletId(int bId){
+        Debug.Log("Setting Bullet Id: " + bId);
+        bulletId = bId;
+	}
 	public void SetBullet(string bulletName){
         Debug.Log("Loading Bullet: " + bulletName);
 		Sprite tryLoad = Resources.Load<Sprite>("bullet/" + bulletName);
@@ -170,7 +175,7 @@ public class PlayerController : LivingController
         //staticBullet.SetActive(false);
         // Fire(vx,vy, target);
         if (needSendDanderScreen){
-            gameController.PlayDanderScreen(this.isHeadingRight, this.info.team);
+            gameController.PlayDanderScreen(this.isHeadingRight, this.info);
             StartCoroutine(WaitAndCloseDanderFlag(2.0f));
             needSendDanderScreen = false;
         }
@@ -201,13 +206,13 @@ public class PlayerController : LivingController
         bCtrl.Fire(time, vx, vy);
         bCtrl.SetTarget(target);
         gameController.CameraToBullet(this);
-		this.PlayAnimation("PlayerFired");
+		this.PlayAnimation("Fired");
     }
 
 
     IEnumerator WaitAndDamage(float time, int damage, bool critical, int remainingBlood){
         yield return new WaitForSeconds(time);
-        this.PlayAnimation("PlayerCry");
+        this.PlayAnimation("Cry");
         GameObject damPanel = null;
         DamagePanelController damPanelController = null;
         if (critical){
