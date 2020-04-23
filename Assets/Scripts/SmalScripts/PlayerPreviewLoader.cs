@@ -89,7 +89,7 @@ public class PlayerPreviewLoader : BaseObjectController
         }
         // yield return StartCoroutine(GetImage(pathInResource, downloaded, isDone));
         yield return StartCoroutine(GetImage(pathInResource, (result) => {
-            Debug.Log("Setting " + pic);
+            // Debug.Log("Setting " + pic);
             target.texture = result;
             if (result == null){
                 target.gameObject.SetActive(false);

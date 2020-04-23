@@ -35,6 +35,15 @@ public class EquipController : MonoBehaviour
         if (equipType == "hair"){
             pathInResource = pathInResource + "B/";
         }
+        if (equipType == "notype"){
+            string armName = "axe";
+            if (equipId > 100){
+                armName = ConnectorManager.FindItemTemplateInfo(equipId,isMale).Pic;
+            }
+            // Debug.Log("changing arm: " + equipId.ToString());
+            pathInResource ="Equip/" + equipType + "/" + armName + "/1/1/";
+        }
+
         clothPath = pathInResource + "game";
         Debug.Log("Changing " + equipType + " to " + pathInResource);
         // Debug.Log(pathInResource);
@@ -58,6 +67,9 @@ public class EquipController : MonoBehaviour
         pathInResource = pathInResource + gender + "/" +equipType + "/" + equipName + "/";
         if (equipType == "hair"){
             pathInResource = pathInResource + "B/";
+        }
+        if (equipType == "notype"){
+            pathInResource ="Equip/" + equipType + "/" + equipName + "/1/1/";
         }
         clothPath = pathInResource + "game";
         // Debug.Log(pathInResource);

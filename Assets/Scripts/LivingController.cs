@@ -144,31 +144,12 @@ public class LivingController : BaseObjectController
         }
     }
 
-
-    public void PlayOneTimeEquipAnimation(string animName){
-        PlayEquipAnimation(animName);
-        StartCoroutine(DelayedStopEquipAnimation(1.5f));
-    }
-
     public void PlayEquipAnimation(string animName){
         Debug.Log("Calling Equip Animation : "+animName);
         foreach(Animator anima in equipAnimators){
             anima.Play(animName,0,0f);
         }
     }
-
-    IEnumerator DelayedStopEquipAnimation(float time){
-        yield return new WaitForSeconds(time);
-        StopEquipAnimation();
-    }
-
-    public void StopEquipAnimation(){
-        foreach(Animator anima in equipAnimators){
-            anima.Play("PlayerIdle",0,0f);
-        }
-    }
-
-
 
     //Move to position in Unity unit
     public void MoveTo(int milisec, Vector3 pos){
@@ -272,6 +253,7 @@ public class LivingController : BaseObjectController
                     }
                     Debug.Log("MoveTo Finished");
                     // StopEquipAnimation();
+                    PlayAnimation("Idle");
                     sentFinishMove = true;
                     isMoving = false;
                 }

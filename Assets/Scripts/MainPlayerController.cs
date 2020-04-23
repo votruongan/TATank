@@ -263,7 +263,7 @@ public class MainPlayerController : PlayerController
         // anim.SetBool("isFired",false);
         // anim.SetBool("isMoving",true);
         this.SetMovableRigidbody();
-        // this.PlayAnimation("PlayerMove");
+        this.PlayAnimation("Move");
         // this.PlayEquipAnimation("ClothMove");
         isBeginMove = true;
         startTimer = true;
@@ -308,9 +308,8 @@ public class MainPlayerController : PlayerController
     public void FinishMove(){
         Debug.Log("FinishMove");
         isBeginMove = false;
-        this.anim.SetBool("isMoving",false);
-        this.PlayAnimation("PlayerIdle");
-        this.StopEquipAnimation();
+        // this.anim.SetBool("isMoving",false);
+        this.PlayAnimation("Idle");
         startTimer = false;
         timer = 0f;
         // virtualRigidBody.StopMove();

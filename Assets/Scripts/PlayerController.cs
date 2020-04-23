@@ -34,6 +34,7 @@ public class PlayerController : LivingController
     private EquipController ClothSprite;
     private EquipController FaceSprite;
     private EquipController HairSprite;
+    private EquipController ArmSprite;
     
     // Start is called before the first frame update
     protected void Start()
@@ -47,6 +48,7 @@ public class PlayerController : LivingController
         ClothSprite = this.FindChildObject("ClothSprite").GetComponent<EquipController>();
         FaceSprite = this.FindChildObject("FaceSprite").GetComponent<EquipController>();
         HairSprite = this.FindChildObject("HairSprite").GetComponent<EquipController>();
+        ArmSprite = this.FindChildObject("ArmSprite").GetComponent<EquipController>();
 
         if (staticBullet == null)
             staticBullet = this.FindChildObject("StaticBullet");
@@ -58,26 +60,34 @@ public class PlayerController : LivingController
             }
     }
 
-    public void ChangeAppearance(string cloth, string face, string hair){
-        Debug.Log("Changing Appearance: "+ cloth + " - " + face + " - " + hair);
-        if (!string.IsNullOrEmpty(cloth))
-            StartCoroutine(ExecChangeCloth(cloth,0));
-        if (!string.IsNullOrEmpty(face))
-            StartCoroutine(ExecChangeFace(face,0));
-        if (!string.IsNullOrEmpty(hair))
-            StartCoroutine(ExecChangeHair(hair,0));
-    }
+    // public void ChangeAppearance(string cloth, string face, string hair){
+    //     Debug.Log("Changing Appearance: "+ cloth + " - " + face + " - " + hair);
+    //     if (!string.IsNullOrEmpty(cloth))
+    //         StartCoroutine(ExecChangeCloth(cloth,0));
+    //     if (!string.IsNullOrEmpty(face))
+    //         StartCoroutine(ExecChangeFace(face,0));
+    //     if (!string.IsNullOrEmpty(hair))
+    //         StartCoroutine(ExecChangeHair(hair,0));
+    // }
     
-    public void ChangeAppearance(int cloth, int face, int hair){
-        Debug.Log("Changing Appearance: "+ cloth + " - " + face + " - " + hair);
-        if (cloth > -1)
-            StartCoroutine(ExecChangeCloth(null,cloth));
-        if (face > -1)
-            StartCoroutine(ExecChangeFace(null,face));
-        if (hair > -1)
-            StartCoroutine(ExecChangeHair(null,hair));
+    public void ChangeAppearance(List<int> styleID){
+        Debug.Log("Changing Appearance: "+ styleID);
+        StartCoroutine(ExecChangeCloth(null,styleID[(int)eItemType.cloth]));
+        StartCoroutine(ExecChangeFace(null,styleID[(int)eItemType.face]));
+        StartCoroutine(ExecChangeHair(null,styleID[(int)eItemType.hair]));
+        StartCoroutine(ExecChangeArm(null,styleID[(int)eItemType.arm]));
     }
 
+    IEnumerator ExecChangeArm(string name, int equipId){
+        while(ArmSprite == null){
+            yield return new WaitForSeconds(0.01f);
+        }
+        if (string.IsNullOrEmpty(name)){
+            ArmSprite.ChangeSpriteSheet(originalInfo.sex, equipId);
+        }else{
+            ArmSprite.ChangeSpriteSheet(originalInfo.sex, name);
+        }
+    }
     IEnumerator ExecChangeCloth(string name, int equipId){
         while(ClothSprite == null){
             yield return new WaitForSeconds(0.01f);
@@ -139,7 +149,12 @@ public class PlayerController : LivingController
         gameController.soundManager.PlayEffect("choose");
         gameController.soundManager.PlayEffect("noti");
         gameController.soundManager.PlayEffect("move");
-        Texture propTexture = GameObject.Find("Prop_"+propString+"_Button").transform.GetChild(0).gameObject.GetComponent<RawImage>().texture;
+        Texture propTexture = null;
+        try
+        {
+            propTexture = GameObject.Find("Prop_"+propString+"_Button").transform.GetChild(0).gameObject.GetComponent<RawImage>().texture;
+        }
+        catch (System.Exception){  }
         ((FightUIController)gameController.uiController).AppendCurrentProp(propTexture);
         this.DisplayPropIcon(propTexture);
         if (propString == "DANDER"){
@@ -251,7 +266,7 @@ public class PlayerController : LivingController
             this.gameController = gc;
         originalInfo = inf;
         List<int> styleID = originalInfo.GetStyleList();
-        ChangeAppearance(styleID[(int)eItemType.cloth],styleID[(int)eItemType.face],styleID[(int)eItemType.hair]);
+        ChangeAppearance(styleID);
         if (healthBar == null)
             healthBar = this.FindChildObject("HealthInfo").GetComponent<HealthBarSprite>();
         if (healthBar.playerName == null)
