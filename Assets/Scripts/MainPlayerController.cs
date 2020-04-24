@@ -221,24 +221,24 @@ public class MainPlayerController : PlayerController
     	// Left/Right Arrow
     	if (Input.GetKey(KeyCode.RightArrow)|| isRightArrowDown){
             // Debug.Log("R");
-            if (!isBeginMove)
-                BeginMove();
             if (!isHeadingRight){
                 RotateLiving();
                 handRotator.SetIsHeadRight(this.isHeadingRight);
             }
+            if (!isBeginMove)
+                BeginMove();
             //MoveTo(new Vector3(this.transform.position.x + moveSpeed.x,this.transform.position.y,0f));
             execTranslate();
     	}
 
     	if (Input.GetKey(KeyCode.LeftArrow) || isLeftArrowDown){
             // Debug.Log("Left");
-            if (!isBeginMove)
-                BeginMove();
             if (isHeadingRight){
                 RotateLiving();
                 handRotator.SetIsHeadRight(this.isHeadingRight);
             }
+            if (!isBeginMove)
+                BeginMove();
             //MoveTo(new Vector3(this.transform.position.x + moveSpeed.x,this.transform.position.y,0f));
             execTranslate();
     	}
@@ -453,7 +453,7 @@ public class MainPlayerController : PlayerController
         {
             this.anim.SetBool("isFired",false);
             this.anim.SetBool("isMoving",true);
-            this.PlayEquipAnimation("Move");
+            // this.PlayEquipAnimation("Move");
         }
 
         if (Input.GetKeyUp(KeyCode.LeftArrow)||Input.GetKeyUp(KeyCode.RightArrow))

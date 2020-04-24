@@ -245,7 +245,7 @@ public class BagAndInfoController : BaseToolbarController
         tryLoadEquipDisplay(isMale, item);
         return item.itemType;
     }
-    string spitEquipType(string equipName){
+    string splitEquipType(string equipName){
         string equipType = equipName;
         for (int i = equipType.Length - 1; i >= 0; i--){
             if (equipType[i] - 48 >-1 && equipType[i] - 48 < 10){
@@ -265,7 +265,9 @@ public class BagAndInfoController : BaseToolbarController
         else
             sexEquipString += "f/";
         //strip equip type - eliminate all number
-        string equipType = spitEquipType(equipName);
+        if (string.IsNullOrEmpty(equipName)||equipName == "default")
+            return null;
+        string equipType = splitEquipType(equipName);
         //try load in gender-related equips
         // Debug.Log("try: " + sexEquipString+equipType+"/"+equipName+"/icon_1");
         Texture2D te = Resources.Load<Texture2D>(sexEquipString+equipType+"/"+equipName+"/icon_1");

@@ -10,8 +10,11 @@ using ConnectorSpace;
 public class PlayerPreviewLoader : BaseObjectController
 {
     public RawImage cloth;
+    public RawImage eff;
     public RawImage face;    
+    public RawImage glass;
     public RawImage hair;
+    public RawImage head;
     public RawImage arm;
     public Text pName;
     private static bool isWeaponLoaded = false;
@@ -36,6 +39,9 @@ public class PlayerPreviewLoader : BaseObjectController
         cloth.gameObject.SetActive(false);
         hair.gameObject.SetActive(false);
         arm.gameObject.SetActive(false);
+        head.gameObject.SetActive(false);
+        glass.gameObject.SetActive(false);
+        eff.gameObject.SetActive(false);
     }
 
     IEnumerator ExecLoad(PlayerInfo pInfo){
@@ -53,8 +59,11 @@ public class PlayerPreviewLoader : BaseObjectController
         List<int> styleID = pInfo.GetStyleList();
         bool isMale = pInfo.sex;
         SetDisplayerTexture(hair, "hair",isMale,styleID[(int)eItemType.hair]);
+        SetDisplayerTexture(head, "head",isMale,styleID[(int)eItemType.head]);
         SetDisplayerTexture(cloth, "cloth",isMale,styleID[(int)eItemType.cloth]);
+        SetDisplayerTexture(eff, "eff",isMale,styleID[(int)eItemType.eff]);
         SetDisplayerTexture(face, "face",isMale,styleID[(int)eItemType.face]);
+        SetDisplayerTexture(glass, "glass",isMale,styleID[(int)eItemType.glass]);
         SetDisplayerTexture(arm, "arm",isMale,styleID[(int)eItemType.arm]);
         this.FindChildObject("LoadingPreview").gameObject.SetActive(false);
     }
@@ -67,9 +76,16 @@ public class PlayerPreviewLoader : BaseObjectController
         Texture2D downloaded = null;
         bool isDone = false;
         string pathInResource = "/image";
-        string pic = ConnectorManager.FindItemTemplateInfo(equipId,isMale).Pic;
+        string pic = "default";
+        if (equipId > 100)
+            pic = ConnectorManager.FindItemTemplateInfo(equipId,isMale).Pic;
         if (equipType == "arm"){
-            pathInResource = pathInResource + "/arm/" +pic+ "/1/0/show";
+            if (equipId == 0)
+                yield break;
+            if (pic == "default")
+                pathInResource = pathInResource + "/arm/axe/1/0/show";
+            else
+                pathInResource = pathInResource + "/arm/" +pic+ "/1/0/show";
         }
         else{
             pathInResource = pathInResource + "/equip";
@@ -87,6 +103,7 @@ public class PlayerPreviewLoader : BaseObjectController
                 pathInResource = pathInResource + "/show"; 
             }
         }
+        Debug.Log(pathInResource);
         // yield return StartCoroutine(GetImage(pathInResource, downloaded, isDone));
         yield return StartCoroutine(GetImage(pathInResource, (result) => {
             // Debug.Log("Setting " + pic);
@@ -203,6 +220,9 @@ public class PlayerPreviewLoader : BaseObjectController
             hair = this.FindChildObject("Hair").GetComponent<RawImage>();
             cloth = this.FindChildObject("Cloth").GetComponent<RawImage>();
             arm = this.FindChildObject("Arm").GetComponent<RawImage>();
+            eff = this.FindChildObject("Effect").GetComponent<RawImage>();
+            glass = this.FindChildObject("Glass").GetComponent<RawImage>();
+            head = this.FindChildObject("Head").GetComponent<RawImage>();
         }
         if (face.texture == null){
             DisableDisplay();

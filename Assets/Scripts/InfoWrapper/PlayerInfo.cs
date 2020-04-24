@@ -91,6 +91,7 @@ public class PlayerInfo : BaseInfoWrapper
         string[] styles = this.style.Split(',');//2: hair; 4: cloth; 5: face; 6: weapon
         List<int> styleID = new List<int>();
         foreach(string str in styles){
+            // Debug.Log("GetStyleList: " + str);
             if (str == ""){
                 styleID.Add(0);
                 continue;
