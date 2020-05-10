@@ -174,7 +174,7 @@ public class MainPlayerController : PlayerController
             if (!UseEnergy(1)){
                 return;
             }
-            transform.Translate(0.015f,0.002f,0f);
+            transform.Translate(0.02f,0.002f,0f);
             gameController.soundManager.PlayEffectOnce("move");
             // if (Vector2.Distance(virtualRbdPos, this.transform.position) >= 0.5f){
             //     Debug.Log("Go Go Go vrb's position: "+ virtualRbdPos);

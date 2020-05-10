@@ -124,6 +124,10 @@ public class ConnectorManager : MonoBehaviour
             }
         }
     }
+    //eTankCmdType.CURRENTBALL
+    public void PVEMissionPrepare(MissionInfo mi){
+        Debug.Log("[Connector - PVEMissionPrepare] " + mi.ToString());
+    }
     //eTankCmdType.FIRE_TAG
     public void FireTagHandler(int pId, bool tag, byte spdTime){
         Debug.Log("tag: "+tag.ToString() + " spdTime: "+spdTime.ToString());  
@@ -238,8 +242,8 @@ public class ConnectorManager : MonoBehaviour
         this.connector.SendLoadingComplete();
     }
     
-    public void StartMatch(){
-        this.connector.StartMatch();
+    public void StartMatch(eRoomType gameType, int timeType){
+        this.connector.StartMatch(gameType, timeType);
     }
     public void StopMatch(){
         this.connector.ExitRoom();

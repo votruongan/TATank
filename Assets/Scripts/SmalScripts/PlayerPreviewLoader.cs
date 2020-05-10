@@ -103,7 +103,7 @@ public class PlayerPreviewLoader : BaseObjectController
                 pathInResource = pathInResource + "/show"; 
             }
         }
-        Debug.Log(pathInResource);
+        // Debug.Log(pathInResource);
         // yield return StartCoroutine(GetImage(pathInResource, downloaded, isDone));
         yield return StartCoroutine(GetImage(pathInResource, (result) => {
             // Debug.Log("Setting " + pic);

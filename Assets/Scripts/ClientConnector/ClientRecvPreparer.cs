@@ -17,6 +17,39 @@ using ConnectorSpace;
 
 public static class ClientRecvPreparer
 {
+
+// BEGIN --  PVE 
+    public static MissionInfo GetPVEMissionInfo(ref GSPacketIn pkg){
+        MissionInfo m = new MissionInfo();
+        m.Name = pkg.ReadString();
+        m.Success = pkg.ReadString();
+        m.Failure = pkg.ReadString();
+        m.Description = pkg.ReadString();
+        m.Title = pkg.ReadString();
+        m.TotalMissionCount = pkg.ReadInt();
+        m.SessionId = pkg.ReadInt();
+        m.TotalTurn = pkg.ReadInt();
+        m.TotalCount = pkg.ReadInt();
+        m.Param1 = pkg.ReadInt();
+        m.Param2 = pkg.ReadInt();
+        return m;
+    }
+    public static LivingInfo AddLivingInfo(ref GSPacketIn pkg){
+        LivingInfo living = new LivingInfo();
+        living.Type = (eLivingType) pkg.ReadByte(); //Type;
+        living.Id = pkg.ReadInt();
+        living.Name = pkg.ReadString();
+        living.ModelId = pkg.ReadString();
+        pkg.ReadString();
+        living.X = pkg.ReadInt();
+        living.Y = pkg.ReadInt();
+        living.Blood = pkg.ReadInt();
+        living.MaxBlood =  pkg.ReadInt();
+        living.Team = pkg.ReadInt();
+        living.Direction = pkg.ReadByte();
+        return living;
+    }
+// END -- PVE
     public static List<FireInfo> MakeFireInfo(ref GSPacketIn pkg){
         int bombCount = pkg.ReadInt();
         float lifeTime = 0;

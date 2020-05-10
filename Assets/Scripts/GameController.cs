@@ -385,8 +385,8 @@ public class GameController : MonoBehaviour
 			return;
 		StartCoroutine(TimedEndGame(2f));
 	}
-	public void StartMatch(){
-		connector.StartMatch();
+	public void StartMatch(int gameType,int timeType){
+		connector.StartMatch((eRoomType) gameType, timeType);
 	}
 	public void StopMatch(){
 		connector.StopMatch();

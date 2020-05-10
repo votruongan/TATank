@@ -162,16 +162,23 @@ public class ClientConnector : BaseConnector
         
     }
     
+    void CreateSoloRoom(){
+        Debug.Log("CreateSoloRoom");
+        CreateRoom((byte)ConfigMgr.RoomType, (byte)ConfigMgr.TimeType);
+    }
+    void CreateExploreRoom(){
+        Debug.Log("CreateExploreRoom");
+        CreateRoom((byte)4, (byte)2);
+    }
 
-
-    public void CreateRoom()
+    public void CreateRoom(byte roomType, byte timeType = 2)
     {
         this.m_lastRecv = 0;
         GSPacketIn pkg = new GSPacketIn((byte)ePackageType.GAME_ROOM_CREATE);
-        pkg.WriteByte((byte)ConfigMgr.RoomType);
-        pkg.WriteByte((byte)ConfigMgr.TimeType);
+        pkg.WriteByte(roomType);
+        pkg.WriteByte(timeType);
         pkg.WriteString("Kien dep trai!");
-        //pkg.WriteString("123456");
+        pkg.WriteString("");
         this.SendTCP(pkg);
     }
 
@@ -185,10 +192,11 @@ public class ClientConnector : BaseConnector
         //this.LastError = "Bị kick khỏi game!";
     }
 
-    public void EnterWaitingRoom()
+    public void EnterWaitingRoom(int typeScene)
     {
         this.m_state = ePlayerState.WaitingRoom;
         GSPacketIn pkg = new GSPacketIn((byte)ePackageType.SCENE_LOGIN);
+        pkg.WriteInt(typeScene);
         this.SendTCP(pkg);
     }
 
@@ -477,7 +485,7 @@ public class ClientConnector : BaseConnector
                 // Debug.Log("localPlayerInfo style: " + localPlayerInfo.style);
                 UnityThread.executeInUpdate(() =>
                 {
-                    //Call StartGameHandler in ConnectorManager
+                    //Call UpdateLocalPlayerPreview in ConnectorManager
                     connectorManager.UpdateLocalPlayerPreview();
                 });
                 break;
@@ -516,6 +524,28 @@ public class ClientConnector : BaseConnector
                     //Call StartGameHandler in ConnectorManager
                     connectorManager.GridGoodsHandler(bagType, bagBag);
                 });
+                break;
+            }
+            case (byte)ePackageType.GAME_ROOM_CREATE:{
+                RoomInfo ri = new RoomInfo();
+                ri.id = pkg.ReadInt();
+                ri.roomType = (eRoomType) pkg.ReadByte();
+                ri.hardLevel = (eHardLevel) pkg.ReadByte();
+                ri.timeMode = pkg.ReadByte();
+                ri.playerCount = pkg.ReadByte();
+                ri.placescount = pkg.ReadByte();
+                ri.isPasswd = pkg.ReadBoolean();
+                ri.mapid = pkg.ReadInt();
+                ri.isplaying = pkg.ReadBoolean();
+                ri.roomname = pkg.ReadString();
+                ri.gametype = (eGameType) pkg.ReadByte();
+                ri.levelLimits = pkg.ReadInt();
+                pkg.ReadBoolean();//pkg.WriteBoolean(false);
+                Debug.Log(ri.ToString());
+                this.m_state = ePlayerState.Room;
+                this.m_isHost = true;
+                this.m_roomCount++;
+                this.Act(new PlayerExecutable(this.StartGame));
                 break;
             }
             case (byte)ePlayerPackageType.ITEM_EQUIP:{
@@ -642,7 +672,7 @@ public class ClientConnector : BaseConnector
                         // this.Act(new PlayerExecutable(this.EnterWaitingRoom));
                         // this.Act(new PlayerExecutable(this.CreateRoom));
                         // this.Act(new PlayerExecutable(this.StartGame));
-                        MatchSummary ms = ClientRecvPreparer.GameOver_MatchSummary(ref pkg, m_playerId);
+                        MatchSummary ms = ClientRecvPreparer.GameOver_MatchSummary(ref pkg, this.m_playerId);
                         UnityThread.executeInUpdate(() =>
                         {
                             //Call StartGameHandler in ConnectorManager
@@ -673,8 +703,10 @@ public class ClientConnector : BaseConnector
                                 //check if player is this user
                                 //Debug.Log("thisPid: "+ this.m_playerId.ToString() + " - Pid: " + Players[i].id.ToString());
                                 // if (playersList[j].id == this.m_playerId){
-                                if (playersList[j].nickname == this.m_account){
-                                    playersList[j].isMainPlayer = true; 
+                                if (playersList[j].nickname == this.m_account 
+                                    || playersList[j].nickname == this.NickName){
+                                    playersList[j].isMainPlayer = true;
+                                    this.m_playerId = playersList[j].id;
                                     this.m_posX = playersList[j].x;
                                     this.m_posY = playersList[j].y;
                                 }
@@ -702,6 +734,7 @@ public class ClientConnector : BaseConnector
                         pkg.ReadInt(); //Roomtype
                         pkg.ReadInt(); //gametype
                         pkg.ReadInt(); //Timetype
+                        localPlayerInfo.nickname = this.m_account;
                         this.playersList = ClientRecvPreparer.GameCreate_PlayerList(ref localPlayerInfo, ref pkg);
                         this.m_playerId = localPlayerInfo.id;
                         this.m_state = ePlayerState.CreateGame;
@@ -725,6 +758,32 @@ public class ClientConnector : BaseConnector
                         
                         this.m_state = ePlayerState.Loading;
                         // this.Act(new PlayerExecutable(this.SendLoadingComplete));
+                        return;
+                    case eTankCmdType.GAME_MISSION_INFO:
+                        MissionInfo mi = ClientRecvPreparer.GetPVEMissionInfo(ref pkg);
+                        UnityThread.executeInUpdate(() =>
+                        {
+                            connectorManager.PVEMissionPrepare(mi);
+                        });
+                        return;
+                    case eTankCmdType.GAME_UI_DATA:
+                        // update turn index and kill count;
+                        int TurnIndex = pkg.ReadInt();
+                        int count = pkg.ReadInt();
+                        int param3 = pkg.ReadInt(), param4 = pkg.ReadInt();
+                        UnityThread.executeInUpdate(() =>
+                        {
+                            Debug.Log(string.Format("GAME_UI_DATA : TurnIndex:{0} - count:{1} - param3,4:{2},{3}",
+                                                                    TurnIndex,count,param3,param4));
+                        });
+                        return;
+                    case eTankCmdType.ADD_LIVING:
+                        // update turn index and kill count;
+                        LivingInfo li = ClientRecvPreparer.AddLivingInfo(ref pkg);
+                        UnityThread.executeInUpdate(() =>
+                        {
+                            Debug.Log("ADD_LIVING : " + li.ToString());
+                        });
                         return;
                     case eTankCmdType.TURN:
                         Debug.Log("pId turn: "+ pkg.Parameter1.ToString());
@@ -853,18 +912,18 @@ public class ClientConnector : BaseConnector
                 }
                 break;  
             }
-            case 0x5e:{
-            //GAME_CREATE_ROOM
-                Debug.Log("GET GAME_CREATE_ROOM PACKAGE");
-                if (pkg.ReadInt() != 0)//if (m_isHost == false)
-                {
-                    this.m_state = ePlayerState.Room;
-                    this.m_isHost = true;
-                    this.m_roomCount++;
-                    this.Act(new PlayerExecutable(this.StartGame));
-                }
-                    break;
-            }
+            // case 0x5e:{
+            // //GAME_CREATE_ROOM
+            //     Debug.Log("GET GAME_CREATE_ROOM PACKAGE");
+            //     if (pkg.ReadInt() != 0)//if (m_isHost == false)
+            //     {
+            //         this.m_state = ePlayerState.Room;
+            //         this.m_isHost = true;
+            //         this.m_roomCount++;
+            //         this.Act(new PlayerExecutable(this.StartGame));
+            //     }
+            //         break;
+            // }
             case 5:
             {
             //SYS_DATE
@@ -917,10 +976,20 @@ public class ClientConnector : BaseConnector
     void ExecStartMatch(){
         this.Act(new PlayerExecutable(this.StartGame));
     }
-    public void StartMatch(){
-        this.Act(new PlayerExecutable(this.EnterWaitingRoom));						
+    public void StartMatch(eRoomType gameType, int timeType){
+        // this.Act(new PlayerExecutable(this.EnterWaitingRoom));
         System.Threading.Thread.Sleep(100);
-        this.Act(new PlayerExecutable(this.CreateRoom));
+        switch (gameType){
+            case eRoomType.Match:
+                EnterWaitingRoom(1);
+                this.Act(new PlayerExecutable(this.CreateSoloRoom));
+                break;
+            default: 				
+                Debug.Log("Starting exploration match");						
+                EnterWaitingRoom(2);
+                this.Act(new PlayerExecutable(this.CreateExploreRoom));		
+                break;
+        }
     }
 
     private void SendMessage(string message)
@@ -1123,10 +1192,9 @@ public class ClientConnector : BaseConnector
 
     public void StartGame()
     {
-		
-            GSPacketIn pkg = new GSPacketIn((byte)ePackageType.GAME_START);
-            //pkg.WriteInt(7);
-            this.SendTCP(pkg);
+        GSPacketIn pkg = new GSPacketIn((byte)ePackageType.GAME_START);
+        //pkg.WriteInt(7);
+        this.SendTCP(pkg);
 			
     }
 

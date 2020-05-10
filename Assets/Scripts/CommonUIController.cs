@@ -109,10 +109,17 @@ public class CommonUIController : UIController
     public GameObject matchButton;
     public GameObject readyButton;
     public GameObject cancelButton;
-
+    public int gameType=0;
+    public int timeType=3;
+    public void ChangeGameType(int value){
+        gameType = value;
+    }
+    public void ChangeTimeType(int value){
+        timeType = value;
+    }
     public void OpenMatch(){
         SoundManager.GetInstance().PlayEffect("sound451");
-        gameController.StartMatch();
+        gameController.StartMatch(gameType,timeType);
     }
     public void ConfirmOpenMatch(){
         matchButton.SetActive(false);
@@ -121,7 +128,7 @@ public class CommonUIController : UIController
 
     public override void SoloPVPMatch(){
         countUpUI.SetActive(true);
-        gameController.StartMatch();
+        gameController.StartMatch(0,3);
     }
     
     public override void CancelMatch(){
